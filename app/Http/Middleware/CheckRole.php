@@ -1,0 +1,31 @@
+<?php
+
+namespace App\Http\Middleware;
+
+use Closure;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
+
+class CheckRole
+{
+    /**
+     * Handle an incoming request.
+     *
+     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param  string  $role
+     */
+    public function handle(Request $request, Closure $next, string $role): Response
+    {
+        // 1. Periksa apakah user sudah login (memiliki session 'user_id')
+        if (!session()->has('user_id')) {
+            return redirect()->route('login')->withErrors(['username' => 'Silakan masuk terlebih dahulu untuk mengakses halaman ini.']);
+        }
+
+        // 2. Periksa apakah 'user_type' sesuai dengan role yang dibutuhkan
+        if (session('user_type') !== $role) {
+            abort(403, 'Akses ditolak. Halaman ini khusus untuk pengguna dengan peran: ' . ucfirst($role));
+        }
+
+        return $next($request);
+    }
+}
