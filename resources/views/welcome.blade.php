@@ -1,197 +1,647 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Realive - Bank Sampah Platform</title>
+    <meta name="description" content="Platform Realive: Waste comes in warm — it leaves green. Ubah sampahmu menjadi keuntungan finansial dan Eco Poin.">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Nunito+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+    <style>
+        /* Design System CSS */
+        :root {
+            /* Warm Spectrum */
+            --color-solar: #FFD700;
+            --color-sunburst: #FFA500;
+            --color-ember: #F5511E;
+            --color-flame: #E63946;
 
-        <title>Bank Sampah - Kelola Sampah, Raih Rupiah</title>
+            /* Green Spectrum */
+            --color-lime: #C8E000;
+            --color-sprout: #7DB825;
+            --color-forest: #2D6A2D;
+            --color-canopy: #1A3A1A;
 
-        <!-- Google Fonts -->
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+            /* Neutrals */
+            --color-black: #0A0A0A;
+            --color-white: #FFFFFF;
+            --color-mist: #F4F7F0;
+            --color-fog: #8A9E8A;
+            --color-smoke: #D4DDD4;
 
-        <!-- Tailwind CSS via Vite -->
-        @vite('resources/css/app.css')
-    </head>
-    <body class="bg-[#0b1311] text-[#e2f1ed] font-['Outfit'] min-h-screen relative overflow-x-hidden selection:bg-emerald-500 selection:text-black">
+            /* Gradients */
+            --gradient-brand: linear-gradient(135deg, var(--color-solar) 0%, var(--color-sprout) 50%, var(--color-forest) 100%);
+            --gradient-warm: linear-gradient(90deg, var(--color-solar) 0%, var(--color-ember) 60%, var(--color-flame) 100%);
+            
+            /* Semantic Tokens */
+            --bg-page: var(--color-mist);
+            --bg-surface: var(--color-white);
+            --bg-dark: var(--color-black);
+            --text-primary: var(--color-canopy);
+            --text-secondary: var(--color-forest);
+            --text-muted: var(--color-fog);
+            --text-on-dark: var(--color-white);
+            --text-on-gradient: var(--color-white);
+            --accent-cta: var(--color-solar);
+            --accent-success: var(--color-forest);
+            --accent-alert: var(--color-flame);
+            --border-default: var(--color-smoke);
+            --border-focus: var(--color-sprout);
+
+            /* Typography */
+            --font-display: 'Nunito', sans-serif;
+            --font-body: 'Nunito Sans', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+
+            /* Border Radius */
+            --radius-sm: 8px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --radius-xl: 36px;
+            --radius-full: 9999px;
+
+            /* Shadows */
+            --shadow-sm: 0 1px 4px rgba(26, 58, 26, 0.08);
+            --shadow-md: 0 4px 16px rgba(26, 58, 26, 0.12);
+            --shadow-lg: 0 8px 32px rgba(26, 58, 26, 0.18);
+            --shadow-xl: 0 16px 56px rgba(26, 58, 26, 0.24);
+            --shadow-glow: 0 0 24px rgba(255, 215, 0, 0.35);
+            --shadow-focus: 0 0 0 3px rgba(125, 184, 37, 0.45);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-page);
+            color: var(--text-primary);
+            line-height: 1.55;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: var(--font-display);
+            line-height: 1.15;
+            letter-spacing: -0.01em;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Animations */
+        @keyframes gradientSweep {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pointRise {
+            0% { transform: translateY(12px) scale(0.8); opacity: 0; }
+            60% { transform: translateY(-6px) scale(1.1); opacity: 1; }
+            100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-body);
+            font-weight: 700;
+            min-height: 48px;
+            padding: 0 24px;
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            transition: all 260ms cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-cta);
+            color: var(--color-canopy);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--color-sunburst);
+            transform: scale(1.02);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .btn-secondary {
+            background-color: var(--bg-surface);
+            border: 2px solid var(--color-forest);
+            color: var(--color-forest);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--color-mist);
+            border-color: var(--color-sprout);
+        }
+
+        .btn-gradient {
+            background: var(--gradient-brand);
+            color: var(--color-white);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Navbar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            position: relative;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo img{
+            max-width: 200px;
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .nav-links a:hover {
+            color: var(--color-sprout);
+        }
+
+        /* Hero Section */
+        .hero {
+            background: var(--bg-dark);
+            color: var(--text-on-dark);
+            position: relative;
+            overflow: hidden;
+            border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+            padding: 100px 0 120px 0;
+            text-align: center;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: var(--gradient-brand);
+            background-size: 200% 200%;
+            animation: gradientSweep 6s ease infinite;
+            opacity: 0.2;
+            z-index: 1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero-title {
+            font-size: 4rem; /* text-6xl */
+            font-weight: 900;
+            margin-bottom: 24px;
+            animation: fadeSlideUp 0.6s ease-out forwards;
+        }
         
-        <!-- Background decorative blur elements -->
-        <div class="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-emerald-900/20 blur-[120px] pointer-events-none"></div>
-        <div class="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] rounded-full bg-teal-900/20 blur-[150px] pointer-events-none"></div>
+        .hero-title span {
+            background: var(--gradient-brand);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--color-mist);
+            margin-bottom: 40px;
+            opacity: 0;
+            animation: fadeSlideUp 0.6s ease-out 0.2s forwards;
+            font-weight: 400;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            opacity: 0;
+            animation: fadeSlideUp 0.6s ease-out 0.4s forwards;
+        }
+
+        /* Section Intro */
+        .intro-section {
+            padding: 80px 0;
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .intro-quote {
+            font-family: var(--font-display);
+            font-size: 2.25rem; /* text-4xl */
+            font-weight: 800;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            line-height: 1.3;
+        }
+
+        .intro-text {
+            font-size: 1.125rem;
+            color: var(--text-muted);
+        }
+
+        /* Features Section */
+        .features {
+            padding: 80px 0;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 64px;
+        }
+
+        .section-title {
+            font-size: 2.25rem;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 32px;
+        }
+
+        .feature-card {
+            background: var(--bg-surface);
+            border-radius: 24px 24px 16px 16px; /* Echo logo shape */
+            padding: 40px 32px;
+            box-shadow: var(--shadow-md);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+        }
         
-        <div class="relative z-10 max-w-7xl mx-auto px-6 py-6 min-h-screen flex flex-col justify-between">
-            <!-- Header -->
-            <header class="flex items-center justify-between border-b border-emerald-950/40 pb-6">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center shadow-lg shadow-emerald-500/20">
-                        <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 6H16"></path>
-                        </svg>
-                    </div>
-                    <span class="text-2xl font-bold tracking-tight bg-gradient-to-r from-emerald-400 to-teal-200 bg-clip-text text-transparent">BankSampah</span>
-                </div>
-                
-                <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-emerald-300/80">
-                    <a href="#" class="hover:text-emerald-400 transition-colors duration-200">Tentang Kami</a>
-                    <a href="#" class="hover:text-emerald-400 transition-colors duration-200">Layanan</a>
-                    <a href="#" class="hover:text-emerald-400 transition-colors duration-200">Kalkulator Sampah</a>
-                    <a href="#" class="hover:text-emerald-400 transition-colors duration-200">Mitra</a>
-                </nav>
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: var(--gradient-brand);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
 
-                <div class="flex items-center gap-4">
-                    @if (Route::has('login'))
-                        @auth
-                            <a href="{{ url('/dashboard') }}" class="px-5 py-2.5 rounded-xl border border-emerald-800 hover:border-emerald-500 text-sm font-medium transition-all duration-300">Dashboard</a>
-                        @else
-                            <a href="{{ route('login') }}" class="text-sm font-medium text-emerald-300 hover:text-emerald-400 transition-colors duration-200">Masuk</a>
-                            @if (Route::has('register'))
-                                <a href="{{ route('register') }}" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-black text-sm font-bold shadow-lg shadow-emerald-950/50 hover:shadow-emerald-400/20 transition-all duration-300">Daftar Sekarang</a>
-                            @endif
-                        @endauth
-                    @endif
-                </div>
-            </header>
+        .feature-card:hover::before {
+            opacity: 1;
+        }
 
-            <!-- Hero Section -->
-            <main class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center my-auto py-12">
-                <!-- Text Content -->
-                <div class="lg:col-span-7 space-y-8 text-center lg:text-left">
-                    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-950/60 border border-emerald-800/40 text-xs font-semibold text-emerald-400 uppercase tracking-wider">
-                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                        Selamatkan Bumi, Dapatkan Penghasilan
-                    </div>
-                    
-                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.1] text-white">
-                        Ubah Sampah Jadi <br class="hidden sm:inline">
-                        <span class="bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-200 bg-clip-text text-transparent">Berkah Finansial</span>
-                    </h1>
-                    
-                    <p class="text-base sm:text-lg text-emerald-200/70 max-w-xl mx-auto lg:mx-0 font-light">
-                        Aplikasi Bank Sampah modern membantu Anda mengelola limbah rumah tangga dengan mudah. Setorkan sampah daur ulang Anda, kumpulkan poinnya, dan tukarkan menjadi uang tunai atau saldo dompet digital.
-                    </p>
+        .feature-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: var(--radius-md);
+            background: var(--bg-page);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+            font-size: 32px;
+        }
 
-                    <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
-                        <a href="#" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-black font-bold text-center shadow-lg shadow-emerald-500/20 hover:shadow-emerald-400/40 transform hover:-translate-y-0.5 transition-all duration-300">
-                            Mulai Setor Sampah
-                        </a>
-                        <a href="#" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-emerald-950/40 hover:bg-emerald-950/80 border border-emerald-800/60 text-[#e2f1ed] text-center font-semibold transition-all duration-300">
-                            Pelajari Selengkapnya
-                        </a>
-                    </div>
+        .feature-title {
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
 
-                    <!-- Small Stat Grid -->
-                    <div class="grid grid-cols-3 gap-6 pt-6 border-t border-emerald-950/40 max-w-md mx-auto lg:mx-0">
-                        <div>
-                            <div class="text-2xl sm:text-3xl font-extrabold text-white">1,240+</div>
-                            <div class="text-xs text-emerald-400/70">Ton Terdaur Ulang</div>
-                        </div>
-                        <div>
-                            <div class="text-2xl sm:text-3xl font-extrabold text-white">15,800+</div>
-                            <div class="text-xs text-emerald-400/70">Nasabah Aktif</div>
-                        </div>
-                        <div>
-                            <div class="text-2xl sm:text-3xl font-extrabold text-white">Rp 2.4M+</div>
-                            <div class="text-xs text-emerald-400/70">Poin Ditukarkan</div>
-                        </div>
-                    </div>
-                </div>
+        .feature-desc {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
 
-                <!-- Interactive Features Card / Graphic -->
-                <div class="lg:col-span-5 relative">
-                    <div class="relative bg-gradient-to-br from-emerald-950/40 to-teal-950/40 backdrop-blur-xl border border-emerald-800/20 rounded-3xl p-8 shadow-2xl space-y-6">
-                        <div class="absolute top-0 right-0 p-4">
-                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 block shadow-lg shadow-emerald-400/50"></span>
-                        </div>
-                        
-                        <h3 class="text-lg font-bold text-white flex items-center gap-2">
-                            <span class="flex h-2 w-2 relative">
-                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                            </span>
-                            Simulasi Konversi Poin
-                        </h3>
+        /* Waste Pricing Section */
+        .pricing {
+            background: var(--bg-surface);
+            padding: 100px 0;
+            border-top: 1px solid var(--color-smoke);
+            border-bottom: 1px solid var(--color-smoke);
+        }
 
-                        <!-- Interactive items simulator UI style -->
-                        <div class="space-y-4">
-                            <!-- Item 1 -->
-                            <div class="flex items-center justify-between p-4 rounded-2xl bg-emerald-900/10 border border-emerald-900/30">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 rounded-xl bg-emerald-900/40 flex items-center justify-center text-lg">
-                                        🍾
-                                    </div>
-                                    <div>
-                                        <div class="font-semibold text-white text-sm">Botol Plastik PET</div>
-                                        <div class="text-xs text-emerald-400/70">Poin: 1.500 / Kg</div>
-                                    </div>
-                                </div>
-                                <div class="text-right">
-                                    <div class="text-sm font-bold text-white">5 Kg</div>
-                                    <div class="text-xs text-emerald-400">7.500 Poin</div>
-                                </div>
-                            </div>
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 24px;
+            margin-top: 48px;
+        }
 
-                            <!-- Item 2 -->
-                            <div class="flex items-center justify-between p-4 rounded-2xl bg-emerald-900/10 border border-emerald-900/30">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 rounded-xl bg-emerald-900/40 flex items-center justify-center text-lg">
-                                        📦
-                                    </div>
-                                    <div>
-                                        <div class="font-semibold text-white text-sm">Kardus Bekas</div>
-                                        <div class="text-xs text-emerald-400/70">Poin: 1.200 / Kg</div>
-                                    </div>
-                                </div>
-                                <div class="text-right">
-                                    <div class="text-sm font-bold text-white">12 Kg</div>
-                                    <div class="text-xs text-emerald-400">14.400 Poin</div>
-                                </div>
-                            </div>
+        .price-card {
+            background: var(--bg-page);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+            border-left: 4px solid var(--color-sprout);
+        }
 
-                            <!-- Item 3 -->
-                            <div class="flex items-center justify-between p-4 rounded-2xl bg-emerald-900/10 border border-emerald-900/30">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 rounded-xl bg-emerald-900/40 flex items-center justify-center text-lg">
-                                        🥫
-                                    </div>
-                                    <div>
-                                        <div class="font-semibold text-white text-sm">Kaleng Aluminium</div>
-                                        <div class="text-xs text-emerald-400/70">Poin: 6.000 / Kg</div>
-                                    </div>
-                                </div>
-                                <div class="text-right">
-                                    <div class="text-sm font-bold text-white">2.5 Kg</div>
-                                    <div class="text-xs text-emerald-400">15.000 Poin</div>
-                                </div>
-                            </div>
-                        </div>
+        .price-card.kertas { border-left-color: var(--color-sunburst); }
+        .price-card.kaca { border-left-color: var(--color-lime); }
+        .price-card.logam { border-left-color: var(--color-fog); }
+        .price-card.gelas { border-left-color: var(--color-solar); }
 
-                        <!-- Total Points and Value -->
-                        <div class="pt-6 border-t border-emerald-900/40 flex items-center justify-between">
-                            <div>
-                                <div class="text-xs text-emerald-400/70">Total Estimasi Poin</div>
-                                <div class="text-2xl font-black text-white">36.900 <span class="text-xs text-emerald-400 font-semibold">Poin</span></div>
-                            </div>
-                            <div class="text-right">
-                                <div class="text-xs text-emerald-400/70">Konversi Rupiah</div>
-                                <div class="text-xl font-bold text-emerald-300">Rp 36.900</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </main>
+        .price-category {
+            font-weight: 700;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
 
-            <!-- Footer -->
-            <footer class="border-t border-emerald-950/40 pt-6 flex flex-col md:flex-row items-center justify-between text-xs text-emerald-500/60 gap-4">
-                <div>
-                    &copy; 2026 BankSampah. Hak Cipta Dilindungi Undang-Undang.
-                </div>
-                <div class="flex items-center gap-6">
-                    <a href="#" class="hover:text-emerald-400 transition-colors duration-200">Kebijakan Privasi</a>
-                    <a href="#" class="hover:text-emerald-400 transition-colors duration-200">Syarat & Ketentuan</a>
-                    <a href="#" class="hover:text-emerald-400 transition-colors duration-200">Laravel v{{ Illuminate\Foundation\Application::VERSION }}</a>
-                </div>
-            </footer>
+        .price-value {
+            font-family: var(--font-mono);
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        /* Gamification Preview */
+        .gamification {
+            padding: 100px 0;
+            background: var(--gradient-brand);
+            color: var(--color-white);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gamification h2 {
+            font-size: 2.25rem;
+            margin-bottom: 24px;
+            color: var(--color-white);
+        }
+        
+        .reward-badge {
+            display: inline-block;
+            background: var(--color-solar);
+            color: var(--color-canopy);
+            font-family: var(--font-display);
+            font-weight: 800;
+            padding: 16px 32px;
+            border-radius: var(--radius-full);
+            font-size: 1.25rem;
+            box-shadow: var(--shadow-glow);
+            margin-top: 24px;
+            animation: pointRise 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--bg-dark);
+            color: var(--color-mist);
+            padding: 64px 0 32px 0;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 48px;
+            margin-bottom: 48px;
+        }
+
+        .footer-brand {
+            max-width: 300px;
+        }
+        
+        .footer-logo {
+            margin-bottom: 16px;
+        }
+
+        .footer-desc {
+            color: var(--color-fog);
+            font-size: 0.875rem;
+        }
+
+        .footer-links h4 {
+            color: var(--color-white);
+            margin-bottom: 24px;
+            font-size: 1.125rem;
+        }
+
+        .footer-links ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: var(--color-fog);
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--color-sprout);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 32px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--color-fog);
+            font-size: 0.875rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2.25rem; }
+            .hero { padding: 60px 0 80px 0; }
+            .nav-links { display: none; } /* Simplified for landing page */
+            .intro-quote { font-size: 1.5rem; }
+            .features-grid { grid-template-columns: 1fr; }
+            .footer-content { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <div class="container">
+        <nav class="navbar">
+            <div class="logo">
+                <img src="{{ asset('images/logo Realive@3x.png') }}" alt="logo Realive" style="max-width: 200px; width: 100%; height: auto; object-fit: contain;">
+            </div>
+            <div class="nav-links">
+                <a href="#fitur">Fitur</a>
+                <a href="#harga">Harga Sampah</a>
+                <a href="#eco-poin">Eco Poin</a>
+            </div>
+            <div style="display: flex; gap: 12px;">
+                @if (Route::has('login'))
+                    @auth
+                        <a href="{{ url('/dashboard') }}" class="btn btn-primary">Dashboard</a>
+                    @else
+                        <a href="{{ route('login') }}" class="btn btn-secondary">Masuk</a>
+                        @if (Route::has('register'))
+                            <a href="{{ route('register') }}" class="btn btn-primary">Daftar</a>
+                        @endif
+                    @endauth
+                @endif
+            </div>
+        </nav>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container hero-content">
+            <h1 class="hero-title">Ubah Sampah Jadi <span>Berkah</span> & <span>Hadiah</span></h1>
+            <p class="hero-subtitle">Realive membantu Anda menabung sampah dengan mudah. Tukarkan dengan uang tunai atau kumpulkan Eco Poin untuk hadiah menarik. Mari bersama selamatkan bumi!</p>
+            <div class="hero-actions">
+                @if (Route::has('register'))
+                    <a href="{{ route('register') }}" class="btn btn-primary">Mulai Daur Ulang</a>
+                @endif
+                <a href="#fitur" class="btn btn-secondary" style="border-color: rgba(255,255,255,0.2); color: white; background: transparent;">Pelajari Lebih Lanjut</a>
+            </div>
         </div>
-    </body>
+    </section>
+
+    <!-- Introduction -->
+    <section class="intro-section container">
+        <h2 class="intro-quote">"Waste comes in warm — it leaves green."</h2>
+        <p class="intro-text">Realive bukan sekadar bank sampah biasa. Kami adalah ekosistem yang menghubungkan nasabah dengan mitra pengepul untuk mewujudkan lingkungan yang lebih hijau sambil memberikan manfaat finansial yang nyata.</p>
+    </section>
+
+    <!-- Features -->
+    <section id="fitur" class="features container">
+        <div class="section-header">
+            <h2 class="section-title">Kenapa Memilih Realive?</h2>
+            <p class="intro-text">Berbagai kemudahan dalam satu platform pintar.</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon" style="color: var(--color-sprout);">🛵</div>
+                <h3 class="feature-title">Setor via Pengepul</h3>
+                <p class="feature-desc">Tidak sempat ke bank sampah utama? Mitra Pengepul kami siap mendatangi Anda di lapangan. Sistem otomatis menghitung bagi hasil yang adil.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon" style="color: var(--color-sunburst);">💸</div>
+                <h3 class="feature-title">Tarik Saldo Instan</h3>
+                <p class="feature-desc">Cairkan saldo tabungan Anda mulai dari Rp 100.000 langsung ke rekening Bank (BCA, Mandiri, BRI) atau E-Wallet (GoPay, OVO, Dana).</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon" style="color: var(--color-solar);">🎁</div>
+                <h3 class="feature-title">Eco Poin Rewards</h3>
+                <p class="feature-desc">Setiap 1 kg sampah = 10 Poin. Kumpulkan poin dan tukarkan dengan sembako atau merchandise eksklusif dari katalog hadiah kami.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing -->
+    <section id="harga" class="pricing">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Harga Sampah Terkini</h2>
+                <p class="intro-text">Taksiran harga beli untuk setiap jenis sampah yang disetorkan ke Realive.</p>
+            </div>
+            <div class="pricing-grid">
+                @if(isset($sampahs) && $sampahs->count() > 0)
+                    @foreach($sampahs as $index => $item)
+                        @php
+                            // Mengatur warna border kiri berdasarkan indeks agar bervariasi sesuai desain
+                            $classes = ['', 'kertas', 'logam', 'kaca', 'gelas'];
+                            $class = $classes[$index % count($classes)];
+                        @endphp
+                        <div class="price-card {{ $class }}">
+                            <div class="price-category">{{ $item->sampah_name }}</div>
+                            <div class="price-value">Rp {{ number_format($item->sampah_harga_kg, 0, ',', '.') }} /kg</div>
+                        </div>
+                    @endforeach
+                @else
+                    <div class="price-card">
+                        <div class="price-category">Data Belum Tersedia</div>
+                        <div class="price-value">-</div>
+                    </div>
+                @endif
+            </div>
+        </div>
+    </section>
+
+    <!-- Gamification -->
+    <section id="eco-poin" class="gamification">
+        <div class="container">
+            <h2>Tingkatkan Level Penyelamat Bumi!</h2>
+            <p style="font-size: 1.125rem; max-width: 600px; margin: 0 auto;">Dapatkan lencana eksklusif dari Pemula hingga Bintang. Makin aktif mendaur ulang, makin banyak hadiah yang menanti.</p>
+            <div class="reward-badge">+150 Poin Diperoleh! 🌟</div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="footer-logo">Realive</div>
+                    <p class="footer-desc">Platform Bank Sampah Digital yang menghubungkan Pejuang Ekologis dan Mitra Pengepul untuk bumi yang lebih hijau.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Layanan</h4>
+                    <ul>
+                        <li><a href="#fitur">Setor Sampah</a></li>
+                        <li><a href="#harga">Harga Sampah</a></li>
+                        <li><a href="#eco-poin">Katalog Rewards</a></li>
+                        <li><a href="#">Tarik Saldo</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Perusahaan</h4>
+                    <ul>
+                        <li><a href="#">Tentang Kami</a></li>
+                        <li><a href="#">Hubungi Kami</a></li>
+                        <li><a href="#">Syarat & Ketentuan</a></li>
+                        <li><a href="#">Kebijakan Privasi</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                &copy; 2026 Realive Platform. Hak Cipta Dilindungi.
+            </div>
+        </div>
+    </footer>
+
+</body>
 </html>
