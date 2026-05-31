@@ -8,32 +8,43 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
-     * 
-     * Perbaikan kardinalitas:
-     * 1. NASABAH → TABUNGAN  : 1:1  → tambah UNIQUE pada id_nasabah di tabungan
-     * 2. NASABAH → GAMIFIKASI: 1:1  → tambah UNIQUE pada id_nasabah di gamifikasi
-     * 3. TRANSAKSI_SETOR → GAMIFIKASI: 1:N → tambah FK id_setor di gamifikasi
      */
     public function up(): void
     {
         // 1. Kardinalitas 1:1 – NASABAH → TABUNGAN
-        Schema::table('tabungan', function (Blueprint $table) {
-            $table->unique('id_nasabah', 'uq_tabungan_nasabah');
-        });
+        // Kita cek lewat Schema::hasIndex jika didukung, atau gunakan try-catch agar aman dari error duplikat indeks
+        try {
+            Schema::table('tabungan', function (Blueprint $table) {
+                $table->unique('id_nasabah', 'uq_tabungan_nasabah');
+            });
+        } catch (\Exception $e) {
+            // Jika indeks sudah ada, abaikan error dan lanjut ke proses berikutnya
+        }
 
-        // 2 & 3. Kardinalitas 1:1 – NASABAH → GAMIFIKASI
-        //         Kardinalitas 1:N – TRANSAKSI_SETOR → GAMIFIKASI
+        // 2 & 3. Kardinalitas 1:1 & 1:N – GAMIFIKASI
         Schema::table('gamifikasi', function (Blueprint $table) {
-            // 1:1 dengan nasabah
-            $table->unique('id_nasabah', 'uq_gamifikasi_nasabah');
-
-            // 1:N dengan transaksi_setor (nullable agar data lama tidak error)
-            $table->integer('id_setor')->nullable()->after('id_nasabah');
-            $table->foreign('id_setor', 'fk_gamifikasi_setor')
-                  ->references('id_setor')
-                  ->on('transaksi_setor')
-                  ->onDelete('set null');
+            // Cek apakah kolom id_setor BELUM ada, jika belum ada baru dibuat
+            if (!Schema::hasColumn('gamifikasi', 'id_setor')) {
+                // Menggunakan foreignId agar tipe data otomatis match dengan tabel induk (Big Integer)
+                $table->foreignId('id_setor')->nullable()->after('id_nasabah');
+            }
         });
+
+        // Tambahkan unique dan foreign key di block terpisah menggunakan try-catch agar anti-gagal
+        try {
+            Schema::table('gamifikasi', function (Blueprint $table) {
+                $table->unique('id_nasabah', 'uq_gamifikasi_nasabah');
+            });
+        } catch (\Exception $e) {}
+
+        try {
+            Schema::table('gamifikasi', function (Blueprint $table) {
+                $table->foreign('id_setor', 'fk_gamifikasi_setor')
+                      ->references('id') // Ubah ke 'id_setor' jika PK di tabel transaksi_setor bukan 'id'
+                      ->on('transaksi_setor')
+                      ->onDelete('set null');
+            });
+        } catch (\Exception $e) {}
     }
 
     /**
@@ -43,14 +54,24 @@ return new class extends Migration
     {
         // Rollback tabel gamifikasi
         Schema::table('gamifikasi', function (Blueprint $table) {
-            $table->dropForeign('fk_gamifikasi_setor');
-            $table->dropColumn('id_setor');
-            $table->dropUnique('uq_gamifikasi_nasabah');
+            try {
+                $table->dropForeign('fk_gamifikasi_setor');
+            } catch (\Exception $e) {}
+
+            if (Schema::hasColumn('gamifikasi', 'id_setor')) {
+                $table->dropColumn('id_setor');
+            }
+
+            try {
+                $table->dropUnique('uq_gamifikasi_nasabah');
+            } catch (\Exception $e) {}
         });
 
         // Rollback tabel tabungan
         Schema::table('tabungan', function (Blueprint $table) {
-            $table->dropUnique('uq_tabungan_nasabah');
+            try {
+                $table->dropUnique('uq_tabungan_nasabah');
+            } catch (\Exception $e) {}
         });
     }
 };

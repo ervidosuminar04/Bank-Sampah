@@ -13,12 +13,12 @@ use App\Models\TransaksiSetor;
 use App\Models\TransaksiTarik;
 use App\Models\SetoranPengepul;
 
+use App\Http\Controllers\LandingController;
+
 // ============================================================
-// Redirect home ke login
+// Landing Page
 // ============================================================
-Route::get('/', function () {
-    return redirect()->route('login');
-});
+Route::get('/', [LandingController::class, 'index'])->name('landing');
 
 // ============================================================
 // Authentication routes
