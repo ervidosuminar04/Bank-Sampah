@@ -49,15 +49,18 @@ class AuthController extends Controller
             return redirect()->intended('/dashboard');
         }
 
-        // Then pengepul
+        // Then pengepul (only allow active)
         $pengepul = Pengepul::where('username', $credentials['username'])->first();
         if ($pengepul && Hash::check($credentials['password'], $pengepul->password)) {
+            if (!$pengepul->status_aktif) {
+                return back()->withErrors(['username' => 'Akun pengepul Anda sedang menunggu verifikasi oleh admin. Silakan tunggu hingga akun diaktifkan.'])->withInput();
+            }
             Session::put('user_id', $pengepul->id);
             Session::put('user_type', 'pengepul');
             return redirect()->intended('/pengepul/dashboard');
         }
 
-        return back()->withErrors(['username' => 'Invalid credentials'])->withInput();
+        return back()->withErrors(['username' => 'Username atau password salah.'])->withInput();
     }
 
     // Show registration form for nasabah (admin registration not required)
@@ -118,6 +121,38 @@ class AuthController extends Controller
         Session::put('user_id', $nasabah->id_nasabah);
         Session::put('user_type', 'nasabah');
         return redirect('/dashboard');
+    }
+
+    // Process pengepul registration (public self-registration)
+    public function registerPengepul(Request $request)
+    {
+        $data = $request->validate([
+            'nama'     => 'required|string|max:100',
+            'alamat'   => 'required|string',
+            'telepon'  => 'required|string|max:20',
+            'username' => 'required|string|max:50|unique:pengepul,username',
+            'password' => 'required|string|min:6|confirmed',
+        ]);
+
+        Pengepul::create([
+            'nama'         => $data['nama'],
+            'alamat'       => $data['alamat'],
+            'telepon'      => $data['telepon'],
+            'username'     => $data['username'],
+            'password'     => Hash::make($data['password']),
+            'status_aktif' => false,
+        ]);
+
+        return redirect('/login')->with('success', 'Pendaftaran pengepul berhasil! Akun Anda sedang menunggu verifikasi oleh admin. Silakan login setelah diverifikasi.');
+    }
+
+    // Admin rejects (deletes) a pending pengepul registration
+    public function rejectPengepul($id)
+    {
+        $pengepul = Pengepul::findOrFail($id);
+        $nama = $pengepul->nama;
+        $pengepul->delete();
+        return back()->with('success', 'Pendaftaran pengepul "' . $nama . '" telah ditolak.');
     }
 
     // Logout user
@@ -394,7 +429,6 @@ class AuthController extends Controller
             'password'     => 'required|string|min:6',
             'latitude'     => 'nullable|numeric',
             'longitude'    => 'nullable|numeric',
-            'status_aktif' => 'required|boolean',
         ]);
 
         \App\Models\Pengepul::create([
@@ -405,7 +439,7 @@ class AuthController extends Controller
             'password'     => Hash::make($data['password']),
             'latitude'     => $data['latitude'] ?? null,
             'longitude'    => $data['longitude'] ?? null,
-            'status_aktif' => $data['status_aktif'],
+            'status_aktif' => false,
         ]);
 
         return back()->with('success', 'Akun pengepul "' . $data['nama'] . '" berhasil ditambahkan. Username: ' . $data['username']);
@@ -464,6 +498,14 @@ class AuthController extends Controller
         $pengepul->delete();
         return back()->with('success', 'Akun pengepul "' . $namaPengepul . '" berhasil dihapus.');
     }
+    public function verifikasiPengepul($id)
+    {
+        $pengepul = \App\Models\Pengepul::findOrFail($id);
+        $pengepul->status_aktif = true;
+        $pengepul->save();
+        return back()->with('success', 'Akun pengepul ' . $pengepul->nama . ' telah diverifikasi.');
+    }
+
 
     // ──────────────────────────────────────────────────────────
     // PENCAIRAN SALDO NASABAH

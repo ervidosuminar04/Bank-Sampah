@@ -507,11 +507,15 @@ Based on the brand illustration assets:
 | Asset | File | Usage |
 |-------|------|-------|
 | Logo lengkap | `logo_Realive_3x.png` | Header, splash screen, about page |
+| Logo altenatif | `white logo@4x.png` | Header, splash screen, about page, use for dark or gradient backgrounds |
+| Logo altenatif | `yellow logo@4x.png` | Header, splash screen, about page, use for dark or gradient backgrounds |
+| Logo altenatif | `green logo@4x.png` | Header, splash screen, about page, use for light or gradient backgrounds |
 | Ikon tempat sampah | `Ilustrasi_3x.png` | Empty states, onboarding, feature cards |
 | Palet warna | `color_palette_3x.png` | Design reference |
-| Pattern gelap | `Pattern_1_3x.png` | Hero sections, dark backgrounds |
-| Pattern terang | `Pattern_2_3x.png` | Section dividers, light feature areas |
-
+| Pattern color 1 | `Pattern_1_3x.png` | Hero sections, light backgrounds |
+| Pattern white 1 | `Pattern_2_3x.png` | use for gradient background |
+| Pattern white 2 | `white pattern@4x.png` | use for gradient background|
+| Pattern color 2 | `white pattern@4x.png` | use for gradient background|
 ---
 
 *Last updated: May 2026 · Realive Design System v1.0*

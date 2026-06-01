@@ -3,33 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kelola Eco Rewards – Bank Sampah Digital</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>Eco Rewards – Realive</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Nunito+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400&display=swap');
+
         :root {
-            --primary: #1b5e20;
-            --primary-light: #e8f5e9;
-            --danger: #d32f2f;
-            --danger-light: #ffebee;
-            --info: #1565c0;
-            --info-light: #e3f2fd;
-            --accent: #ffb300;
-            --white: #ffffff;
-            --gray-light: #f5f5f5;
-            --gray-medium: #e0e0e0;
-            --shadow: 0 4px 20px rgba(0,0,0,0.07);
-            --radius: 12px;
-            --transition: all 0.3s ease;
+            /* Warm Spectrum (Energy / CTA) */
+            --color-solar:      #FFD700;
+            --color-sunburst:   #FFA500;
+            --color-ember:      #F5511E;
+            --color-flame:      #E63946;
+
+            /* Green Spectrum (Brand / Growth) */
+            --color-lime:       #C8E000;
+            --color-sprout:     #7DB825;
+            --color-forest:     #2D6A2D;
+            --color-canopy:     #1A3A1A;
+
+            /* Neutrals */
+            --color-black:      #0A0A0A;
+            --color-white:      #FFFFFF;
+            --color-mist:       #F4F7F0;
+            --color-fog:        #8A9E8A;
+            --color-smoke:      #D4DDD4;
+
+            /* Gradients */
+            --gradient-brand: linear-gradient(135deg, #FFD700 0%, #7DB825 50%, #2D6A2D 100%);
+            --gradient-warm: linear-gradient(90deg, #FFD700 0%, #F5511E 60%, #E63946 100%);
+
+            /* Semantic Tokens */
+            --bg-page:          var(--color-mist);
+            --bg-surface:       var(--color-white);
+            --text-primary:     var(--color-canopy);
+            --text-secondary:   var(--color-forest);
+            --text-muted:       var(--color-fog);
+            --accent-cta:       var(--color-solar);
+            --accent-success:   var(--color-forest);
+            --accent-alert:     var(--color-flame);
+            --border-default:   var(--color-smoke);
+            --border-focus:     var(--color-sprout);
+
+            /* Shadows & Radius */
+            --shadow-sm:    0 1px 4px rgba(26, 58, 26, 0.08);
+            --shadow-md:    0 4px 16px rgba(26, 58, 26, 0.12);
+            --shadow-lg:    0 8px 32px rgba(26, 58, 26, 0.18);
+            --shadow-xl:    0 16px 56px rgba(26, 58, 26, 0.24);
+            --shadow-glow:  0 0 24px rgba(255, 215, 0, 0.35);
+            --shadow-focus: 0 0 0 3px rgba(125, 184, 37, 0.45);
+
+            --radius-sm:   8px;
+            --radius-md:   16px;
+            --radius-lg:   24px;
+            --radius-xl:   36px;
+            --radius-full: 9999px;
+            
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
         }
+
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: 'Outfit', sans-serif;
-            background: #f4f6f5;
-            color: #212121;
-            min-height: 100vh;
+        body { font-family: 'Nunito Sans', sans-serif; background: var(--bg-page); color: var(--text-primary); min-height: 100vh; }
+
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            background-image: url('{{ asset('images/Pattern 1@3x.png') }}');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.12;
+            pointer-events: none;
         }
+
         .topbar {
-            background: linear-gradient(135deg, var(--primary), #0c3610);
+            background-color: var(--color-canopy);
             color: #fff;
             padding: 16px 32px;
             display: flex;
@@ -37,145 +85,193 @@
             justify-content: space-between;
             box-shadow: 0 2px 10px rgba(0,0,0,0.15);
         }
-        .topbar h1 { font-size: 20px; font-weight: 800; }
+        .topbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .topbar-brand img {
+            max-height: 36px;
+            object-fit: contain;
+        }
+        .topbar h1 { font-family: 'Nunito', sans-serif; font-size: 20px; font-weight: 800; }
         .topbar a {
             color: #fff;
             text-decoration: none;
-            font-size: 13px;
+            font-size: 13.5px;
+            font-weight: 700;
             background: rgba(255,255,255,0.15);
-            padding: 6px 14px;
-            border-radius: 20px;
+            padding: 8px 18px;
+            border-radius: var(--radius-full);
+            transition: var(--transition);
         }
         .topbar a:hover { background: rgba(255,255,255,0.25); }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 28px 24px;
-        }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
+
         .alert {
-            padding: 14px 18px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            font-weight: 600;
-            font-size: 14px;
-        }
-        .alert-success { background: var(--primary-light); color: var(--primary); border: 1px solid #a5d6a7; }
-        .alert-error { background: var(--danger-light); color: var(--danger); border: 1px solid #ef9a9a; }
-        
-        .main-tabs {
+            padding: 16px 20px;
+            border-radius: var(--radius-md);
+            margin-bottom: 25px;
+            font-size: 14.5px;
+            font-weight: 700;
             display: flex;
-            gap: 10px;
-            margin-bottom: 24px;
-            border-bottom: 2px solid var(--gray-medium);
-            padding-bottom: 8px;
+            align-items: center;
+            gap: 12px;
+            box-shadow: var(--shadow-md);
+            border-left: 5px solid;
         }
+        .alert-success { background-color: var(--color-mist); border-left-color: var(--color-sprout); color: var(--color-forest); }
+        .alert-error { background-color: rgba(230, 57, 70, 0.1); border-left-color: var(--color-flame); color: var(--color-flame); }
+
+        /* Main Tabs Navigation */
+        .main-tabs { display: flex; gap: 12px; margin-bottom: 28px; border-bottom: 2px solid var(--color-smoke); padding-bottom: 12px; }
         .main-tab-btn {
             padding: 12px 24px;
-            border-radius: 8px 8px 0 0;
             border: none;
-            background: none;
-            color: #666;
-            font-weight: 700;
-            font-size: 14.5px;
+            background: transparent;
+            color: var(--color-forest);
+            font-family: 'Nunito', sans-serif;
+            font-weight: 800;
+            font-size: 15px;
             cursor: pointer;
-            position: relative;
             transition: var(--transition);
+            border-radius: var(--radius-sm);
         }
-        .main-tab-btn.active {
-            color: var(--primary);
-        }
-        .main-tab-btn.active::after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: var(--primary);
-            border-radius: 2px;
-        }
+        .main-tab-btn:hover { background-color: var(--color-mist); }
+        .main-tab-btn.active { background-color: var(--color-canopy); color: var(--color-white); }
 
-        .tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
-        .tab-btn {
-            padding: 8px 18px;
-            border-radius: 8px;
-            border: none;
-            background: var(--gray-light);
-            color: #555;
-            font-weight: 700;
-            font-size: 12.5px;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-        .tab-btn.active { background: var(--primary); color: #fff; }
-        .tab-pane { display: none; }
-        .tab-pane.active { display: block; }
         .main-pane { display: none; }
         .main-pane.active { display: block; }
 
-        .card { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; margin-bottom: 25px; }
-        .card-head {
-            padding: 18px 22px;
-            font-size: 15.5px;
+        /* Sub tabs for Status selection */
+        .tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+        .tab-btn {
+            padding: 8px 18px;
+            border-radius: var(--radius-full);
+            border: 2px solid transparent;
+            background: var(--color-white);
+            color: var(--color-forest);
             font-weight: 700;
-            color: var(--primary);
-            border-bottom: 2px solid var(--primary-light);
+            font-size: 13px;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+        .tab-btn:hover { background-color: var(--color-mist); border-color: var(--color-smoke); }
+        .tab-btn.active { background: var(--color-forest); color: #fff; border-color: var(--color-forest); }
+
+        .tab-pane { display: none; }
+        .tab-pane.active { display: block; }
+
+        /* Cards and blocks */
+        .card {
+            background: var(--bg-surface);
+            border-radius: 24px 24px 16px 16px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(45, 106, 45, 0.05);
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+        .card-head {
+            padding: 20px 24px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--color-canopy);
+            border-bottom: 2px solid var(--color-mist);
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
+
+        /* Table */
         .table-wrap { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
-        th { background: var(--gray-light); padding: 12px 14px; font-weight: 600; color: #666; border-bottom: 2px solid var(--gray-medium); text-align: left; }
-        td { padding: 12px 14px; border-bottom: 1px solid var(--gray-light); vertical-align: middle; }
-        tr:hover td { background: #fafafa; }
-        .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 700; }
-        .badge-menunggu { background: #fff8e1; color: #e65100; }
-        .badge-diambil { background: var(--primary-light); color: var(--primary); }
-        .badge-ditolak { background: var(--danger-light); color: var(--danger); }
-        
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        th { background: var(--color-mist); padding: 14px 16px; font-weight: 700; color: var(--color-canopy); border-bottom: 2px solid var(--color-smoke); text-align: left; text-transform: uppercase; font-size: 11.5px; letter-spacing: 0.05em; }
+        td { padding: 14px 16px; border-bottom: 1px solid var(--color-mist); vertical-align: middle; }
+        tr:hover td { background: rgba(244, 247, 240, 0.5); }
+
+        /* Action buttons */
         .btn {
-            padding: 7px 15px;
-            border-radius: 8px;
+            padding: 8px 18px;
+            border-radius: var(--radius-full);
             border: none;
             font-weight: 700;
-            font-size: 12px;
+            font-size: 12.5px;
             cursor: pointer;
             transition: var(--transition);
             display: inline-flex;
             align-items: center;
             gap: 6px;
         }
-        .btn-approve { background: var(--primary); color: #fff; }
-        .btn-approve:hover { background: #0c3610; }
-        .btn-reject { background: var(--danger-light); color: var(--danger); }
-        .btn-reject:hover { background: #ffcdd2; }
-        .btn-edit { background: var(--info-light); color: var(--info); }
-        .btn-edit:hover { background: #bbdefb; }
-        .btn-delete { background: var(--danger-light); color: var(--danger); }
-        .btn-delete:hover { background: #ffcdd2; }
-        .btn-add { background: var(--primary); color: #white; padding: 10px 18px; font-size: 13.5px; border-radius: 8px; color:#fff; }
-        .btn-add:hover { background: #0c3610; }
+        .btn-approve { background: var(--accent-cta); color: var(--color-canopy); }
+        .btn-approve:hover { background: var(--color-sunburst); transform: scale(1.03); box-shadow: var(--shadow-glow); }
+        
+        .btn-reject { background: transparent; border: 2px solid var(--color-flame); color: var(--color-flame); }
+        .btn-reject:hover { background: var(--color-flame); color: var(--color-white); }
 
-        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 1000; justify-content: center; align-items: center; }
+        .btn-add { background: var(--gradient-brand); color: white; border-radius: var(--radius-full); box-shadow: var(--shadow-sm); }
+        .btn-add:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+
+        .btn-edit { background: var(--color-white); border: 2px solid var(--color-forest); color: var(--color-forest); }
+        .btn-edit:hover { background: var(--color-mist); border-color: var(--color-sprout); }
+
+        .btn-delete { background: rgba(230, 57, 70, 0.1); color: var(--color-flame); }
+        .btn-delete:hover { background: var(--color-flame); color: var(--color-white); }
+
+        /* Form elements */
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 700; color: var(--color-canopy); margin-bottom: 6px; }
+        .form-control { width: 100%; padding: 12px 14px; border: 2px solid var(--border-default); border-radius: var(--radius-sm); font-size: 14px; font-family: inherit; outline: none; background: #fff; }
+        .form-control:focus { border-color: var(--border-focus); box-shadow: var(--shadow-focus); }
+        textarea.form-control { height: auto; resize: vertical; }
+
+        /* Modals style */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 10, 10, 0.45);
+            backdrop-filter: blur(6px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.3s ease;
+        }
         .modal-overlay.show { display: flex; }
-        .modal-box { background: #fff; border-radius: 16px; padding: 28px; width: 450px; max-width: 95vw; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
-        .modal-title { font-size: 17px; font-weight: 800; margin-bottom: 8px; }
-        .modal-sub { font-size: 13px; color: #555; margin-bottom: 18px; line-height: 1.5; }
-        .form-group { margin-bottom: 14px; }
-        .form-group label { display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 6px; }
-        .form-control { width: 100%; padding: 10px 14px; border: 1px solid var(--gray-medium); border-radius: 8px; font-size: 13px; font-family: inherit; outline: none; }
-        .form-control:focus { border-color: var(--primary); }
-        .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 18px; }
-        .btn-cancel { background: var(--gray-light); color: #555; }
-        .empty-state { text-align: center; padding: 40px; color: #aaa; }
-        .empty-state .icon { font-size: 40px; margin-bottom: 12px; }
+        .modal-box {
+            background: #fff;
+            border-radius: 24px;
+            padding: 32px;
+            width: 480px;
+            max-width: 95vw;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid rgba(125, 184, 37, 0.15);
+            animation: sheetUp 0.35s var(--ease-spring) forwards;
+        }
+        @keyframes sheetUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-title { font-family: 'Nunito', sans-serif; font-size: 18px; font-weight: 800; margin-bottom: 8px; color: var(--color-canopy); }
+        .modal-sub { font-size: 13.5px; color: var(--color-forest); margin-bottom: 18px; line-height: 1.5; }
+        .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+        .btn-cancel { background: var(--color-mist); color: var(--color-forest); }
+        .btn-cancel:hover { background: var(--color-smoke); }
+
+        .empty-state { text-align: center; padding: 48px; color: var(--color-fog); }
+        .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
     </style>
 </head>
 <body>
 
 <div class="topbar">
-    <h1>🎁 Kelola Penukaran & Katalog Hadiah</h1>
+    <div class="topbar-brand">
+        <img src="{{ asset('images/logo Realive@3x.png') }}" alt="Realive Logo">
+        <h1>Kelola Penukaran &amp; Katalog Hadiah</h1>
+    </div>
     <a href="{{ url('/dashboard') }}">← Kembali ke Dashboard</a>
 </div>
 
@@ -216,20 +312,20 @@
                                 <th>Barang Hadiah</th>
                                 <th>Jumlah</th>
                                 <th>Eco Poin Ditukar</th>
-                                <th>Aksi</th>
+                                <th style="width: 320px;">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse($menunggu as $t)
                             <tr>
                                 <td>
-                                    <b>{{ $t->nasabah->nasabah_nama ?? '-' }}</b><br>
-                                    <span style="font-size:11px;color:#888;">{{ $t->nasabah->nasabah_username ?? '-' }}</span>
+                                    <strong>{{ $t->nasabah->nasabah_nama ?? '-' }}</strong><br>
+                                    <span style="font-size:11px;color:var(--color-fog);">{{ $t->nasabah->nasabah_username ?? '-' }}</span>
                                 </td>
-                                <td>{{ \Carbon\Carbon::parse($t->tanggal_tukar)->format('d/m/Y') }}</td>
-                                <td style="font-weight:700;">{{ $t->hadiah->nama_hadiah ?? 'Hadiah Dihapus' }}</td>
+                                <td style="font-family:'JetBrains Mono',monospace;">{{ \Carbon\Carbon::parse($t->tanggal_tukar)->format('d/m/Y') }}</td>
+                                <td style="font-weight:700;color:var(--color-forest);">{{ $t->hadiah->nama_hadiah ?? 'Hadiah Dihapus' }}</td>
                                 <td>{{ $t->jumlah }} pcs</td>
-                                <td style="font-weight:800;color:#0d47a1;font-size:14px;">{{ $t->total_poin_ditukar }} Poin</td>
+                                <td style="font-family:'JetBrains Mono',monospace;font-weight:800;color:var(--color-forest);font-size:15px;">{{ $t->total_poin_ditukar }} Poin</td>
                                 <td>
                                     <button class="btn btn-approve" onclick="openApprove({{ $t->id_penukaran }}, '{{ $t->nasabah->nasabah_nama ?? '' }}', '{{ $t->hadiah->nama_hadiah ?? '' }}', {{ $t->jumlah }})">✅ Serahkan Barang</button>
                                     <button class="btn btn-reject" onclick="openReject({{ $t->id_penukaran }}, '{{ $t->nasabah->nasabah_nama ?? '' }}')">❌ Tolak</button>
@@ -240,7 +336,7 @@
                                 <td colspan="6">
                                     <div class="empty-state">
                                         <div class="icon">🎉</div>
-                                        <p>Tidak ada permohonan penukaran barang yang menunggu</p>
+                                        <p style="font-weight:700;">Tidak ada permohonan penukaran barang yang menunggu</p>
                                     </div>
                                 </td>
                             </tr>
@@ -270,15 +366,15 @@
                         <tbody>
                             @forelse($diambil as $t)
                             <tr>
-                                <td><b>{{ $t->nasabah->nasabah_nama ?? '-' }}</b></td>
-                                <td>{{ \Carbon\Carbon::parse($t->tanggal_tukar)->format('d/m/Y') }}</td>
-                                <td>{{ $t->hadiah->nama_hadiah ?? 'Hadiah Dihapus' }}</td>
+                                <td><strong>{{ $t->nasabah->nasabah_nama ?? '-' }}</strong></td>
+                                <td style="font-family:'JetBrains Mono',monospace;">{{ \Carbon\Carbon::parse($t->tanggal_tukar)->format('d/m/Y') }}</td>
+                                <td style="font-weight:700;color:var(--color-forest);">{{ $t->hadiah->nama_hadiah ?? 'Hadiah Dihapus' }}</td>
                                 <td>{{ $t->jumlah }} pcs</td>
-                                <td style="font-weight:700;color:var(--primary);">{{ $t->total_poin_ditukar }} Poin</td>
-                                <td><span style="font-size:12px;color:#555;">{{ $t->admin->admin_nama ?? 'Admin' }}</span></td>
+                                <td style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--color-forest);">{{ $t->total_poin_ditukar }} Poin</td>
+                                <td><span style="font-size:12.5px;color:var(--color-canopy);font-weight:700;">{{ $t->admin->admin_nama ?? 'Admin' }}</span></td>
                             </tr>
                             @empty
-                            <tr><td colspan="6"><div class="empty-state"><p>Belum ada penukaran barang yang diambil</p></div></td></tr>
+                            <tr><td colspan="6"><div class="empty-state"><p style="font-weight:700;">Belum ada penukaran barang yang diambil</p></div></td></tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -289,7 +385,7 @@
         <!-- Sub-pane Ditolak -->
         <div class="tab-pane" id="sub-ditolak">
             <div class="card">
-                <div class="card-head">Penukaran Hadiah yang Ditolak (Poin & Stok Dikembalikan)</div>
+                <div class="card-head">Penukaran Hadiah yang Ditolak (Poin &amp; Stok Dikembalikan)</div>
                 <div class="table-wrap">
                     <table>
                         <thead>
@@ -305,15 +401,15 @@
                         <tbody>
                             @forelse($ditolak as $t)
                             <tr>
-                                <td><b>{{ $t->nasabah->nasabah_nama ?? '-' }}</b></td>
-                                <td>{{ \Carbon\Carbon::parse($t->tanggal_tukar)->format('d/m/Y') }}</td>
-                                <td>{{ $t->hadiah->nama_hadiah ?? 'Hadiah Dihapus' }}</td>
+                                <td><strong>{{ $t->nasabah->nasabah_nama ?? '-' }}</strong></td>
+                                <td style="font-family:'JetBrains Mono',monospace;">{{ \Carbon\Carbon::parse($t->tanggal_tukar)->format('d/m/Y') }}</td>
+                                <td style="font-weight:700;color:var(--color-canopy);">{{ $t->hadiah->nama_hadiah ?? 'Hadiah Dihapus' }}</td>
                                 <td>{{ $t->jumlah }} pcs</td>
-                                <td style="font-weight:700;color:var(--danger);">+ {{ $t->total_poin_ditukar }} Poin</td>
-                                <td style="color:var(--danger);font-size:12px;">{{ $t->catatan ?? '-' }}</td>
+                                <td style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--color-flame);">+ {{ $t->total_poin_ditukar }} Poin</td>
+                                <td style="color:var(--color-flame);font-size:13px;font-weight:600;">{{ $t->catatan ?? '-' }}</td>
                             </tr>
                             @empty
-                            <tr><td colspan="6"><div class="empty-state"><p>Tidak ada penukaran barang yang ditolak</p></div></td></tr>
+                            <tr><td colspan="6"><div class="empty-state"><p style="font-weight:700;">Tidak ada penukaran barang yang ditolak</p></div></td></tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -326,7 +422,7 @@
     <div class="main-pane" id="pane-katalog">
         <div class="card">
             <div class="card-head">
-                <span>🛍️ Daftar Katalog Barang Eco Rewards</span>
+                <span>🛍&nbsp; Daftar Katalog Barang Eco Rewards</span>
                 <button class="btn btn-add" onclick="openAddHadiah()">➕ Tambah Hadiah Baru</button>
             </div>
             <div class="table-wrap">
@@ -337,20 +433,20 @@
                             <th>Poin Dibutuhkan</th>
                             <th>Stok Tersedia</th>
                             <th>Keterangan</th>
-                            <th style="width:180px;">Aksi</th>
+                            <th style="width:200px;">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($hadiahs as $h)
                         <tr>
-                            <td><strong style="color:#333;">{{ $h->nama_hadiah }}</strong></td>
-                            <td style="font-weight:700;color:var(--primary);">{{ $h->poin_butuh }} Eco Poin</td>
+                            <td><strong style="color:var(--color-canopy);">{{ $h->nama_hadiah }}</strong></td>
+                            <td style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--color-forest);">{{ $h->poin_butuh }} Eco Poin</td>
                             <td>
-                                <strong style="{{ $h->stok > 0 ? 'color:#2e7d32;' : 'color:var(--danger);' }}">
+                                <strong style="{{ $h->stok > 0 ? 'color:var(--color-forest);' : 'color:var(--color-flame);' }}">
                                     {{ $h->stok }} pcs
                                 </strong>
                             </td>
-                            <td style="font-size:12px;color:#666;line-height:1.4;">{{ $h->keterangan ?? '-' }}</td>
+                            <td style="font-size:13px;color:var(--color-forest);line-height:1.4;">{{ $h->keterangan ?? '-' }}</td>
                             <td>
                                 <button class="btn btn-edit" onclick="openEditHadiah({{ $h->id_hadiah }}, '{{ $h->nama_hadiah }}', {{ $h->poin_butuh }}, {{ $h->stok }}, '{{ $h->keterangan ?? '' }}')">✏️ Edit</button>
                                 <form method="POST" action="/admin/hadiah/delete/{{ $h->id_hadiah }}" style="display:inline;" onsubmit="return confirm('Apakah Anda yakin ingin menghapus barang ini dari katalog?')">
@@ -362,7 +458,7 @@
                         @empty
                         <tr>
                             <td colspan="5">
-                                <div class="empty-state"><p>Belum ada hadiah di katalog. Klik tombol di kanan atas untuk menambah.</p></div>
+                                <div class="empty-state"><p style="font-weight:700;">Belum ada hadiah di katalog. Klik tombol di kanan atas untuk menambah.</p></div>
                             </td>
                         </tr>
                         @endforelse
@@ -399,12 +495,12 @@
         <form method="POST" id="formReject">
             @csrf
             <div class="form-group">
-                <label>Alasan Penolakan <span style="color:red">*</span></label>
+                <label>Alasan Penolakan <span style="color:var(--color-flame)">*</span></label>
                 <input type="text" name="catatan" class="form-control" placeholder="Jelaskan alasan penolakan..." required>
             </div>
             <div class="modal-actions">
                 <button type="button" class="btn btn-cancel" onclick="closeModal('modalReject')">Batal</button>
-                <button type="submit" class="btn btn-reject">❌ Tolak & Refund Poin</button>
+                <button type="submit" class="btn btn-approve" style="background:var(--color-flame); color:white;">❌ Tolak &amp; Refund Poin</button>
             </div>
         </form>
     </div>
@@ -503,6 +599,7 @@ function openApprove(id, nasabah, barang, qty) {
     document.getElementById('modalApprove').classList.add('show');
 }
 
+// Open reject modal
 function openReject(id, nasabah) {
     document.getElementById('formReject').action = `/admin/penukaran-hadiah/${id}/reject`;
     document.getElementById('rejectDesc').innerHTML = `

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Masuk - Realive</title>
+    <title>Daftar Akun - Realive</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Nunito+Sans:wght@400;600;700&display=swap');
 
@@ -78,7 +78,6 @@
         }
 
         body::before {
-
             content: "";
             position: absolute;
            top: 0px;
@@ -94,15 +93,15 @@
 
             filter: blur(1px);
             opacity: 0.5;
-
         }
+
         .card {
             background: var(--bg-surface);
             border-radius: 24px 24px 16px 16px;
             box-shadow: var(--shadow-xl);
             padding: 48px 36px;
             width: 100%;
-            max-width: 420px;
+            max-width: 480px;
             position: relative;
             animation: fadeSlideUp 0.6s var(--ease-spring) forwards;
         }
@@ -114,7 +113,7 @@
 
         .logo {
             text-align: center;
-            margin-bottom: 32px;
+            margin-bottom: 24px;
         }
 
         .logo img{
@@ -133,6 +132,49 @@
             margin-bottom: 24px;
         }
 
+        /* Role Selector Tabs */
+        .role-selector {
+            display: flex;
+            gap: 0;
+            margin-bottom: 28px;
+            border-radius: var(--radius-full);
+            overflow: hidden;
+            border: 2px solid var(--border-default);
+            background: var(--color-mist);
+        }
+
+        .role-tab {
+            flex: 1;
+            padding: 14px 16px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 700;
+            font-family: 'Nunito Sans', sans-serif;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            background: transparent;
+            position: relative;
+        }
+
+        .role-tab.active {
+            background: var(--gradient-brand);
+            color: var(--color-white);
+            box-shadow: var(--shadow-md);
+        }
+
+        .role-tab:not(.active):hover {
+            color: var(--text-primary);
+            background: rgba(125, 184, 37, 0.08);
+        }
+
+        .role-tab .role-icon {
+            display: block;
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
         .alert-error {
             background: rgba(230, 57, 70, 0.1);
             border: 1px solid var(--color-flame);
@@ -145,6 +187,23 @@
         }
 
         .alert-error ul { padding-left: 16px; margin-top: 4px; }
+
+        .section-title {
+            font-family: 'Nunito', sans-serif;
+            font-size: 13px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--color-forest);
+            margin-bottom: 16px;
+            margin-top: 4px;
+        }
+
+        .divider {
+            border: none;
+            border-top: 2px solid var(--color-mist);
+            margin: 20px 0;
+        }
 
         .form-group {
             margin-bottom: 20px;
@@ -160,7 +219,8 @@
 
         input[type="text"],
         input[type="password"],
-        input[type="email"] {
+        input[type="email"],
+        textarea {
             width: 100%;
             height: 48px;
             padding: 0 16px;
@@ -174,12 +234,18 @@
             background: var(--bg-surface);
         }
 
-        input:focus {
+        textarea {
+            height: auto;
+            padding: 12px 16px;
+            resize: vertical;
+        }
+
+        input:focus, textarea:focus {
             border-color: var(--border-focus);
             box-shadow: var(--shadow-focus);
         }
         
-        input::placeholder {
+        input::placeholder, textarea::placeholder {
             color: var(--text-muted);
         }
 
@@ -208,6 +274,23 @@
             box-shadow: var(--shadow-glow);
         }
 
+        .info-box {
+            background: rgba(125, 184, 37, 0.08);
+            border: 1px solid rgba(125, 184, 37, 0.25);
+            border-radius: var(--radius-sm);
+            padding: 14px 16px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: var(--color-forest);
+            font-weight: 600;
+            line-height: 1.5;
+        }
+
+        .info-box .info-icon {
+            font-size: 16px;
+            margin-right: 6px;
+        }
+
         .footer-link {
             text-align: center;
             margin-top: 24px;
@@ -226,6 +309,15 @@
         .footer-link a:hover { 
             color: var(--color-sprout);
         }
+
+        /* Form panel transitions */
+        .form-panel {
+            display: none;
+            animation: fadeSlideUp 0.35s var(--ease-spring);
+        }
+        .form-panel.active {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -233,7 +325,19 @@
         <div class="logo">
             <img src="{{ asset('images/logo Realive@3x.png') }}" alt="logo">
         </div>
-        <h2>Buat Akun Nasabah</h2>
+        <h2>Buat Akun Baru</h2>
+
+        <!-- Role Selector Tabs -->
+        <div class="role-selector">
+            <button type="button" class="role-tab active" onclick="switchRole('nasabah')" id="tab-nasabah">
+                <span class="role-icon">👤</span>
+                Nasabah
+            </button>
+            <button type="button" class="role-tab" onclick="switchRole('pengepul')" id="tab-pengepul">
+                <span class="role-icon">🚛</span>
+                Pengepul
+            </button>
+        </div>
 
         @if ($errors->any())
             <div class="alert-error">
@@ -245,67 +349,142 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ url('/register') }}">
-            @csrf
+        <!-- ============ FORM NASABAH ============ -->
+        <div id="form-nasabah" class="form-panel active">
+            <form method="POST" action="{{ url('/register') }}">
+                @csrf
 
-            <p class="section-title">Data Pribadi</p>
+                <p class="section-title">Data Pribadi</p>
 
-            <div class="form-group">
-                <label for="nasabah_nama">Nama Lengkap</label>
-                <input type="text" name="nasabah_nama" id="nasabah_nama"
-                       value="{{ old('nasabah_nama') }}" required>
+                <div class="form-group">
+                    <label for="nasabah_nama">Nama Lengkap</label>
+                    <input type="text" name="nasabah_nama" id="nasabah_nama"
+                           value="{{ old('nasabah_nama') }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="nasabah_nik">NIK (Nomor Induk Kependudukan)</label>
+                    <input type="text" name="nasabah_nik" id="nasabah_nik"
+                           value="{{ old('nasabah_nik') }}" maxlength="20" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="nasabah_alamat">Alamat</label>
+                    <textarea name="nasabah_alamat" id="nasabah_alamat" rows="3" required>{{ old('nasabah_alamat') }}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="nasabah_telepon">Nomor Telepon</label>
+                    <input type="text" name="nasabah_telepon" id="nasabah_telepon"
+                           value="{{ old('nasabah_telepon') }}" maxlength="20" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="nasabah_email">Email</label>
+                    <input type="email" name="nasabah_email" id="nasabah_email"
+                           value="{{ old('nasabah_email') }}" required>
+                </div>
+
+                <hr class="divider">
+                <p class="section-title">Akun & Keamanan</p>
+
+                <div class="form-group">
+                    <label for="nasabah_username">Username</label>
+                    <input type="text" name="nasabah_username" id="nasabah_username"
+                           value="{{ old('nasabah_username') }}" maxlength="50" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="nasabah_password">Password</label>
+                    <input type="password" name="nasabah_password" id="nasabah_password"
+                           minlength="6" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="nasabah_password_confirmation">Konfirmasi Password</label>
+                    <input type="password" name="nasabah_password_confirmation"
+                           id="nasabah_password_confirmation" required>
+                </div>
+
+                <button type="submit" class="btn">Daftar Sebagai Nasabah</button>
+            </form>
+        </div>
+
+        <!-- ============ FORM PENGEPUL ============ -->
+        <div id="form-pengepul" class="form-panel">
+            <div class="info-box">
+                <span class="info-icon">ℹ️</span>
+                Akun pengepul yang baru mendaftar akan berstatus <strong>menunggu verifikasi</strong> oleh admin. 
+                Anda dapat login setelah akun diverifikasi.
             </div>
 
-            <div class="form-group">
-                <label for="nasabah_nik">NIK (Nomor Induk Kependudukan)</label>
-                <input type="text" name="nasabah_nik" id="nasabah_nik"
-                       value="{{ old('nasabah_nik') }}" maxlength="20" required>
-            </div>
+            <form method="POST" action="{{ url('/register/pengepul') }}">
+                @csrf
 
-            <div class="form-group">
-                <label for="nasabah_alamat">Alamat</label>
-                <textarea name="nasabah_alamat" id="nasabah_alamat" rows="3" required>{{ old('nasabah_alamat') }}</textarea>
-            </div>
+                <p class="section-title">Data Pengepul</p>
 
-            <div class="form-group">
-                <label for="nasabah_telepon">Nomor Telepon</label>
-                <input type="text" name="nasabah_telepon" id="nasabah_telepon"
-                       value="{{ old('nasabah_telepon') }}" maxlength="20" required>
-            </div>
+                <div class="form-group">
+                    <label for="pengepul_nama">Nama Lengkap / Nama Usaha</label>
+                    <input type="text" name="nama" id="pengepul_nama"
+                           value="{{ old('nama') }}" placeholder="Contoh: Budi Santoso / CV Maju Jaya" required>
+                </div>
 
-            <div class="form-group">
-                <label for="nasabah_email">Email</label>
-                <input type="email" name="nasabah_email" id="nasabah_email"
-                       value="{{ old('nasabah_email') }}" required>
-            </div>
+                <div class="form-group">
+                    <label for="pengepul_alamat">Alamat Lengkap</label>
+                    <textarea name="alamat" id="pengepul_alamat" rows="3" placeholder="Alamat tempat usaha atau domisili" required>{{ old('alamat') }}</textarea>
+                </div>
 
-            <hr class="divider">
-            <p class="section-title">Akun & Keamanan</p>
+                <div class="form-group">
+                    <label for="pengepul_telepon">Nomor Telepon</label>
+                    <input type="text" name="telepon" id="pengepul_telepon"
+                           value="{{ old('telepon') }}" maxlength="20" placeholder="08xxxxxxxxxx" required>
+                </div>
 
-            <div class="form-group">
-                <label for="nasabah_username">Username</label>
-                <input type="text" name="nasabah_username" id="nasabah_username"
-                       value="{{ old('nasabah_username') }}" maxlength="50" required>
-            </div>
+                <hr class="divider">
+                <p class="section-title">Akun & Keamanan</p>
 
-            <div class="form-group">
-                <label for="nasabah_password">Password</label>
-                <input type="password" name="nasabah_password" id="nasabah_password"
-                       minlength="6" required>
-            </div>
+                <div class="form-group">
+                    <label for="pengepul_username">Username (untuk login)</label>
+                    <input type="text" name="username" id="pengepul_username"
+                           value="{{ old('username') }}" maxlength="50" placeholder="Contoh: pengepul_budi" required>
+                </div>
 
-            <div class="form-group">
-                <label for="nasabah_password_confirmation">Konfirmasi Password</label>
-                <input type="password" name="nasabah_password_confirmation"
-                       id="nasabah_password_confirmation" required>
-            </div>
+                <div class="form-group">
+                    <label for="pengepul_password">Password</label>
+                    <input type="password" name="password" id="pengepul_password"
+                           minlength="6" required>
+                </div>
 
-            <button type="submit" class="btn">Daftar Sekarang</button>
-        </form>
+                <div class="form-group">
+                    <label for="pengepul_password_confirmation">Konfirmasi Password</label>
+                    <input type="password" name="password_confirmation"
+                           id="pengepul_password_confirmation" required>
+                </div>
+
+                <button type="submit" class="btn">Daftar Sebagai Pengepul</button>
+            </form>
+        </div>
 
         <p class="footer-link">
             Sudah punya akun? <a href="{{ url('/login') }}">Masuk di sini</a>
         </p>
     </div>
+
+    <script>
+        function switchRole(role) {
+            // Toggle tabs
+            document.getElementById('tab-nasabah').classList.toggle('active', role === 'nasabah');
+            document.getElementById('tab-pengepul').classList.toggle('active', role === 'pengepul');
+            
+            // Toggle form panels
+            document.getElementById('form-nasabah').classList.toggle('active', role === 'nasabah');
+            document.getElementById('form-pengepul').classList.toggle('active', role === 'pengepul');
+        }
+
+        // If there are old pengepul fields, auto-switch to pengepul tab
+        @if(old('username') || old('nama'))
+            switchRole('pengepul');
+        @endif
+    </script>
 </body>
 </html>

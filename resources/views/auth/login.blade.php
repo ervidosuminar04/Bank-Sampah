@@ -235,6 +235,12 @@
         </div>
         <h2>Masuk ke Akun Kamu</h2>
 
+        @if(session('success'))
+            <div style="background: rgba(125, 184, 37, 0.1); border: 1px solid var(--color-sprout); color: var(--color-forest); padding: 12px 16px; border-radius: var(--radius-sm); margin-bottom: 24px; font-size: 14px; font-weight: 600;">
+                ✅ {{ session('success') }}
+            </div>
+        @endif
+
         @if ($errors->any())
             <div class="alert-error">
                 <ul>

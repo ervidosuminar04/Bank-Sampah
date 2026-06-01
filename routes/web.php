@@ -28,6 +28,7 @@ Route::post('/login', [AuthController::class, 'login']);
 
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
 Route::post('/register', [AuthController::class, 'register']);
+Route::post('/register/pengepul', [AuthController::class, 'registerPengepul'])->name('register.pengepul');
 
 Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::post('/logout', [AuthController::class, 'logout']);
@@ -81,6 +82,7 @@ Route::get('/dashboard', function () {
         $data['allGeolokasi'] = Geolokasi::orderBy('id_lokasi', 'desc')->get();
         $data['nasabahs']     = Nasabah::orderBy('id_nasabah', 'desc')->take(5)->get();
         $data['allPengepul']  = \App\Models\Pengepul::orderBy('nama')->get();
+        $data['pendingPengepul'] = \App\Models\Pengepul::where('status_aktif', false)->orderBy('created_at', 'desc')->get();
 
     } else {
         // Nasabah
@@ -189,6 +191,8 @@ Route::middleware(['role:admin'])->group(function () {
     Route::post('/admin/pengepul/store', [AuthController::class, 'storePengepul'])->name('admin.pengepul.store');
     Route::post('/admin/pengepul/update/{id}', [AuthController::class, 'updatePengepul'])->name('admin.pengepul.update');
     Route::post('/admin/pengepul/delete/{id}', [AuthController::class, 'deletePengepul'])->name('admin.pengepul.delete');
+    Route::post('/admin/pengepul/verify/{id}', [AuthController::class, 'verifikasiPengepul'])->name('admin.pengepul.verify');
+    Route::post('/admin/pengepul/reject/{id}', [AuthController::class, 'rejectPengepul'])->name('admin.pengepul.reject');
 
     // Setoran Pengepul – Admin
     Route::get('/admin/setoran-pengepul', [SetoranPengepulController::class, 'index'])->name('admin.setoran.index');
