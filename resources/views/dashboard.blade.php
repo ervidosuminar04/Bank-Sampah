@@ -3,33 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Bank Sampah Digital</title>
+    <title>Dashboard Realive Bank Sampah</title>
     <!-- Leaflet CSS & JS for Interactive Map -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    <!-- Google Fonts -->
+    <!-- Google Fonts: Nunito, Nunito Sans, JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Nunito+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
     
     <style>
-        /* Modern Premium Style System */
+        /* Modern Premium Style System - REALIVE */
         :root {
-            --primary: #1b5e20;
-            --primary-light: #e8f5e9;
-            --primary-medium: #81c784;
-            --secondary: #2e7d32;
-            --accent: #ffb300;
-            --danger: #d32f2f;
-            --danger-light: #ffebee;
-            --dark: #212121;
-            --gray-light: #f5f5f5;
-            --gray-medium: #e0e0e0;
-            --white: #ffffff;
-            --shadow: 0 4px 20px rgba(0,0,0,0.06);
-            --shadow-hover: 0 8px 30px rgba(27,94,32,0.12);
-            --radius: 12px;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            /* Warm Spectrum (Energy / CTA) */
+            --color-solar:      #FFD700;
+            --color-sunburst:   #FFA500;
+            --color-ember:      #F5511E;
+            --color-flame:      #E63946;
+
+            /* Green Spectrum (Brand / Growth) */
+            --color-lime:       #C8E000;
+            --color-sprout:     #7DB825;
+            --color-forest:     #2D6A2D;
+            --color-canopy:     #1A3A1A;
+
+            /* Neutrals */
+            --color-black:      #0A0A0A;
+            --color-white:      #FFFFFF;
+            --color-mist:       #F4F7F0;
+            --color-fog:        #8A9E8A;
+            --color-smoke:      #D4DDD4;
+
+            /* Gradients */
+            --gradient-brand: linear-gradient(135deg, #FFD700 0%, #7DB825 50%, #2D6A2D 100%);
+            --gradient-warm:  linear-gradient(90deg, #FFD700 0%, #F5511E 60%, #E63946 100%);
+
+            /* Semantics */
+            --bg-page:          var(--color-mist);
+            --bg-surface:       var(--color-white);
+            --bg-dark:          var(--color-black);
+            --text-primary:     var(--color-canopy);
+            --text-secondary:   var(--color-forest);
+            --text-muted:       var(--color-fog);
+            --text-on-dark:     var(--color-white);
+            --text-on-gradient: var(--color-white);
+            --accent-cta:       var(--color-solar);
+            --accent-success:   var(--color-forest);
+            --accent-alert:     var(--color-flame);
+            --border-default:   var(--color-smoke);
+            --border-focus:     var(--color-sprout);
+
+            /* Radius */
+            --radius-sm:   8px;
+            --radius-md:   16px;
+            --radius-lg:   24px;
+            --radius-xl:   36px;
+            --radius-full: 9999px;
+
+            /* Shadow */
+            --shadow-sm:    0 1px 4px rgba(26, 58, 26, 0.08);
+            --shadow-md:    0 4px 16px rgba(26, 58, 26, 0.12);
+            --shadow-lg:    0 8px 32px rgba(26, 58, 26, 0.18);
+            --shadow-xl:    0 16px 56px rgba(26, 58, 26, 0.24);
+            --shadow-glow:  0 0 24px rgba(255, 215, 0, 0.35);
+            --shadow-focus: 0 0 0 3px rgba(125, 184, 37, 0.45);
+
+            --transition: all 0.26s cubic-bezier(0.4, 0, 0.2, 1);
+            --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         * {
@@ -39,12 +79,19 @@
         }
 
         body {
-            font-family: 'Outfit', sans-serif;
-            background-color: #f4f6f5;
-            color: var(--dark);
+            font-family: 'Nunito Sans', sans-serif;
+            background-color: var(--bg-page);
+            color: var(--text-primary);
             min-height: 100vh;
             display: flex;
-            overflow: hidden; /* Prevent body scroll, scroll elements instead */
+            overflow: hidden; 
+            line-height: 1.55;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Nunito', sans-serif;
+            line-height: 1.15;
+            letter-spacing: -0.01em;
         }
 
         /* App Layout Grid */
@@ -56,30 +103,36 @@
 
         /* Sidebar Style */
         .sidebar {
-            width: 280px;
-            background: linear-gradient(180deg, var(--primary) 0%, #0c3610 100%);
-            color: var(--white);
+            width: 256px;
+            background-color: var(--color-canopy);
+            color: var(--text-on-dark);
             display: flex;
             flex-direction: column;
             height: 100%;
             z-index: 100;
-            box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow-lg);
             transition: var(--transition);
         }
 
         .sidebar-brand {
             padding: 24px;
-            font-size: 22px;
+            font-size: 24px;
+            font-family: 'Nunito', sans-serif;
             font-weight: 800;
-            letter-spacing: 0.5px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            letter-spacing: 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             display: flex;
             align-items: center;
+            background: var(--gradient-brand);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent; /* Fallback */
         }
-
-        .sidebar-brand span {
-            margin-right: 10px;
-            font-size: 26px;
+        .sidebar-brand-icon {
+            -webkit-text-fill-color: initial; 
+            margin-right: 12px;
+            font-size: 28px;
         }
 
         /* Profile Card inside Sidebar */
@@ -88,22 +141,22 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            background-color: rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .profile-avatar {
             width: 44px;
             height: 44px;
-            border-radius: 50%;
-            background-color: var(--white);
-            color: var(--primary);
+            border-radius: var(--radius-full);
+            background: var(--gradient-brand);
+            color: var(--color-white);
+            font-family: 'Nunito', sans-serif;
             font-size: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 700;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            font-weight: 800;
+            box-shadow: var(--shadow-sm);
         }
 
         .profile-info {
@@ -114,34 +167,38 @@
 
         .profile-name {
             font-size: 14px;
+            font-family: 'Nunito Sans', sans-serif;
             font-weight: 700;
             white-space: nowrap;
             text-overflow: ellipsis;
             overflow: hidden;
+            color: var(--color-white);
         }
 
         .profile-role-badge {
             font-size: 10px;
-            background-color: var(--accent);
-            color: var(--dark);
-            padding: 1px 8px;
-            border-radius: 10px;
+            background-color: var(--color-solar);
+            color: var(--color-canopy);
+            padding: 2px 10px;
+            border-radius: var(--radius-full);
             font-weight: 700;
             text-transform: uppercase;
+            letter-spacing: 0.1em;
             align-self: flex-start;
-            margin-top: 3px;
+            margin-top: 4px;
         }
 
         /* Sidebar Navigation Menu */
         .sidebar-menu {
             list-style: none;
-            padding: 20px 12px;
+            padding: 20px 0;
             flex: 1;
             overflow-y: auto;
         }
 
         .sidebar-menu li {
-            margin-bottom: 6px;
+            margin-bottom: 4px;
+            padding: 0 12px;
         }
 
         .menu-link {
@@ -149,29 +206,34 @@
             align-items: center;
             gap: 12px;
             padding: 12px 16px;
-            color: rgba(255, 255, 255, 0.75);
+            color: var(--color-fog);
             text-decoration: none;
             font-size: 14px;
+            font-family: 'Nunito Sans', sans-serif;
             font-weight: 600;
-            border-radius: 8px;
+            border-radius: var(--radius-sm);
             transition: var(--transition);
             cursor: pointer;
+            border-left: 4px solid transparent;
         }
 
         .menu-link:hover {
-            color: var(--white);
-            background-color: rgba(255, 255, 255, 0.08);
+            color: var(--color-white);
+            background-color: rgba(255, 255, 255, 0.05);
         }
 
         .menu-link.active {
-            color: var(--white);
-            background-color: var(--secondary);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            color: var(--color-white);
+            background-color: rgba(45, 106, 45, 0.4); /* forest/40 */
+            border-left: 4px solid var(--color-solar); /* Simulating gradient border */
+            border-image: var(--gradient-brand) 1;
+            border-image-slice: 0 0 0 1;
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
         }
 
         .sidebar-footer {
             padding: 20px 24px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .btn-logout-sidebar {
@@ -179,20 +241,22 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-            background-color: var(--danger);
-            color: var(--white);
+            background-color: rgba(230, 57, 70, 0.1);
+            border: 1px solid var(--color-flame);
+            color: var(--color-flame);
             width: 100%;
-            border: none;
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 13.5px;
+            padding: 12px;
+            border-radius: var(--radius-full);
+            font-size: 14px;
+            font-family: 'Nunito Sans', sans-serif;
             font-weight: 700;
             text-decoration: none;
             transition: var(--transition);
         }
 
         .btn-logout-sidebar:hover {
-            background-color: #b71c1c;
+            background-color: var(--color-flame);
+            color: var(--color-white);
         }
 
         /* Main Viewport Panel */
@@ -202,13 +266,14 @@
             flex-direction: column;
             height: 100%;
             overflow: hidden;
+            background-color: var(--bg-page);
         }
 
         /* Panel Header */
         .panel-header {
-            background-color: var(--white);
-            border-bottom: 1px solid var(--gray-medium);
-            padding: 16px 30px;
+            background-color: var(--bg-surface);
+            border-bottom: 1px solid var(--color-smoke);
+            padding: 16px 32px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -216,9 +281,10 @@
         }
 
         .header-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--primary);
+            font-size: 20px;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 800;
+            color: var(--text-primary);
         }
 
         .mobile-toggle {
@@ -226,15 +292,27 @@
             background: none;
             border: none;
             font-size: 24px;
-            color: var(--primary);
+            color: var(--color-forest);
             cursor: pointer;
-            margin-right: 15px;
+            margin-right: 16px;
+        }
+        
+        .role-badge {
+            background-color: var(--color-mist);
+            color: var(--color-forest);
+            border: 2px solid var(--color-sprout);
+            padding: 6px 16px;
+            border-radius: var(--radius-full);
+            font-weight: 700;
+            font-size: 12px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
         }
 
         /* Panel Content Area */
         .panel-content {
             flex: 1;
-            padding: 30px;
+            padding: 32px;
             overflow-y: auto;
             position: relative;
         }
@@ -242,109 +320,135 @@
         /* Tab Content Section Container */
         .tab-content {
             display: none;
-            animation: fadeIn 0.4s ease;
+            animation: fadeSlideUp 0.35s var(--ease-spring);
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
         /* Card Elements */
         .welcome-section {
-            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
-            border-radius: var(--radius);
-            padding: 24px 30px;
-            margin-bottom: 30px;
-            box-shadow: var(--shadow);
+            background: var(--gradient-brand);
+            border-radius: var(--radius-xl);
+            padding: 32px 40px;
+            margin-bottom: 32px;
+            box-shadow: var(--shadow-lg);
             position: relative;
             overflow: hidden;
+            color: var(--color-white);
+        }
+
+        /* Adding a light pattern overlay using CSS */
+        .welcome-section::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: radial-gradient(rgba(255,255,255,0.15) 2px, transparent 2px);
+            background-size: 20px 20px;
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .welcome-text {
+            position: relative;
+            z-index: 2;
         }
 
         .welcome-text h1 {
-            font-size: 24px;
-            font-weight: 800;
-            color: #0d5c14;
-            margin-bottom: 6px;
+            font-size: 30px;
+            font-weight: 900;
+            color: var(--color-white);
+            margin-bottom: 8px;
         }
 
         .welcome-text p {
-            color: #437046;
-            font-size: 14.5px;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 16px;
+            font-weight: 600;
+            max-width: 600px;
         }
 
         /* Stats Grid */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+            gap: 24px;
+            margin-bottom: 32px;
         }
 
         .card-stat {
-            background-color: var(--white);
-            border-radius: var(--radius);
-            padding: 20px;
-            box-shadow: var(--shadow);
+            background-color: var(--bg-surface);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            box-shadow: var(--shadow-md);
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 20px;
             transition: var(--transition);
-            border: 1px solid rgba(0,0,0,0.02);
+            border: 1px solid var(--color-smoke);
+            border-left: 4px solid var(--color-sprout);
         }
 
         .card-stat:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--shadow-hover);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
         }
 
         .stat-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
+            width: 56px;
+            height: 56px;
+            border-radius: var(--radius-full);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 22px;
+            font-size: 28px;
         }
 
         .stat-content h3 {
-            font-size: 11px;
-            color: #888;
+            font-size: 12px;
+            color: var(--color-fog);
             text-transform: uppercase;
-            letter-spacing: 0.8px;
-            margin-bottom: 4px;
+            letter-spacing: 0.1em;
+            margin-bottom: 6px;
             font-weight: 700;
+            font-family: 'Nunito Sans', sans-serif;
         }
 
         .stat-content p {
-            font-size: 18px;
+            font-size: 24px;
             font-weight: 800;
-            color: var(--dark);
+            color: var(--text-primary);
+            font-family: 'Nunito', sans-serif;
+        }
+        
+        .stat-content .data-mono {
+            font-family: 'JetBrains Mono', monospace;
         }
 
-        .icon-accent-1 { background-color: #e8f5e9; color: #2e7d32; }
-        .icon-accent-2 { background-color: #e3f2fd; color: #1e88e5; }
-        .icon-accent-3 { background-color: #fff8e1; color: #ff8f00; }
-        .icon-accent-4 { background-color: #f3e5f5; color: #8e24aa; }
+        .icon-accent-1 { background-color: rgba(125, 184, 37, 0.15); color: var(--color-forest); }
+        .icon-accent-2 { background-color: rgba(255, 215, 0, 0.15); color: var(--color-sunburst); }
+        .icon-accent-3 { background-color: rgba(26, 58, 26, 0.1); color: var(--color-canopy); }
+        .icon-accent-4 { background-color: rgba(230, 57, 70, 0.1); color: var(--color-flame); }
 
         /* UI Blocks */
         .ui-block {
-            background-color: var(--white);
-            border-radius: var(--radius);
-            padding: 24px;
-            box-shadow: var(--shadow);
-            border: 1px solid rgba(0,0,0,0.02);
-            margin-bottom: 25px;
+            background-color: var(--bg-surface);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--color-smoke);
+            margin-bottom: 32px;
         }
 
         .block-title {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 18px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid var(--primary-light);
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--color-mist);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -352,243 +456,324 @@
 
         /* E-Gamifikasi Center */
         .gamifikasi-card {
-            background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
-            color: var(--white);
-            border-radius: var(--radius);
-            padding: 24px;
-            box-shadow: var(--shadow);
-            margin-bottom: 25px;
+            background: var(--color-black);
+            color: var(--color-white);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            box-shadow: var(--shadow-lg);
+            margin-bottom: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Dark pattern approximation */
+        .gamifikasi-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: radial-gradient(rgba(125, 184, 37, 0.2) 2px, transparent 2px);
+            background-size: 20px 20px;
+            pointer-events: none;
+            opacity: 0.8;
+        }
+
+        .gamifikasi-card > * {
+            position: relative;
+            z-index: 2;
         }
 
         .gamifikasi-title {
-            font-size: 13px;
+            font-size: 14px;
+            font-family: 'Nunito Sans', sans-serif;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.1em;
             font-weight: 700;
-            margin-bottom: 12px;
-            color: var(--primary-medium);
+            margin-bottom: 16px;
+            color: var(--color-sprout);
         }
 
         .gamifikasi-points {
-            font-size: 32px;
-            font-weight: 800;
-            margin-bottom: 5px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 48px;
+            font-weight: 900;
+            margin-bottom: 8px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
+            color: var(--color-solar);
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
         }
 
-        .gamifikasi-points span { font-size: 16px; font-weight: 500; opacity: 0.8; }
+        .gamifikasi-points span { font-size: 20px; font-weight: 700; color: var(--color-white); opacity: 0.9; }
 
         .level-progress {
-            margin-top: 12px;
-            margin-bottom: 20px;
+            margin-top: 20px;
+            margin-bottom: 24px;
         }
 
         .level-meta {
             display: flex;
             justify-content: space-between;
-            font-size: 11.5px;
-            margin-bottom: 6px;
-            opacity: 0.9;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: rgba(255, 255, 255, 0.8);
         }
 
         .level-bar {
-            background-color: rgba(255, 255, 255, 0.2);
-            height: 10px;
-            border-radius: 5px;
+            background-color: rgba(255, 255, 255, 0.1);
+            height: 12px;
+            border-radius: var(--radius-full);
             overflow: hidden;
         }
 
         .level-fill {
-            background: linear-gradient(90deg, var(--accent) 0%, #ffe082 100%);
+            background: var(--gradient-brand);
             height: 100%;
-            border-radius: 5px;
-            transition: width 0.5s ease-in-out;
+            border-radius: var(--radius-full);
+            transition: width 0.8s var(--ease-spring);
         }
 
         /* Badges Collection */
         .badges-title {
-            font-size: 11.5px;
+            font-size: 12px;
             text-transform: uppercase;
-            letter-spacing: 0.8px;
-            margin-bottom: 10px;
-            font-weight: 600;
-            opacity: 0.85;
+            letter-spacing: 0.1em;
+            margin-bottom: 12px;
+            font-weight: 700;
+            color: var(--color-mist);
         }
 
         .badges-row {
             display: flex;
             flex-wrap: wrap;
-            gap: 12px;
+            gap: 16px;
         }
 
         .badge-circle {
-            width: 46px;
-            height: 46px;
-            border-radius: 50%;
-            background-color: rgba(255, 255, 255, 0.15);
-            border: 2px dashed rgba(255, 255, 255, 0.3);
+            width: 56px;
+            height: 56px;
+            border-radius: var(--radius-full);
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 2px dashed rgba(255, 255, 255, 0.2);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 22px;
+            font-size: 28px;
             position: relative;
             cursor: pointer;
             transition: var(--transition);
         }
 
         .badge-circle.active {
-            background-color: var(--white);
-            border: 2px solid var(--accent);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            background-color: var(--color-solar);
+            border: 2px solid var(--color-solar);
+            box-shadow: var(--shadow-glow);
         }
 
         .badge-circle:hover .tooltip {
             visibility: visible;
             opacity: 1;
+            transform: translateX(-50%) translateY(0);
         }
 
         .tooltip {
             visibility: hidden;
-            background-color: var(--dark);
-            color: #fff;
+            background-color: var(--color-canopy);
+            color: var(--color-white);
             text-align: center;
-            padding: 5px 10px;
-            border-radius: 6px;
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
             position: absolute;
-            z-index: 1;
-            bottom: 125%;
+            z-index: 10;
+            bottom: calc(100% + 12px);
             left: 50%;
-            transform: translateX(-50%);
+            transform: translateX(-50%) translateY(8px);
             opacity: 0;
-            transition: opacity 0.3s;
-            font-size: 11px;
+            transition: var(--transition);
+            font-size: 12px;
+            font-weight: 600;
             white-space: nowrap;
+            box-shadow: var(--shadow-md);
         }
 
         /* Form Controls */
         .form-group {
-            margin-bottom: 16px;
+            margin-bottom: 20px;
         }
 
         .form-group label {
             display: block;
-            font-size: 13px;
-            font-weight: 600;
-            color: #555;
-            margin-bottom: 6px;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
         }
 
         .form-control {
             width: 100%;
-            padding: 10px 14px;
-            border: 1px solid var(--gray-medium);
-            border-radius: 8px;
-            font-size: 13.5px;
+            padding: 12px 16px;
+            border: 2px solid var(--border-default);
+            border-radius: var(--radius-sm);
+            font-size: 16px;
+            color: var(--text-primary);
             outline: none;
             font-family: inherit;
             transition: var(--transition);
+            background-color: var(--color-white);
         }
 
         .form-control:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(27,94,32,0.12);
+            border-color: var(--border-focus);
+            box-shadow: var(--shadow-focus);
         }
 
         /* Buttons */
         .btn-submit {
-            background-color: var(--primary);
-            color: var(--white);
+            background-color: var(--accent-cta);
+            color: var(--color-canopy);
             border: none;
-            padding: 11px 20px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
+            padding: 14px 24px;
+            border-radius: var(--radius-full);
+            font-size: 16px;
+            font-weight: 700;
+            font-family: 'Nunito Sans', sans-serif;
             cursor: pointer;
             width: 100%;
             transition: var(--transition);
+            min-height: 48px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
         .btn-submit:hover {
-            background-color: var(--secondary);
+            background-color: var(--color-sunburst);
+            transform: scale(1.02);
+            box-shadow: var(--shadow-glow);
         }
 
         .btn-action-sm {
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 11.5px;
+            padding: 8px 16px;
+            border-radius: var(--radius-full);
+            font-size: 14px;
             font-weight: 700;
             text-decoration: none;
             cursor: pointer;
             border: none;
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
             transition: var(--transition);
+            font-family: 'Nunito Sans', sans-serif;
+            min-height: 40px;
         }
 
-        .btn-success { background-color: var(--primary-light); color: var(--primary); }
-        .btn-success:hover { background-color: var(--primary-medium); color: var(--white); }
+        .btn-success { background-color: var(--color-solar); color: var(--color-canopy); box-shadow: var(--shadow-sm); }
+        .btn-success:hover { background-color: var(--color-sunburst); box-shadow: var(--shadow-glow); transform: scale(1.02); }
         
-        .btn-danger { background-color: var(--danger-light); color: var(--danger); }
-        .btn-danger:hover { background-color: var(--danger); color: var(--white); }
+        .btn-danger { background-color: rgba(230, 57, 70, 0.1); color: var(--color-flame); border: 1px solid var(--color-flame); }
+        .btn-danger:hover { background-color: var(--color-flame); color: var(--color-white); }
 
-        .btn-secondary { background-color: var(--gray-light); color: #555; border: 1px solid var(--gray-medium); }
-        .btn-secondary:hover { background-color: var(--gray-medium); }
+        .btn-secondary { background-color: var(--color-white); color: var(--color-forest); border: 2px solid var(--color-forest); }
+        .btn-secondary:hover { background-color: var(--color-mist); border-color: var(--color-sprout); }
+
+        .btn-gradient { background: var(--gradient-brand); color: var(--color-white); box-shadow: var(--shadow-md); }
+        .btn-gradient:hover { transform: scale(1.02); box-shadow: var(--shadow-lg); }
 
         /* Table Style */
         .table-wrap {
             width: 100%;
             overflow-x: auto;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--color-smoke);
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 13.5px;
+            font-size: 14px;
             text-align: left;
         }
 
         th {
-            background-color: var(--gray-light);
-            padding: 12px;
-            font-weight: 600;
-            color: #666;
-            border-bottom: 2px solid var(--gray-medium);
+            background-color: var(--color-mist);
+            padding: 16px;
+            font-weight: 700;
+            color: var(--color-forest);
+            border-bottom: 2px solid var(--color-smoke);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-size: 12px;
         }
 
         td {
-            padding: 12px;
-            border-bottom: 1px solid var(--gray-light);
+            padding: 16px;
+            border-bottom: 1px solid var(--color-smoke);
+            color: var(--text-primary);
+        }
+        
+        td code {
+            font-family: 'JetBrains Mono', monospace;
+            background-color: var(--color-mist);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 13px;
         }
 
         tr:hover td {
-            background-color: #fafdfb;
+            background-color: rgba(244, 247, 240, 0.5); /* mist with opacity */
+        }
+
+        /* Status & Distance Badges */
+        .status-badge {
+            font-size: 10px;
+            padding: 4px 12px;
+            border-radius: var(--radius-full);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .status-badge.open { background-color: rgba(125, 184, 37, 0.15); color: var(--color-forest); }
+        .status-badge.closed { background-color: rgba(230, 57, 70, 0.1); color: var(--color-flame); }
+
+        .distance-badge {
+            font-size: 13px;
+            font-weight: 700;
+            background-color: var(--color-solar);
+            color: var(--color-canopy);
+            padding: 6px 14px;
+            border-radius: var(--radius-full);
+            box-shadow: var(--shadow-sm);
         }
 
         /* GPS Geolokasi Module */
         .gps-section {
-            background-color: #eef7f2;
-            border: 1px solid #cce6d5;
-            border-radius: var(--radius);
-            padding: 20px;
+            background-color: var(--color-white);
+            border: 2px solid var(--color-smoke);
+            border-radius: var(--radius-lg);
+            padding: 24px;
         }
 
         .gps-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             flex-wrap: wrap;
-            gap: 12px;
+            gap: 16px;
         }
 
         .gps-btn {
-            background-color: var(--secondary);
-            color: var(--white);
+            background-color: var(--color-forest);
+            color: var(--color-white);
             border: none;
-            padding: 9px 18px;
-            border-radius: 8px;
-            font-size: 13px;
+            padding: 10px 20px;
+            border-radius: var(--radius-full);
+            font-size: 14px;
             font-weight: 700;
             cursor: pointer;
             display: flex;
@@ -598,80 +783,68 @@
         }
 
         .gps-btn:hover {
-            background-color: var(--primary);
+            background-color: var(--color-canopy);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
         }
 
         .gps-list {
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            margin-top: 15px;
+            gap: 16px;
+            margin-top: 20px;
         }
 
         .gps-item {
-            background-color: var(--white);
-            border: 1px solid rgba(0,0,0,0.05);
-            padding: 14px 18px;
-            border-radius: 8px;
+            background-color: var(--color-white);
+            border: 1px solid var(--color-smoke);
+            padding: 16px 20px;
+            border-radius: var(--radius-md);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+            box-shadow: var(--shadow-sm);
             flex-wrap: wrap;
-            gap: 12px;
+            gap: 16px;
+            transition: var(--transition);
+        }
+        
+        .gps-item:hover {
+            border-color: var(--color-sprout);
+            box-shadow: var(--shadow-md);
         }
 
         .gps-meta h4 {
-            font-size: 14.5px;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 3px;
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--color-forest);
+            margin-bottom: 4px;
         }
 
         .gps-meta p {
-            font-size: 12px;
-            color: #666;
-        }
-
-        .status-badge {
-            font-size: 9.5px;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-
-        .status-badge.open { background-color: #e8f5e9; color: #2e7d32; }
-        .status-badge.closed { background-color: #fee2e2; color: #c62828; }
-
-        .distance-badge {
-            font-size: 12.5px;
-            font-weight: 700;
-            background-color: #e3f2fd;
-            color: #1565c0;
-            padding: 5px 12px;
-            border-radius: 20px;
+            font-size: 14px;
+            color: var(--color-fog);
         }
 
         /* Alert styling */
         .alert {
-            padding: 16px 20px;
-            border-radius: var(--radius);
-            margin-bottom: 25px;
-            font-size: 14px;
-            font-weight: 500;
+            padding: 16px 24px;
+            border-radius: var(--radius-md);
+            margin-bottom: 32px;
+            font-size: 16px;
+            font-weight: 600;
             display: flex;
             align-items: center;
-            gap: 12px;
-            box-shadow: var(--shadow);
-            animation: slideDown 0.4s ease-out;
+            gap: 16px;
+            box-shadow: var(--shadow-sm);
+            animation: fadeSlideUp 0.4s var(--ease-spring);
         }
 
-        .alert-success { background-color: var(--primary-light); border-left: 5px solid var(--secondary); color: #1b5e20; }
-        .alert-error { background-color: var(--danger-light); border-left: 5px solid var(--danger); color: #b71c1c; }
+        .alert-success { background-color: var(--color-mist); border-left: 6px solid var(--color-sprout); color: var(--color-forest); }
+        .alert-error { background-color: rgba(230, 57, 70, 0.05); border-left: 6px solid var(--color-flame); color: var(--color-flame); }
 
         /* Responsive Mobile Layout adjustments */
-        @media (max-width: 768px) {
+        @media (max-width: 1024px) {
             .sidebar {
                 position: fixed;
                 left: -280px;
@@ -699,7 +872,7 @@
         <!-- ======================================================= -->
         <aside class="sidebar">
             <div class="sidebar-brand">
-                <span>🌿</span> Bank Sampah
+                <span class="sidebar-brand-icon">🌿</span> Realive
             </div>
             
             <div class="sidebar-profile">
@@ -726,8 +899,13 @@
                         </a>
                     </li>
                     <li>
-                        <a class="menu-link" data-tab="tab-pengepul" onclick="switchTab(event, 'tab-pengepul')">
+                        <a class="menu-link" data-tab="tab-pengepul" onclick="switchTab(event, 'tab-pengepul')" style="display:flex;justify-content:space-between;align-items:center;">
                             🚛 Kelola Pengepul
+                            @if(($pendingPengepul ?? collect())->count() > 0)
+                                <span style="background:var(--color-flame);color:var(--color-white);border-radius:10px;padding:2px 8px;font-size:11px;font-weight:bold;">
+                                    {{ $pendingPengepul->count() }}
+                                </span>
+                            @endif
                         </a>
                     </li>
                     <li>
@@ -749,7 +927,7 @@
                         <a class="menu-link" href="{{ route('admin.setoran.index') }}" style="display:flex;justify-content:space-between;align-items:center;">
                             💸 Setoran Pengepul
                             @if(($setoranMenunggu ?? 0) > 0)
-                                <span style="background:#d32f2f;color:#fff;border-radius:10px;padding:1px 8px;font-size:11px;">
+                                <span style="background:var(--color-flame);color:var(--color-white);border-radius:10px;padding:2px 8px;font-size:11px;font-weight:bold;">
                                     {{ $setoranMenunggu }}
                                 </span>
                             @endif
@@ -764,7 +942,7 @@
                         <a class="menu-link" href="{{ route('admin.penukaran.index') }}" style="display:flex;justify-content:space-between;align-items:center;">
                             🎁 Penukaran & Hadiah
                             @if(($rewardsMenunggu ?? 0) > 0)
-                                <span style="background:#ffb300;color:#212121;border-radius:10px;padding:1px 8px;font-size:11px;font-weight:700;">
+                                <span style="background:var(--color-solar);color:var(--color-canopy);border-radius:10px;padding:2px 8px;font-size:11px;font-weight:700;box-shadow:var(--shadow-glow);">
                                     {{ $rewardsMenunggu }}
                                 </span>
                             @endif
@@ -813,9 +991,9 @@
             <header class="panel-header">
                 <div style="display:flex; align-items:center;">
                     <button class="mobile-toggle" onclick="toggleSidebar()">☰</button>
-                    <div class="header-title">Bank Sampah Digital</div>
+                    <div class="header-title">Dashboard Realive</div>
                 </div>
-                <div class="role-badge" style="background-color: var(--primary-light); color: var(--primary); border:none; padding:6px 14px; border-radius:20px; font-weight:700;">
+                <div class="role-badge">
                     Otoritas: {{ ucfirst($userType) }}
                 </div>
             </header>
@@ -927,46 +1105,61 @@
                     <!-- 2. KELOLA PENGEPUL TAB -->
                     <div id="tab-pengepul" class="tab-content">
 
-                        <!-- Form Tambah Pengepul -->
+                        <!-- Verifikasi Pendaftaran Pengepul -->
                         <div class="ui-block" style="margin-bottom:24px;">
-                            <h2 class="block-title">🚛 Tambah Akun Pengepul Baru</h2>
-                            <form method="POST" action="{{ route('admin.pengepul.store') }}">
-                                @csrf
-                                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-                                    <div class="form-group">
-                                        <label>Nama Pengepul</label>
-                                        <input type="text" name="nama" class="form-control" placeholder="Contoh: Budi Santoso" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Nomor Telepon</label>
-                                        <input type="text" name="telepon" class="form-control" placeholder="08xxxxxxxxxx">
-                                    </div>
+                            <h2 class="block-title" style="display:flex;justify-content:space-between;align-items:center;">
+                                <span>🔔 Verifikasi Pendaftaran Pengepul</span>
+                                @if(($pendingPengepul ?? collect())->count() > 0)
+                                    <span style="background:var(--color-flame);color:var(--color-white);border-radius:var(--radius-full);padding:4px 14px;font-size:12px;font-weight:700;">
+                                        {{ $pendingPengepul->count() }} Menunggu
+                                    </span>
+                                @endif
+                            </h2>
+                            <p style="font-size:13px; color:#666; margin-bottom:16px;">Pengepul yang mendaftar secara mandiri akan muncul di sini. Verifikasi untuk mengaktifkan akun mereka.</p>
+                            
+                            @if(($pendingPengepul ?? collect())->isEmpty())
+                                <div style="text-align:center;padding:32px 20px;background:var(--color-mist);border-radius:var(--radius-md);border:1px dashed var(--color-smoke);">
+                                    <span style="font-size:40px;display:block;margin-bottom:12px;">✅</span>
+                                    <p style="color:var(--color-fog);font-size:14px;font-weight:600;">Tidak ada pendaftaran pengepul yang menunggu verifikasi.</p>
                                 </div>
-                                <div class="form-group">
-                                    <label>Alamat</label>
-                                    <input type="text" name="alamat" class="form-control" placeholder="Jl. Contoh No. 1, Kel. Contoh" required>
+                            @else
+                                <div class="table-wrap">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Nama</th>
+                                                <th>Username</th>
+                                                <th>Alamat</th>
+                                                <th>Telepon</th>
+                                                <th>Tanggal Daftar</th>
+                                                <th>Aksi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($pendingPengepul as $pp)
+                                            <tr>
+                                                <td><strong>{{ $pp->nama }}</strong></td>
+                                                <td><code>{{ $pp->username }}</code></td>
+                                                <td>{{ $pp->alamat }}</td>
+                                                <td>{{ $pp->telepon ?? '-' }}</td>
+                                                <td>{{ $pp->created_at ? $pp->created_at->format('d M Y H:i') : '-' }}</td>
+                                                <td style="display:flex;gap:6px;flex-wrap:wrap;">
+                                                    <form method="POST" action="{{ route('admin.pengepul.verify', $pp->id) }}" style="display:inline;">
+                                                        @csrf
+                                                        <button type="submit" class="btn-action-sm btn-success">✅ Verifikasi</button>
+                                                    </form>
+                                                    <form method="POST" action="{{ route('admin.pengepul.reject', $pp->id) }}" 
+                                                          onsubmit="return confirm('Tolak dan hapus pendaftaran {{ $pp->nama }}?')" style="display:inline;">
+                                                        @csrf
+                                                        <button type="submit" class="btn-action-sm btn-danger">❌ Tolak</button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
                                 </div>
-                                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">
-                                    <div class="form-group">
-                                        <label>Username (untuk login)</label>
-                                        <input type="text" name="username" class="form-control" placeholder="Contoh: pengepul_budi" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Password</label>
-                                        <input type="password" name="password" class="form-control" placeholder="Min. 6 karakter" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Status Aktif</label>
-                                        <select name="status_aktif" class="form-control">
-                                            <option value="1">Aktif</option>
-                                            <option value="0">Nonaktif</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <button type="submit" class="btn-submit" style="width:auto;padding:10px 28px;">
-                                    ➕ Tambah Pengepul
-                                </button>
-                            </form>
+                            @endif
                         </div>
 
                         <!-- Daftar Pengepul -->
@@ -1128,7 +1321,7 @@
                                                 <tr>
                                                     <td><strong>{{ $tr->nasabah->nasabah_nama }}</strong></td>
                                                     <td>{{ \Carbon\Carbon::parse($tr->tarik_tanggal)->format('d M Y H:i') }}</td>
-                                                    <td><strong style="color:var(--danger)">Rp {{ number_format($tr->tarik_jumlah, 0, ',', '.') }}</strong></td>
+                                                    <td><strong style="color:var(--color-flame)">Rp {{ number_format($tr->tarik_jumlah, 0, ',', '.') }}</strong></td>
                                                     <td>
                                                         <form method="POST" action="{{ route('admin.persetujuan_tarik', [$tr->id_tarik, 'setuju']) }}" style="display:inline;">
                                                             @csrf
@@ -1173,7 +1366,7 @@
                                                 <tr>
                                                     <td><strong>{{ $sam->sampah_name }}</strong></td>
                                                     <td>{{ $sam->sampah_jenis }}</td>
-                                                    <td><strong style="color:var(--secondary)">Rp {{ number_format($sam->sampah_harga_kg, 0, ',', '.') }}</strong></td>
+                                                    <td><strong style="color:var(--color-canopy)">Rp {{ number_format($sam->sampah_harga_kg, 0, ',', '.') }}</strong></td>
                                                     <td>
                                                         <button onclick="openEditPriceForm({{ $sam->id_sampah }}, '{{ $sam->sampah_name }}', {{ $sam->sampah_harga_kg }})" class="btn-action-sm btn-success">✏️ Edit Harga</button>
                                                     </td>
@@ -1186,8 +1379,8 @@
                                 <!-- Form update price & add new -->
                                 <div>
                                     <!-- Edit Harga Form -->
-                                    <div id="price_edit_section" style="display:none; background-color: var(--primary-light); padding: 20px; border-radius: var(--radius); border: 1px solid var(--primary-medium);">
-                                        <h4 style="font-size:14px; color:var(--primary); margin-bottom:12px; font-weight:700;">Ubah Harga: <span id="price_edit_title"></span></h4>
+                                    <div id="price_edit_section" style="display:none; background-color: rgba(125, 184, 37, 0.1); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--color-sprout);">
+                                        <h4 style="font-size:14px; color:var(--color-forest); margin-bottom:12px; font-weight:700;">Ubah Harga: <span id="price_edit_title"></span></h4>
                                         <form method="POST" action="{{ route('admin.master_sampah.update') }}">
                                             @csrf
                                             <input type="hidden" name="id_sampah" id="price_edit_id">
@@ -1203,8 +1396,8 @@
                                     </div>
 
                                     <!-- Tambah Sampah Baru Form -->
-                                    <div id="sampah_add_section" style="display:none; background-color: var(--primary-light); padding: 20px; border-radius: var(--radius); border: 1px solid var(--primary-medium);">
-                                        <h4 style="font-size:14px; color:var(--primary); margin-bottom:12px; font-weight:700;">Tambah Sampah Baru</h4>
+                                    <div id="sampah_add_section" style="display:none; background-color: rgba(125, 184, 37, 0.1); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--color-sprout);">
+                                        <h4 style="font-size:14px; color:var(--color-forest); margin-bottom:12px; font-weight:700;">Tambah Sampah Baru</h4>
                                         <form method="POST" action="{{ route('admin.master_sampah.store') }}">
                                             @csrf
                                             <div class="form-group">
@@ -1241,7 +1434,7 @@
                                         </form>
                                     </div>
 
-                                    <div id="price_edit_placeholder" style="background-color: var(--gray-light); padding:20px; border-radius:var(--radius); text-align:center; color:#888; font-size:13px; border: 1px dashed var(--gray-medium);">
+                                    <div id="price_edit_placeholder" style="background-color: #f5f6f5; padding:20px; border-radius:var(--radius-md); text-align:center; color:#888; font-size:13px; border: 1px dashed #d1d5d1;">
                                         *Klik tombol Edit Harga di tabel untuk mengubah harga bahan, atau klik tombol Tambah Sampah Baru untuk menambah jenis sampah baru.
                                     </div>
                                 </div>
@@ -1258,8 +1451,8 @@
                             </h2>
 
                             <!-- Add Geolocation form -->
-                            <div id="form_tambah_lokasi" style="display:none; background-color: var(--gray-light); padding: 24px; border-radius: var(--radius); margin-bottom: 25px; border: 1px solid var(--gray-medium);">
-                                <h3 style="font-size:15px; font-weight:700; margin-bottom:15px; color: var(--primary);">Tambah Lokasi Baru</h3>
+                            <div id="form_tambah_lokasi" style="display:none; background-color: #f5f6f5; padding: 24px; border-radius: var(--radius-md); margin-bottom: 25px; border: 1px solid #d1d5d1;">
+                                <h3 style="font-size:15px; font-weight:700; margin-bottom:15px; color: var(--color-forest);">Tambah Lokasi Baru</h3>
                                 <form method="POST" action="{{ route('admin.master_geolokasi.store') }}">
                                     @csrf
                                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
@@ -1365,7 +1558,7 @@
                                         @endfor
                                     </select>
                                 </div>
-                                <button type="submit" class="btn-submit" style="background-color: var(--secondary); display:flex; align-items:center; justify-content:center; gap:10px;">
+                                <button type="submit" class="btn-submit" style="background-color: var(--color-canopy); display:flex; align-items:center; justify-content:center; gap:10px;">
                                     🖨️ Generate & Buka Laporan Cetak
                                 </button>
                             </form>
@@ -1460,7 +1653,7 @@
 
                             <!-- User Info Box -->
                             <div class="ui-block">
-                                <h3 style="font-size: 14px; font-weight:700; color:var(--primary); margin-bottom: 12px;">ℹ️ Data Akun</h3>
+                                <h3 style="font-size: 14px; font-weight:700; color:var(--color-forest); margin-bottom: 12px;">ℹ️ Data Akun</h3>
                                 <div style="font-size:12.5px; line-height: 1.8; color: #555;">
                                     <p>Nama: <strong>{{ $user->nasabah_nama }}</strong></p>
                                     <p>NIK: {{ $user->nasabah_nik }}</p>
@@ -1478,7 +1671,7 @@
                             <div class="gps-section">
                                 <div class="gps-header">
                                     <div>
-                                        <h3 style="font-size:15.5px; font-weight:700; color:var(--primary); display:flex; align-items:center; gap:8px;">📍 Cari Pengepul Mitra Terdekat (Radius GPS)</h3>
+                                        <h3 style="font-size:15.5px; font-weight:700; color:var(--color-forest); display:flex; align-items:center; gap:8px;">📍 Cari Pengepul Mitra Terdekat (Radius GPS)</h3>
                                         <p style="font-size:12px; color:#555; margin-top:3px;">Aktifkan koordinat GPS perangkat Anda untuk menghitung radius jarak pengepul aktif secara real-time.</p>
                                     </div>
                                     <button onclick="aktifkanGPS()" class="gps-btn">📡 Aktifkan GPS</button>
@@ -1501,16 +1694,16 @@
                             <p style="font-size: 13px; color: #666; margin-bottom: 16px; line-height: 1.5;">Masukkan nominal uang yang ingin dicairkan. Minimal pencairan <strong>Rp 100.000</strong>. Pengajuan akan diproses oleh admin.</p>
 
                             {{-- Info saldo saat ini --}}
-                            <div style="background: #e8f5e9; border-radius: 10px; padding: 14px 18px; margin-bottom: 20px; display:flex; justify-content:space-between; align-items:center;">
+                            <div style="background: rgba(125, 184, 37, 0.1); border-radius: 10px; padding: 14px 18px; margin-bottom: 20px; display:flex; justify-content:space-between; align-items:center;">
                                 <div>
                                     <div style="font-size:12px;color:#555;font-weight:600;">Saldo Anda Saat Ini</div>
-                                    <div style="font-size:22px;font-weight:800;color:#1b5e20;">Rp {{ number_format($saldoNasabah ?? 0, 0, ',', '.') }}</div>
+                                    <div style="font-size:22px;font-weight:800;color:var(--color-forest);">Rp {{ number_format($saldoNasabah ?? 0, 0, ',', '.') }}</div>
                                 </div>
                                 <div style="font-size:28px;">💰</div>
                             </div>
 
                             @if(($saldoNasabah ?? 0) < $minimalPencairan)
-                                <div style="background:#fff8e1;border:1px solid #ffcc02;border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#e65100;">
+                                <div style="background:rgba(255, 183, 15, 0.1);border:1px solid var(--color-solar);border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:var(--color-flame);">
                                     ⚠️ Saldo Anda belum mencukupi untuk melakukan pencairan. Minimal saldo <strong>Rp {{ number_format($minimalPencairan,0,',','.') }}</strong>.
                                 </div>
                             @endif
@@ -1588,7 +1781,7 @@
                                                     <td>{{ \Carbon\Carbon::parse($rs->setor_tanggal)->format('d M Y H:i') }}</td>
                                                     <td><strong>{{ $rs->sampah->sampah_name }}</strong></td>
                                                     <td>{{ number_format($rs->setor_berat_kg, 2, ',', '.') }} kg</td>
-                                                    <td><strong style="color:var(--secondary)">+ Rp {{ number_format($rs->setor_harga_total, 0, ',', '.') }}</strong></td>
+                                                    <td><strong style="color:var(--color-canopy)">+ Rp {{ number_format($rs->setor_harga_total, 0, ',', '.') }}</strong></td>
                                                     <td><span style="font-size:12px; color:#666;">{{ $rs->setor_keterangan }}</span></td>
                                                 </tr>
                                             @endforeach
@@ -1619,7 +1812,7 @@
                                             @foreach($recentPenarikans as $rp)
                                                 <tr>
                                                     <td>{{ \Carbon\Carbon::parse($rp->tarik_tanggal)->format('d M Y') }}</td>
-                                                    <td><strong style="color:var(--danger)">Rp {{ number_format($rp->tarik_jumlah, 0, ',', '.') }}</strong></td>
+                                                    <td><strong style="color:var(--color-flame)">Rp {{ number_format($rp->tarik_jumlah, 0, ',', '.') }}</strong></td>
                                                     <td>Rp {{ number_format($rp->tarik_sisa_saldo, 0, ',', '.') }}</td>
                                                     <td>
                                                         @if($rp->tarik_bank_tujuan)
@@ -1635,11 +1828,11 @@
                                                     </td>
                                                     <td>
                                                         @if($rp->status === 'menunggu')
-                                                            <span class="status-badge" style="background-color:#fff3e0; color:#ef6c00;">⏳ Menunggu</span>
+                                                            <span class="status-badge" style="background-color:rgba(255, 183, 15, 0.1); color:var(--color-flame);">⏳ Menunggu</span>
                                                         @elseif($rp->status === 'disetujui')
-                                                            <span class="status-badge" style="background-color:#e8f5e9; color:#2e7d32;">✅ Disetujui</span>
+                                                            <span class="status-badge" style="background-color:rgba(125, 184, 37, 0.1); color:var(--color-forest);">✅ Disetujui</span>
                                                         @else
-                                                            <span class="status-badge" style="background-color:#ffebee; color:#c62828;">❌ Ditolak</span>
+                                                            <span class="status-badge" style="background-color:rgba(255, 87, 34, 0.1); color:var(--color-flame);">❌ Ditolak</span>
                                                         @endif
                                                     </td>
                                                     @if($rp->catatan)
@@ -1657,7 +1850,7 @@
                     <!-- 5. TUKAR ECO POIN TAB -->
                     <div id="tab-rewards" class="tab-content">
                         <!-- Eco Poin Stats Card -->
-                        <div style="background: linear-gradient(135deg, #1565c0 0%, #0d47a1 100%); color:#fff; border-radius: var(--radius); padding:20px; box-shadow: var(--shadow); margin-bottom: 25px; display:flex; justify-content:space-between; align-items:center;">
+                        <div style="background: var(--gradient-warm); color:#fff; border-radius: var(--radius-md); padding:20px; box-shadow: var(--shadow-glow); margin-bottom: 25px; display:flex; justify-content:space-between; align-items:center;">
                             <div>
                                 <div style="font-size:12.5px; opacity:0.8; text-transform:uppercase; font-weight:700; letter-spacing:0.5px;">Saldo Poin Anda Saat Ini</div>
                                 <div style="font-size:28px; font-weight:800; margin-top:5px;">{{ $user->gamifikasi->poin_diperoleh ?? 0 }} <span style="font-size:16px; font-weight:500; opacity:0.8;">Eco Poin</span></div>
@@ -1672,15 +1865,15 @@
 
                         <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap:20px; margin-bottom:30px;">
                             @forelse($allHadiahs as $h)
-                                <div class="ui-block" style="display:flex; flex-direction:column; padding:18px; position:relative; overflow:hidden; border-top: 4px solid var(--primary); background:#fff;">
+                                <div class="ui-block" style="display:flex; flex-direction:column; padding:18px; position:relative; overflow:hidden; border-top: 4px solid var(--color-forest); background:#fff;">
                                     <!-- Reward Title -->
                                     <h3 style="font-size:15.5px; font-weight:700; color:#333; margin-bottom:8px;">{{ $h->nama_hadiah }}</h3>
                                     <!-- Description -->
                                     <p style="font-size:12.5px; color:#666; flex-grow:1; margin-bottom:15px; line-height:1.4;">{{ $h->keterangan ?? 'Tidak ada keterangan.' }}</p>
                                     <!-- Meta Row -->
                                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; background:#f9f9f9; padding:8px; border-radius:6px; font-size:12.5px;">
-                                        <div>Biaya: <strong style="color:var(--primary); font-weight:700;">{{ $h->poin_butuh }} Poin</strong></div>
-                                        <div>Stok: <strong style="{{ $h->stok > 0 ? 'color:#2e7d32;' : 'color:var(--danger);' }}">{{ $h->stok }} pcs</strong></div>
+                                        <div>Biaya: <strong style="color:var(--color-forest); font-weight:700;">{{ $h->poin_butuh }} Poin</strong></div>
+                                        <div>Stok: <strong style="{{ $h->stok > 0 ? 'color:var(--color-forest);' : 'color:var(--color-flame);' }}">{{ $h->stok }} pcs</strong></div>
                                     </div>
                                     <!-- Action Form -->
                                     @if($h->stok > 0)
@@ -1690,14 +1883,14 @@
                                                 <input type="hidden" name="id_hadiah" value="{{ $h->id_hadiah }}">
                                                 <div style="display:flex; gap:8px;">
                                                     <input type="number" name="jumlah" value="1" min="1" max="{{ min($h->stok, floor(($user->gamifikasi->poin_diperoleh ?? 0) / $h->poin_butuh)) }}" class="form-control" style="width:70px; padding:6px 8px; text-align:center;" required>
-                                                    <button type="submit" class="btn-submit" style="margin:0; font-size:12.5px; padding:8px 12px; background:var(--primary); color:#fff; border:none; border-radius:6px; cursor:pointer; font-weight:700;">Tukar</button>
+                                                    <button type="submit" class="btn-submit" style="margin:0; font-size:12.5px; padding:8px 12px; background:var(--color-forest); color:#fff; border:none; border-radius:6px; cursor:pointer; font-weight:700;">Tukar</button>
                                                 </div>
                                             </form>
                                         @else
                                             <button disabled style="width:100%; border:none; background:#e0e0e0; color:#888; font-size:12px; padding:10px; border-radius:8px; cursor:not-allowed; font-weight:700;">Poin Tidak Cukup</button>
                                         @endif
                                     @else
-                                        <button disabled style="width:100%; border:none; background:#ffebee; color:var(--danger); font-size:12px; padding:10px; border-radius:8px; cursor:not-allowed; font-weight:700;">Stok Habis</button>
+                                        <button disabled style="width:100%; border:none; background:rgba(255, 87, 34, 0.1); color:var(--color-flame); font-size:12px; padding:10px; border-radius:8px; cursor:not-allowed; font-weight:700;">Stok Habis</button>
                                     @endif
                                 </div>
                             @empty
@@ -1729,14 +1922,14 @@
                                                      <td>{{ \Carbon\Carbon::parse($pr->tanggal_tukar)->format('d M Y') }}</td>
                                                      <td><strong>{{ $pr->hadiah->nama_hadiah ?? 'Hadiah Dihapus' }}</strong></td>
                                                      <td>{{ $pr->jumlah }} pcs</td>
-                                                     <td><strong style="color:#0d47a1">- {{ $pr->total_poin_ditukar }} Poin</strong></td>
+                                                     <td><strong style="color:var(--color-canopy)">- {{ $pr->total_poin_ditukar }} Poin</strong></td>
                                                      <td>
                                                          @if($pr->status === 'menunggu')
-                                                             <span class="status-badge" style="background-color:#fff3e0; color:#ef6c00;">⏳ Menunggu</span>
+                                                             <span class="status-badge" style="background-color:rgba(255, 183, 15, 0.1); color:var(--color-flame);">⏳ Menunggu</span>
                                                          @elseif($pr->status === 'diambil')
-                                                             <span class="status-badge" style="background-color:#e8f5e9; color:#2e7d32;">✅ Sudah Diambil</span>
+                                                             <span class="status-badge" style="background-color:rgba(125, 184, 37, 0.1); color:var(--color-forest);">✅ Sudah Diambil</span>
                                                          @else
-                                                             <span class="status-badge" style="background-color:#ffebee; color:#c62828;">❌ Ditolak</span>
+                                                             <span class="status-badge" style="background-color:rgba(255, 87, 34, 0.1); color:var(--color-flame);">❌ Ditolak</span>
                                                          @endif
                                                      </td>
                                                      <td><span style="font-size:12px; color:#666;">{{ $pr->catatan ?? '-' }}</span></td>
@@ -1753,7 +1946,7 @@
 
             </div>
 
-            <footer style="margin-top:auto; padding:20px 30px; text-align:center; font-size:12px; color:#888; background:#fff; border-top: 1px solid var(--gray-medium);">
+            <footer style="margin-top:auto; padding:20px 30px; text-align:center; font-size:12px; color:#888; background:#fff; border-top: 1px solid #d1d5d1;">
                 &copy; 2026 Bank Sampah Digital. Bersama Kita Selamatkan Ekosistem Hijau & Finansial Masa Depan.
             </footer>
 
@@ -1764,8 +1957,8 @@
     <!-- Edit Geolokasi Modal (Admin Only, triggered by JS) -->
     @if($userType === 'admin')
         <div id="edit_geo_modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
-            <div class="ui-block" style="width:100%; max-width:550px; margin: 0 15px; border-top: 5px solid var(--secondary);">
-                <h3 style="font-size:16px; font-weight:700; margin-bottom:15px; color:var(--primary);">Ubah Data Geolokasi</h3>
+            <div class="ui-block" style="width:100%; max-width:550px; margin: 0 15px; border-top: 5px solid var(--color-canopy);">
+                <h3 style="font-size:16px; font-weight:700; margin-bottom:15px; color:var(--color-forest);">Ubah Data Geolokasi</h3>
                 <form id="edit_geo_form" method="POST" action="">
                     @csrf
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
@@ -1979,7 +2172,7 @@
                 const renderList = document.getElementById('gps_render_list');
                 
                 if (!navigator.geolocation) {
-                    statusMsg.innerHTML = '<span style="color:var(--danger);">⚠️ Browser Anda tidak mendukung koordinat GPS.</span>';
+                    statusMsg.innerHTML = '<span style="color:var(--color-flame);">⚠️ Browser Anda tidak mendukung koordinat GPS.</span>';
                     return;
                 }
                 
@@ -2008,7 +2201,7 @@
                                 : loc.distance.toFixed(2) + ' km';
 
                             const tipeBadge = loc.tipe === 'Cabang Utama' 
-                                ? '<span class="status-badge open" style="background-color:#e8f5e9; color:#2e7d32; margin-left: 8px;">🏛️ Cabang Utama</span>'
+                                ? '<span class="status-badge open" style="background-color:rgba(125, 184, 37, 0.1); color:var(--color-forest); margin-left: 8px;">🏛️ Cabang Utama</span>'
                                 : '<span class="status-badge open" style="background-color:#e3f2fd; color:#1565c0; margin-left: 8px;">🚛 Mitra Pengepul</span>';
 
                             const itemHtml = `
@@ -2027,7 +2220,7 @@
                         renderList.style.display = 'flex';
                     },
                     (err) => {
-                        statusMsg.innerHTML = '<span style="color:var(--danger);">⚠️ Gagal melacak lokasi. Mohon berikan izin akses GPS/Lokasi di browser Anda.</span>';
+                        statusMsg.innerHTML = '<span style="color:var(--color-flame);">⚠️ Gagal melacak lokasi. Mohon berikan izin akses GPS/Lokasi di browser Anda.</span>';
                     }
                 );
             }

@@ -3,37 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Pengepul – Bank Sampah Digital</title>
+    <title>Dashboard Pengepul – Realive</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
     <style>
-        /* Sistem Warna – selaras dengan dashboard utama */
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Nunito+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400&display=swap');
+
         :root {
-            --primary:        #1b5e20;
-            --primary-light:  #e8f5e9;
-            --primary-medium: #81c784;
-            --secondary:      #2e7d32;
-            --accent:         #ffb300;
-            --danger:         #d32f2f;
-            --danger-light:   #ffebee;
-            --dark:           #212121;
-            --gray-light:     #f5f5f5;
-            --gray-medium:    #e0e0e0;
-            --white:          #ffffff;
-            --shadow:         0 4px 20px rgba(0,0,0,0.06);
-            --shadow-hover:   0 8px 30px rgba(27,94,32,0.12);
-            --radius:         12px;
-            --transition:     all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            /* Warm Spectrum (Energy / CTA) */
+            --color-solar:      #FFD700;
+            --color-sunburst:   #FFA500;
+            --color-ember:      #F5511E;
+            --color-flame:      #E63946;
+
+            /* Green Spectrum (Brand / Growth) */
+            --color-lime:       #C8E000;
+            --color-sprout:     #7DB825;
+            --color-forest:     #2D6A2D;
+            --color-canopy:     #1A3A1A;
+
+            /* Neutrals */
+            --color-black:      #0A0A0A;
+            --color-white:      #FFFFFF;
+            --color-mist:       #F4F7F0;
+            --color-fog:        #8A9E8A;
+            --color-smoke:      #D4DDD4;
+
+            /* Gradients */
+            --gradient-brand: linear-gradient(135deg, #FFD700 0%, #7DB825 50%, #2D6A2D 100%);
+            --gradient-warm: linear-gradient(90deg, #FFD700 0%, #F5511E 60%, #E63946 100%);
+
+            /* Semantic Tokens */
+            --bg-page:          var(--color-mist);
+            --bg-surface:       var(--color-white);
+            --bg-dark:          var(--color-black);
+            --text-primary:     var(--color-canopy);
+            --text-secondary:   var(--color-forest);
+            --text-muted:       var(--color-fog);
+            --text-on-dark:     var(--color-white);
+            --text-on-gradient: var(--color-white);
+            --accent-cta:       var(--color-solar);
+            --accent-success:   var(--color-forest);
+            --accent-alert:     var(--color-flame);
+            --border-default:   var(--color-smoke);
+            --border-focus:     var(--color-sprout);
+
+            /* Shadows & Radius */
+            --shadow-sm:    0 1px 4px rgba(26, 58, 26, 0.08);
+            --shadow-md:    0 4px 16px rgba(26, 58, 26, 0.12);
+            --shadow-lg:    0 8px 32px rgba(26, 58, 26, 0.18);
+            --shadow-xl:    0 16px 56px rgba(26, 58, 26, 0.24);
+            --shadow-glow:  0 0 24px rgba(255, 215, 0, 0.35);
+            --shadow-focus: 0 0 0 3px rgba(125, 184, 37, 0.45);
+
+            --radius-sm:   8px;
+            --radius-md:   16px;
+            --radius-lg:   24px;
+            --radius-xl:   36px;
+            --radius-full: 9999px;
+
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            font-family: 'Outfit', sans-serif;
-            background-color: #f4f6f5;
-            color: var(--dark);
+            font-family: 'Nunito Sans', sans-serif;
+            background-color: var(--bg-page);
+            color: var(--text-primary);
             min-height: 100vh;
             display: flex;
             overflow: hidden;
@@ -45,25 +83,29 @@
         /* ── SIDEBAR ── */
         .sidebar {
             width: 280px;
-            background: linear-gradient(180deg, var(--primary) 0%, #0c3610 100%);
-            color: var(--white);
+            background-color: var(--color-canopy);
+            color: var(--color-white);
             display: flex;
             flex-direction: column;
             height: 100%;
             z-index: 100;
-            box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+            box-shadow: 4px 0 15px rgba(26, 58, 26, 0.15);
             transition: var(--transition);
         }
 
         .sidebar-brand {
             padding: 24px;
-            font-size: 22px;
-            font-weight: 800;
-            letter-spacing: 0.5px;
             border-bottom: 1px solid rgba(255,255,255,0.1);
             display: flex;
             align-items: center;
-            gap: 10px;
+            justify-content: center;
+        }
+
+        .sidebar-brand img {
+            max-width: 140px;
+            width: 100%;
+            height: auto;
+            object-fit: contain;
         }
 
         .sidebar-profile {
@@ -72,31 +114,32 @@
             align-items: center;
             gap: 12px;
             border-bottom: 1px solid rgba(255,255,255,0.1);
-            background-color: rgba(255,255,255,0.03);
+            background-color: rgba(255,255,255,0.02);
         }
 
         .profile-avatar {
             width: 44px; height: 44px;
             border-radius: 50%;
-            background-color: var(--white);
-            color: var(--primary);
+            background: var(--gradient-brand);
+            color: var(--color-white);
             font-size: 20px;
             display: flex; align-items: center; justify-content: center;
-            font-weight: 700;
+            font-weight: 800;
+            box-shadow: var(--shadow-sm);
         }
 
         .profile-info { display: flex; flex-direction: column; overflow: hidden; }
-        .profile-name { font-size: 14px; font-weight: 700; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+        .profile-name { font-size: 14.5px; font-weight: 700; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
         .profile-role-badge {
             font-size: 10px;
-            background-color: var(--accent);
-            color: var(--dark);
-            padding: 1px 8px;
-            border-radius: 10px;
-            font-weight: 700;
+            background-color: var(--color-solar);
+            color: var(--color-canopy);
+            padding: 2px 8px;
+            border-radius: var(--radius-full);
+            font-weight: 800;
             text-transform: uppercase;
             align-self: flex-start;
-            margin-top: 3px;
+            margin-top: 4px;
         }
 
         .sidebar-menu { list-style: none; padding: 20px 12px; flex: 1; overflow-y: auto; }
@@ -105,46 +148,54 @@
         .menu-link {
             display: flex; align-items: center; gap: 12px;
             padding: 12px 16px;
-            color: rgba(255,255,255,0.75);
+            color: var(--color-fog);
             text-decoration: none;
-            font-size: 14px; font-weight: 600;
-            border-radius: 8px;
+            font-size: 14.5px; font-weight: 700;
+            border-radius: var(--radius-sm);
             transition: var(--transition);
             cursor: pointer;
+            border-left: 4px solid transparent;
         }
-        .menu-link:hover { color: var(--white); background-color: rgba(255,255,255,0.08); }
-        .menu-link.active { color: var(--white); background-color: var(--secondary); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .menu-link:hover { color: var(--color-white); background-color: rgba(255,255,255,0.05); }
+        .menu-link.active {
+            color: var(--color-white);
+            background-color: rgba(45, 106, 45, 0.4);
+            border-left-color: var(--color-solar);
+            box-shadow: var(--shadow-sm);
+        }
 
         .sidebar-footer { padding: 20px 24px; border-top: 1px solid rgba(255,255,255,0.1); }
         .btn-logout-sidebar {
             display: flex; align-items: center; justify-content: center; gap: 8px;
-            background-color: var(--danger);
-            color: var(--white);
-            width: 100%; border: none;
-            padding: 10px; border-radius: 8px;
-            font-size: 13.5px; font-weight: 700;
+            background-color: transparent;
+            border: 2px solid var(--color-flame);
+            color: var(--color-flame);
+            width: 100%;
+            padding: 10px; border-radius: var(--radius-full);
+            font-size: 14px; font-weight: 700;
             text-decoration: none;
             transition: var(--transition);
         }
-        .btn-logout-sidebar:hover { background-color: #b71c1c; }
+        .btn-logout-sidebar:hover { background-color: var(--color-flame); color: var(--color-white); }
 
         /* ── MAIN PANEL ── */
         .main-panel { flex: 1; display: flex; flex-direction: column; height: 100%; overflow: hidden; }
 
         .panel-header {
-            background-color: var(--white);
-            border-bottom: 1px solid var(--gray-medium);
+            background-color: var(--color-white);
+            border-bottom: 1px solid var(--border-default);
             padding: 16px 30px;
             display: flex; justify-content: space-between; align-items: center;
             z-index: 10;
+            box-shadow: var(--shadow-sm);
         }
 
-        .header-title { font-size: 18px; font-weight: 700; color: var(--primary); }
+        .header-title { font-family: 'Nunito', sans-serif; font-size: 20px; font-weight: 800; color: var(--color-canopy); }
 
         .mobile-toggle {
             display: none;
             background: none; border: none;
-            font-size: 24px; color: var(--primary);
+            font-size: 24px; color: var(--color-canopy);
             cursor: pointer; margin-right: 15px;
         }
 
@@ -159,15 +210,28 @@
 
         /* ── WELCOME ── */
         .welcome-section {
-            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
-            border-radius: var(--radius);
-            padding: 24px 30px;
+            background: var(--gradient-brand);
+            border-radius: var(--radius-md);
+            padding: 28px 36px;
             margin-bottom: 30px;
-            box-shadow: var(--shadow);
+            box-shadow: var(--shadow-md);
             position: relative; overflow: hidden;
         }
-        .welcome-text h1 { font-size: 22px; font-weight: 800; color: #0d5c14; margin-bottom: 6px; }
-        .welcome-text p  { color: #437046; font-size: 14px; }
+
+        .welcome-section::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('{{ asset('images/Pattern 2@3x.png') }}');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.15;
+            pointer-events: none;
+        }
+
+        .welcome-text { position: relative; z-index: 2; }
+        .welcome-text h1 { font-family: 'Nunito', sans-serif; font-size: 24px; font-weight: 900; color: var(--color-white); margin-bottom: 6px; }
+        .welcome-text p  { color: rgba(255, 255, 255, 0.9); font-size: 14px; font-weight: 600; }
 
         /* ── STATS ── */
         .stats-grid {
@@ -176,135 +240,152 @@
             gap: 20px; margin-bottom: 30px;
         }
         .card-stat {
-            background-color: var(--white);
-            border-radius: var(--radius);
-            padding: 20px;
-            box-shadow: var(--shadow);
+            background-color: var(--color-white);
+            border-radius: var(--radius-md);
+            padding: 24px 20px;
+            box-shadow: var(--shadow-md);
             display: flex; align-items: center; gap: 16px;
             transition: var(--transition);
-            border: 1px solid rgba(0,0,0,0.02);
+            border: 1px solid rgba(45, 106, 45, 0.05);
+            border-bottom: 4px solid var(--color-sprout);
         }
-        .card-stat:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); }
+        .card-stat:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
 
         .stat-icon {
             width: 50px; height: 50px;
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             font-size: 22px;
+            box-shadow: var(--shadow-sm);
         }
-        .stat-content h3 { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px; font-weight: 700; }
-        .stat-content p  { font-size: 18px; font-weight: 800; color: var(--dark); }
+        .stat-content { flex: 1; }
+        .stat-content h3 { font-size: 11px; color: var(--color-forest); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px; font-weight: 700; }
+        .stat-content p  { font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 800; color: var(--color-canopy); }
 
-        .icon-accent-1 { background-color: #e8f5e9; color: #2e7d32; }
-        .icon-accent-2 { background-color: #e3f2fd; color: #1e88e5; }
-        .icon-accent-3 { background-color: #fff8e1; color: #ff8f00; }
+        .icon-accent-1 { background-color: var(--color-mist); color: var(--color-forest); }
+        .icon-accent-2 { background-color: rgba(125, 184, 37, 0.15); color: var(--color-forest); }
+        .icon-accent-3 { background-color: rgba(255, 215, 0, 0.15); color: var(--color-sunburst); }
 
         /* ── UI BLOCK ── */
         .ui-block {
-            background-color: var(--white);
-            border-radius: var(--radius);
-            padding: 24px;
-            box-shadow: var(--shadow);
-            border: 1px solid rgba(0,0,0,0.02);
+            background-color: var(--color-white);
+            border-radius: 24px 24px 16px 16px;
+            padding: 28px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(45, 106, 45, 0.05);
             margin-bottom: 25px;
         }
         .block-title {
-            font-size: 16px; font-weight: 700; color: var(--primary);
-            margin-bottom: 18px; padding-bottom: 10px;
-            border-bottom: 2px solid var(--primary-light);
+            font-family: 'Nunito', sans-serif;
+            font-size: 17px; font-weight: 800; color: var(--color-canopy);
+            margin-bottom: 20px; padding-bottom: 12px;
+            border-bottom: 2px solid var(--color-mist);
             display: flex; justify-content: space-between; align-items: center;
         }
 
         /* ── FORM ── */
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-        .form-group { margin-bottom: 16px; }
-        .form-group label { display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 6px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 13.5px; font-weight: 700; color: var(--color-canopy); margin-bottom: 8px; }
         .form-control {
-            width: 100%; padding: 10px 14px;
-            border: 1px solid var(--gray-medium);
-            border-radius: 8px;
-            font-size: 13.5px; outline: none;
+            width: 100%; height: 48px; padding: 0 16px;
+            border: 2px solid var(--border-default);
+            border-radius: var(--radius-sm);
+            font-size: 14.5px; outline: none;
             font-family: inherit; transition: var(--transition);
+            background-color: var(--color-white);
+            color: var(--text-primary);
         }
-        .form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(27,94,32,0.12); }
+        .form-control:focus { border-color: var(--border-focus); box-shadow: var(--shadow-focus); }
 
-        /* Preview nilai rupiah realtime */
         .nilai-preview {
-            background: var(--primary-light);
-            border-radius: 8px;
+            background: var(--color-mist);
+            border-radius: var(--radius-sm);
             padding: 12px 16px;
-            margin-top: 4px;
+            margin-top: 10px;
             font-size: 15px;
             font-weight: 700;
-            color: var(--primary);
+            color: var(--color-forest);
             display: flex; align-items: center; gap: 8px;
+            border: 1px solid rgba(125, 184, 37, 0.15);
         }
 
         /* ── BUTTONS ── */
         .btn-submit {
-            background-color: var(--primary);
-            color: var(--white); border: none;
-            padding: 11px 20px; border-radius: 8px;
-            font-size: 14px; font-weight: 700;
+            background-color: var(--accent-cta);
+            color: var(--color-canopy); border: none;
+            padding: 12px 24px; border-radius: var(--radius-full);
+            font-size: 15px; font-weight: 700;
             cursor: pointer; width: 100%;
             transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+            display: flex; align-items: center; justify-content: center; gap: 8px;
         }
-        .btn-submit:hover { background-color: var(--secondary); transform: translateY(-1px); }
+        .btn-submit:hover { background-color: var(--color-sunburst); transform: scale(1.02); box-shadow: var(--shadow-glow); }
 
         .btn-print {
-            background-color: var(--primary);
-            color: var(--white); border: none;
-            padding: 9px 18px; border-radius: 8px;
-            font-size: 13px; font-weight: 700;
+            background-color: var(--color-white);
+            color: var(--color-forest); border: 2px solid var(--color-forest);
+            padding: 10px 20px; border-radius: var(--radius-full);
+            font-size: 14px; font-weight: 700;
             cursor: pointer; text-decoration: none;
             display: inline-flex; align-items: center; gap: 8px;
             transition: var(--transition);
         }
-        .btn-print:hover { background-color: var(--secondary); }
+        .btn-print:hover { background-color: var(--color-mist); border-color: var(--color-sprout); }
 
         .btn-filter {
-            background-color: var(--secondary);
-            color: var(--white); border: none;
-            padding: 9px 18px; border-radius: 8px;
-            font-size: 13px; font-weight: 700;
+            background-color: var(--color-canopy);
+            color: var(--color-white); border: none;
+            padding: 10px 20px; border-radius: var(--radius-full);
+            font-size: 14px; font-weight: 700;
             cursor: pointer;
             display: inline-flex; align-items: center; gap: 6px;
             transition: var(--transition);
         }
-        .btn-filter:hover { background-color: var(--primary); }
+        .btn-filter:hover { background-color: var(--color-forest); }
 
         /* ── TABLE ── */
-        .table-wrap { width: 100%; overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; font-size: 13.5px; text-align: left; }
-        th { background-color: var(--gray-light); padding: 12px; font-weight: 600; color: #666; border-bottom: 2px solid var(--gray-medium); }
-        td { padding: 12px; border-bottom: 1px solid var(--gray-light); }
-        tr:hover td { background-color: #fafdfb; }
+        .table-wrap { width: 100%; overflow-x: auto; margin-top: 10px; }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; text-align: left; }
+        th { background-color: var(--color-mist); padding: 14px 16px; font-weight: 700; color: var(--color-canopy); border-bottom: 2px solid var(--color-smoke); text-transform: uppercase; font-size: 12px; letter-spacing: 0.05em; }
+        td { padding: 14px 16px; border-bottom: 1px solid var(--color-mist); color: var(--text-primary); }
+        tr:hover td { background-color: rgba(244, 247, 240, 0.5); }
+        
+        td.mono-col { font-family: 'JetBrains Mono', monospace; font-weight: 600; }
 
         /* ── ALERT ── */
         .alert {
-            padding: 16px 20px; border-radius: var(--radius);
-            margin-bottom: 25px; font-size: 14px; font-weight: 500;
+            padding: 16px 20px; border-radius: var(--radius-md);
+            margin-bottom: 25px; font-size: 14.5px; font-weight: 700;
             display: flex; align-items: center; gap: 12px;
-            box-shadow: var(--shadow);
+            box-shadow: var(--shadow-md);
+            border-left: 5px solid;
+            animation: slideDown 0.4s ease-out;
         }
-        .alert-success { background-color: var(--primary-light); border-left: 5px solid var(--secondary); color: #1b5e20; }
-        .alert-error   { background-color: var(--danger-light);  border-left: 5px solid var(--danger);    color: #b71c1c; }
+        @keyframes slideDown {
+            from { transform: translateY(-10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .alert-success { background-color: var(--color-mist); border-left-color: var(--color-sprout); color: var(--color-forest); }
+        .alert-error   { background-color: rgba(230, 57, 70, 0.1);  border-left-color: var(--color-flame);    color: var(--color-flame); }
 
         /* ── FILTER ROW ── */
-        .filter-row { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 20px; }
+        .filter-row { display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 24px; }
         .filter-row .form-group { margin-bottom: 0; }
 
         /* ── LAPORAN TOTAL ── */
         .laporan-total {
-            display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px;
+            display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px;
         }
         .total-box {
-            background: var(--primary-light);
-            border-radius: var(--radius);
-            padding: 14px 20px; flex: 1; min-width: 160px;
+            background: var(--color-mist);
+            border-radius: var(--radius-md);
+            padding: 16px 20px; flex: 1; min-width: 180px;
+            border: 1px solid rgba(125, 184, 37, 0.15);
         }
-        .total-box h4 { font-size: 11px; color: #437046; text-transform: uppercase; font-weight: 700; margin-bottom: 4px; }
-        .total-box p  { font-size: 20px; font-weight: 800; color: var(--primary); }
+        .total-box h4 { font-size: 11px; color: var(--color-forest); text-transform: uppercase; font-weight: 700; margin-bottom: 6px; letter-spacing: 0.05em; }
+        .total-box p  { font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 800; color: var(--color-canopy); }
 
         /* ── RESPONSIVE ── */
         @media (max-width: 768px) {
@@ -323,7 +404,7 @@
     <!-- ═══════════════════════════════════════════ -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-brand">
-            <span>🌿</span> Bank Sampah
+            <img src="{{ asset('images/logo Realive@3x.png') }}" alt="Realive Logo">
         </div>
 
         <div class="sidebar-profile">
@@ -337,30 +418,30 @@
         <ul class="sidebar-menu">
             <li>
                 <a class="menu-link active" data-tab="tab-dashboard" onclick="switchTab(event,'tab-dashboard')">
-                    🏠 Dashboard
+                    <span>🏠</span> Dashboard
                 </a>
             </li>
             <li>
                 <a class="menu-link" data-tab="tab-timbang" onclick="switchTab(event,'tab-timbang')">
-                    ⚖️ Timbang &amp; Setor
+                    <span>⚖️</span> Timbang &amp; Setor
                 </a>
             </li>
             <li>
                 <a class="menu-link" data-tab="tab-setoran" onclick="switchTab(event,'tab-setoran')">
-                    💸 Setoran ke Admin
+                    <span>💸</span> Setoran ke Admin
                     @if($transaksiBelumDisetor->count() > 0)
-                        <span style="background:#ffb300;color:#fff;border-radius:10px;padding:1px 8px;font-size:11px;margin-left:6px;">{{ $transaksiBelumDisetor->count() }}</span>
+                        <span style="background:var(--color-solar);color:var(--color-canopy);border-radius:10px;padding:1px 8px;font-size:11px;margin-left:6px;font-weight:800;">{{ $transaksiBelumDisetor->count() }}</span>
                     @endif
                 </a>
             </li>
             <li>
                 <a class="menu-link" data-tab="tab-riwayat-setoran" onclick="switchTab(event,'tab-riwayat-setoran')">
-                    📜 Riwayat Setoran
+                    <span>📜</span> Riwayat Setoran
                 </a>
             </li>
             <li>
                 <a class="menu-link" data-tab="tab-laporan" onclick="switchTab(event,'tab-laporan')">
-                    📊 Laporan Bulanan
+                    <span>📊</span> Laporan Bulanan
                 </a>
             </li>
         </ul>
@@ -379,8 +460,8 @@
                 <button class="mobile-toggle" onclick="document.getElementById('sidebar').classList.toggle('mobile-active')">☰</button>
                 <div class="header-title">Bank Sampah Digital</div>
             </div>
-            <div style="background:var(--primary-light);color:var(--primary);padding:6px 14px;border-radius:20px;font-weight:700;font-size:13px;">
-                Pengepul
+            <div style="background:var(--color-mist);color:var(--color-forest);padding:6px 14px;border-radius:20px;font-weight:700;font-size:13px;border:1px solid rgba(45,106,45,0.15);">
+                Pengepul Panel
             </div>
         </header>
 
@@ -403,7 +484,7 @@
                     </div>
                 </div>
 
-                <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(160px,1fr));">
+                <div class="stats-grid">
                     <div class="card-stat">
                         <div class="stat-icon icon-accent-1">⚖️</div>
                         <div class="stat-content">
@@ -414,29 +495,29 @@
                     <div class="card-stat">
                         <div class="stat-icon icon-accent-2">🗂️</div>
                         <div class="stat-content">
-                            <h3>Total Berat Terkumpul</h3>
+                            <h3>Total Berat</h3>
                             <p>{{ number_format($totalBeratKg, 2) }} kg</p>
                         </div>
                     </div>
                     <div class="card-stat">
                         <div class="stat-icon icon-accent-3">💰</div>
                         <div class="stat-content">
-                            <h3>Nilai ke Nasabah</h3>
+                            <h3>Nilai Nasabah</h3>
                             <p>Rp {{ number_format($totalNilaiRupiah, 0, ',', '.') }}</p>
                         </div>
                     </div>
-                    <div class="card-stat" style="border-left:4px solid #ffb300;">
-                        <div class="stat-icon" style="background:#fff8e1;color:#ff8f00;">🤑</div>
+                    <div class="card-stat" style="border-bottom-color: var(--color-sunburst);">
+                        <div class="stat-icon" style="background:rgba(255, 215, 0, 0.15);color:var(--color-sunburst);">🤑</div>
                         <div class="stat-content">
-                            <h3>Total Komisi Saya</h3>
-                            <p style="color:#e65100;">Rp {{ number_format($totalKomisi, 0, ',', '.') }}</p>
+                            <h3>Komisi Saya</h3>
+                            <p style="color:var(--color-sunburst);">Rp {{ number_format($totalKomisi, 0, ',', '.') }}</p>
                         </div>
                     </div>
-                    <div class="card-stat" style="border-left:4px solid #d32f2f;">
-                        <div class="stat-icon" style="background:#ffebee;color:#c62828;">⏳</div>
+                    <div class="card-stat" style="border-bottom-color: var(--color-flame);">
+                        <div class="stat-icon" style="background:rgba(230, 57, 70, 0.1);color:var(--color-flame);">⏳</div>
                         <div class="stat-content">
                             <h3>Belum Disetor</h3>
-                            <p style="color:#c62828;">{{ $transaksiBelumDisetor->count() }} transaksi</p>
+                            <p style="color:var(--color-flame);">{{ $transaksiBelumDisetor->count() }} Trx</p>
                         </div>
                     </div>
                 </div>
@@ -457,15 +538,15 @@
                             <tbody>
                                 @forelse($transaksibulanIni as $t)
                                 <tr>
-                                    <td>{{ \Carbon\Carbon::parse($t->tanggal)->format('d/m/Y') }}</td>
-                                    <td>{{ $t->nasabah->nasabah_nama ?? '-' }}</td>
+                                    <td class="mono-col">{{ \Carbon\Carbon::parse($t->tanggal)->format('d/m/Y') }}</td>
+                                    <td><strong>{{ $t->nasabah->nasabah_nama ?? '-' }}</strong></td>
                                     <td>{{ $t->sampah->sampah_name ?? '-' }}</td>
-                                    <td>{{ number_format($t->berat_kg, 2) }}</td>
-                                    <td>{{ number_format($t->nilai_idr, 0, ',', '.') }}</td>
+                                    <td class="mono-col">{{ number_format($t->berat_kg, 2) }}</td>
+                                    <td class="mono-col">Rp {{ number_format($t->nilai_idr, 0, ',', '.') }}</td>
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="5" style="text-align:center;color:#aaa;padding:24px;">
+                                    <td colspan="5" style="text-align:center;color:var(--color-fog);padding:24px;">
                                         Belum ada transaksi bulan ini
                                     </td>
                                 </tr>
@@ -478,24 +559,24 @@
                 <!-- Geolokasi Stasiun Pengepul (Update GPS) -->
                 <div class="ui-block" style="margin-top:24px;">
                     <div class="block-title">📍 Geolokasi Stasiun Pengepul</div>
-                    <p style="font-size:12.5px; color:#555; margin-bottom:16px;">
-                        Nasabah memerlukan data GPS Anda untuk mencari stasiun terdekat. Anda dapat memperbarui lokasi koordinat stasiun pengepul Anda berdasarkan posisi GPS perangkat Anda saat ini secara real-time.
+                    <p style="font-size:13.5px; color:var(--color-forest); margin-bottom:16px; line-height: 1.5;">
+                        Nasabah memerlukan data GPS kamu untuk mencari stasiun terdekat. Kamu dapat memperbarui lokasi koordinat stasiun pengepul berdasarkan posisi GPS perangkat saat ini secara real-time.
                     </p>
                     
-                    <div style="background:#eef7f2; border:1px solid #cce6d5; border-radius:8px; padding:16px; margin-bottom:16px;">
-                        <p style="font-size:13.5px; color:#333; font-weight:600;">
+                    <div style="background:var(--color-mist); border:1px solid rgba(125, 184, 37, 0.25); border-radius:8px; padding:16px; margin-bottom:16px;">
+                        <p style="font-size:14px; color:var(--color-canopy); font-weight:700;">
                             📍 Koordinat Stasiun Saat Ini: 
-                            <span style="color:var(--primary); font-family:monospace; font-size:14px;" id="current_coords">
+                            <span style="color:var(--color-forest); font-family:monospace; font-size:14.5px;" id="current_coords">
                                 {{ $pengepul->latitude ?? '-' }}, {{ $pengepul->longitude ?? '-' }}
                             </span>
                         </p>
-                        <div id="gps_status" style="font-size:12.5px; color:#666; font-style:italic; margin-top:6px;">
-                            *Tekan tombol di bawah untuk melacak GPS perangkat Anda.
+                        <div id="gps_status" style="font-size:12.5px; color:var(--color-fog); font-style:italic; margin-top:6px;">
+                            *Tekan tombol di bawah untuk melacak GPS perangkat kamu.
                         </div>
                     </div>
                     
                     <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
-                        <button type="button" onclick="ambilLokasiGPS()" class="btn-filter" style="background-color: var(--secondary); font-size:13px; padding:10px 20px; font-weight:700;">
+                        <button type="button" onclick="ambilLokasiGPS()" class="btn-filter" style="background-color: var(--color-forest); font-size:13px; padding:10px 20px; font-weight:700;">
                             📡 Ambil Lokasi GPS Perangkat
                         </button>
                         
@@ -503,7 +584,7 @@
                             @csrf
                             <input type="hidden" name="latitude" id="input_latitude">
                             <input type="hidden" name="longitude" id="input_longitude">
-                            <button type="submit" class="btn-submit" style="width:auto; padding:10px 24px; background-color: var(--primary);">
+                            <button type="submit" class="btn-submit" style="width:auto; padding:10px 24px; background-color: var(--color-sprout); color: white;">
                                 💾 Simpan Koordinat GPS Baru
                             </button>
                         </form>
@@ -551,7 +632,7 @@
                                     placeholder="Contoh: 2.50" required
                                     oninput="hitungNilai()">
                                 <div class="nilai-preview" id="nilaiPreview">
-                                    💰 Nilai: <span id="nilaiText">Rp 0</span>
+                                    💰 Nilai: <span id="nilaiText" style="font-family: 'JetBrains Mono', monospace; font-weight: 800;">Rp 0</span>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -576,33 +657,33 @@
             <div class="tab-content" id="tab-setoran">
                 <div class="ui-block">
                     <div class="block-title">💸 Setoran ke Admin
-                        <span style="font-size:12px;font-weight:500;color:#666;">Pilih transaksi yang akan disetor</span>
+                        <span style="font-size:12px;font-weight:500;color:var(--color-fog);">Pilih transaksi yang akan disetor</span>
                     </div>
 
                     @if($transaksiBelumDisetor->isEmpty())
-                        <div style="text-align:center;padding:40px;color:#aaa;">
+                        <div style="text-align:center;padding:40px;color:var(--color-fog);">
                             <div style="font-size:40px;">✅</div>
-                            <p style="margin-top:12px;font-size:14px;">Semua transaksi sudah disetor ke admin.</p>
+                            <p style="margin-top:12px;font-size:14px;font-weight:700;">Semua transaksi sudah disetor ke admin.</p>
                         </div>
                     @else
                         {{-- Ringkasan setoran --}}
                         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:20px;">
-                            <div style="background:#e8f5e9;border-radius:10px;padding:14px;text-align:center;">
-                                <div style="font-size:12px;color:#555;font-weight:600;">Nilai ke Nasabah</div>
-                                <div style="font-size:18px;font-weight:800;color:#1b5e20;margin-top:4px;">Rp {{ number_format($totalBelumDisetor,0,',','.') }}</div>
+                            <div style="background:var(--color-mist);border-radius:10px;padding:14px;text-align:center;border:1px solid rgba(45,106,45,0.15);">
+                                <div style="font-size:12px;color:var(--color-forest);font-weight:700;text-transform:uppercase;">Nilai Nasabah</div>
+                                <div style="font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:800;color:var(--color-canopy);margin-top:4px;">Rp {{ number_format($totalBelumDisetor,0,',','.') }}</div>
                             </div>
-                            <div style="background:#fff8e1;border-radius:10px;padding:14px;text-align:center;">
-                                <div style="font-size:12px;color:#555;font-weight:600;">Komisi Saya (50%)</div>
-                                <div style="font-size:18px;font-weight:800;color:#e65100;margin-top:4px;">Rp {{ number_format($totalKomisiBelum,0,',','.') }}</div>
+                            <div style="background:rgba(255, 215, 0, 0.1);border-radius:10px;padding:14px;text-align:center;border:1px solid rgba(255, 215, 0, 0.3);">
+                                <div style="font-size:12px;color:var(--color-sunburst);font-weight:700;text-transform:uppercase;">Komisi Saya (50%)</div>
+                                <div style="font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:800;color:var(--color-sunburst);margin-top:4px;">Rp {{ number_format($totalKomisiBelum,0,',','.') }}</div>
                             </div>
-                            <div style="background:#fce4ec;border-radius:10px;padding:14px;text-align:center;">
-                                <div style="font-size:12px;color:#555;font-weight:600;">Bagian Admin (50%)</div>
-                                <div style="font-size:18px;font-weight:800;color:#c62828;margin-top:4px;">Rp {{ number_format($totalAdminBelum,0,',','.') }}</div>
+                            <div style="background:rgba(230, 57, 70, 0.05);border-radius:10px;padding:14px;text-align:center;border:1px solid rgba(230, 57, 70, 0.2);">
+                                <div style="font-size:12px;color:var(--color-flame);font-weight:700;text-transform:uppercase;">Bagian Admin (50%)</div>
+                                <div style="font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:800;color:var(--color-flame);margin-top:4px;">Rp {{ number_format($totalAdminBelum,0,',','.') }}</div>
                             </div>
-                            <div style="background:#e3f2fd;border-radius:10px;padding:14px;text-align:center;border:2px solid #1565c0;">
-                                <div style="font-size:12px;color:#555;font-weight:600;">Total Disetor ke Admin</div>
-                                <div style="font-size:18px;font-weight:800;color:#1565c0;margin-top:4px;">Rp {{ number_format($totalHarusDisetor,0,',','.') }}</div>
-                                <div style="font-size:10px;color:#777;margin-top:2px;">(nilai nasabah + bagian admin)</div>
+                            <div style="background:var(--color-mist);border-radius:10px;padding:14px;text-align:center;border:2px solid var(--color-forest);">
+                                <div style="font-size:12px;color:var(--color-forest);font-weight:700;text-transform:uppercase;">Total Disetor</div>
+                                <div style="font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:800;color:var(--color-canopy);margin-top:4px;">Rp {{ number_format($totalHarusDisetor,0,',','.') }}</div>
+                                <div style="font-size:10px;color:var(--color-fog);margin-top:2px;">(nilai nasabah + bagian admin)</div>
                             </div>
                         </div>
 
@@ -626,13 +707,13 @@
                                         @foreach($transaksiBelumDisetor as $t)
                                         <tr>
                                             <td><input type="checkbox" name="transaksi_ids[]" value="{{ $t->id }}" class="trx-check" checked></td>
-                                            <td>{{ \Carbon\Carbon::parse($t->tanggal)->format('d/m/Y') }}</td>
-                                            <td>{{ $t->nasabah->nasabah_nama ?? '-' }}</td>
+                                            <td class="mono-col">{{ \Carbon\Carbon::parse($t->tanggal)->format('d/m/Y') }}</td>
+                                            <td><strong>{{ $t->nasabah->nasabah_nama ?? '-' }}</strong></td>
                                             <td>{{ $t->sampah->sampah_name ?? '-' }}</td>
-                                            <td>{{ number_format($t->berat_kg,2) }}</td>
-                                            <td>Rp {{ number_format($t->nilai_idr,0,',','.') }}</td>
-                                            <td style="color:#e65100;font-weight:600;">Rp {{ number_format($t->komisi_pengepul,0,',','.') }}</td>
-                                            <td style="color:#c62828;font-weight:600;">Rp {{ number_format($t->bagian_admin,0,',','.') }}</td>
+                                            <td class="mono-col">{{ number_format($t->berat_kg,2) }}</td>
+                                            <td class="mono-col">Rp {{ number_format($t->nilai_idr,0,',','.') }}</td>
+                                            <td class="mono-col" style="color:var(--color-sunburst);">Rp {{ number_format($t->komisi_pengepul,0,',','.') }}</td>
+                                            <td class="mono-col" style="color:var(--color-flame);">Rp {{ number_format($t->bagian_admin,0,',','.') }}</td>
                                         </tr>
                                         @endforeach
                                     </tbody>
@@ -668,24 +749,24 @@
                             <tbody>
                                 @forelse($riwayatSetoran as $s)
                                 <tr>
-                                    <td>{{ $s->created_at->format('d/m/Y H:i') }}</td>
-                                    <td>Rp {{ number_format($s->total_nilai_nasabah,0,',','.') }}</td>
-                                    <td style="color:#e65100;font-weight:600;">Rp {{ number_format($s->total_komisi_pengepul,0,',','.') }}</td>
-                                    <td style="color:#1565c0;font-weight:700;">Rp {{ number_format($s->total_disetor,0,',','.') }}</td>
+                                    <td class="mono-col">{{ $s->created_at->format('d/m/Y H:i') }}</td>
+                                    <td class="mono-col">Rp {{ number_format($s->total_nilai_nasabah,0,',','.') }}</td>
+                                    <td class="mono-col" style="color:var(--color-sunburst);">Rp {{ number_format($s->total_komisi_pengepul,0,',','.') }}</td>
+                                    <td class="mono-col" style="color:var(--color-forest);font-weight:700;">Rp {{ number_format($s->total_disetor,0,',','.') }}</td>
                                     <td>
                                         @if($s->status === 'terverifikasi')
-                                            <span style="background:#e8f5e9;color:#1b5e20;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:700;">✅ Terverifikasi</span>
+                                            <span style="background:var(--color-mist);color:var(--color-forest);padding:4px 12px;border-radius:12px;font-size:12px;font-weight:700;border:1px solid rgba(45,106,45,0.15);">✅ Terverifikasi</span>
                                         @elseif($s->status === 'menunggu')
-                                            <span style="background:#fff8e1;color:#e65100;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:700;">⏳ Menunggu</span>
+                                            <span style="background:rgba(255, 215, 0, 0.15);color:var(--color-sunburst);padding:4px 12px;border-radius:12px;font-size:12px;font-weight:700;">⏳ Menunggu</span>
                                         @else
-                                            <span style="background:#ffebee;color:#c62828;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:700;">❌ Ditolak</span>
+                                            <span style="background:rgba(230, 57, 70, 0.1);color:var(--color-flame);padding:4px 12px;border-radius:12px;font-size:12px;font-weight:700;">❌ Ditolak</span>
                                         @endif
                                     </td>
-                                    <td style="color:#666;font-size:12px;">{{ $s->catatan ?? '-' }}</td>
+                                    <td style="color:var(--color-forest);font-size:13px;">{{ $s->catatan ?? '-' }}</td>
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="6" style="text-align:center;color:#aaa;padding:24px;">Belum ada riwayat setoran</td>
+                                    <td colspan="6" style="text-align:center;color:var(--color-fog);padding:24px;">Belum ada riwayat setoran</td>
                                 </tr>
                                 @endforelse
                             </tbody>
@@ -699,7 +780,6 @@
                 <div class="ui-block">
                     <div class="block-title">📊 Laporan Bulanan</div>
 
-                    {{-- Form filter – kirim ke dashboard dengan query param --}}
                     <form method="GET" action="{{ route('pengepul.dashboard') }}" id="formLaporan">
                         <input type="hidden" name="_tab" value="tab-laporan">
                         <div class="filter-row">
@@ -724,9 +804,9 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <button type="submit" class="btn-filter">🔍 Filter</button>
+                            <button type="submit" class="btn-filter">🔍 Filter Periodik</button>
                             <a href="{{ route('pengepul.laporan', ['bulan' => $laporanBulan, 'tahun' => $laporanTahun, 'cetak' => 1]) }}"
-                               class="btn-print" target="_blank">🖨️ Cetak / Print</a>
+                               class="btn-print" target="_blank">🖨️ Cetak PDF</a>
                         </div>
                     </form>
 
@@ -764,16 +844,16 @@
                                 @forelse($laporanTransaksi as $index => $t)
                                 <tr>
                                     <td>{{ $index + 1 }}</td>
-                                    <td>{{ \Carbon\Carbon::parse($t->tanggal)->format('d/m/Y') }}</td>
-                                    <td>{{ $t->nasabah->nasabah_nama ?? '-' }}</td>
+                                    <td class="mono-col">{{ \Carbon\Carbon::parse($t->tanggal)->format('d/m/Y') }}</td>
+                                    <td><strong>{{ $t->nasabah->nasabah_nama ?? '-' }}</strong></td>
                                     <td>{{ $t->sampah->sampah_name ?? '-' }}</td>
-                                    <td>{{ number_format($t->berat_kg, 2) }}</td>
-                                    <td>{{ number_format($t->nilai_idr, 0, ',', '.') }}</td>
+                                    <td class="mono-col">{{ number_format($t->berat_kg, 2) }}</td>
+                                    <td class="mono-col">Rp {{ number_format($t->nilai_idr, 0, ',', '.') }}</td>
                                     <td>{{ $t->keterangan ?? '-' }}</td>
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="7" style="text-align:center;color:#aaa;padding:24px;">
+                                    <td colspan="7" style="text-align:center;color:var(--color-fog);padding:24px;">
                                         Tidak ada transaksi pada periode ini
                                     </td>
                                 </tr>
@@ -789,7 +869,7 @@
 </div><!-- /app-layout -->
 
 <script>
-    // ── Tab Engine (identik dengan dashboard utama) ──────────────────
+    // ── Tab Engine ──────────────────
     const STORAGE_KEY = 'BS_pengepul_tab';
 
     function switchTab(event, tabId) {
@@ -806,7 +886,7 @@
         localStorage.setItem(STORAGE_KEY, tabId);
     }
 
-    // Restore tab: prioritas → query param _tab → localStorage → default
+    // Restore tab
     (function () {
         const urlParams   = new URLSearchParams(window.location.search);
         const tabFromUrl  = urlParams.get('_tab');
@@ -821,7 +901,6 @@
         const link = document.querySelector(`[data-tab="${savedTab}"]`);
         if (link) link.classList.add('active');
 
-        // Simpan ke localStorage agar persistent
         localStorage.setItem(STORAGE_KEY, savedTab);
     })();
 
@@ -841,9 +920,6 @@
 
     document.getElementById('id_sampah')?.addEventListener('change', hitungNilai);
 
-    // ── Redirect tab laporan ke server dengan GET ──────────────────
-    // (ditangani langsung via form GET, tidak perlu JS tambahan)
-
     // ── Ambil lokasi dari GPS Perangkat ─────────────────────────────
     function ambilLokasiGPS() {
         const statusMsg = document.getElementById('gps_status');
@@ -852,7 +928,7 @@
         const inputLng = document.getElementById('input_longitude');
 
         if (!navigator.geolocation) {
-            statusMsg.innerHTML = '<span style="color:var(--danger);">⚠️ Browser Anda tidak mendukung koordinat GPS / Geolocation.</span>';
+            statusMsg.innerHTML = '<span style="color:var(--color-flame);">⚠️ Browser Anda tidak mendukung koordinat GPS / Geolocation.</span>';
             return;
         }
 
@@ -870,7 +946,7 @@
                 formUpdate.style.display = 'block';
             },
             function(err) {
-                statusMsg.innerHTML = '<span style="color:var(--danger);">⚠️ Gagal melacak lokasi. Mohon izinkan akses lokasi (GPS) di browser Anda.</span>';
+                statusMsg.innerHTML = '<span style="color:var(--color-flame);">⚠️ Gagal melacak lokasi. Mohon izinkan akses lokasi (GPS) di browser Anda.</span>';
             },
             {
                 enableHighAccuracy: true,
