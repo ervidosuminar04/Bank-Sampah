@@ -17,6 +17,8 @@ return new class extends Migration
             $table->decimal('setor_berat_kg', 10, 2);
             $table->decimal('setor_harga_total', 15, 2);
             $table->text('setor_keterangan')->nullable();
+            $table->string('foto_dokumentasi')->nullable()
+                  ->comment('Path foto dokumentasi transaksi setor untuk verifikasi');
             
             // Relasi ke nasabah (melakukan)
             $table->integer('id_nasabah');

@@ -109,6 +109,7 @@ class PengepulController extends Controller
             'id_sampah'   => 'required|integer|exists:sampah,id_sampah',
             'berat_kg'    => 'required|numeric|min:0.01',
             'keterangan'  => 'nullable|string|max:255',
+            'foto_dokumentasi' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $pengepulId = session('user_id');
@@ -144,6 +145,7 @@ class PengepulController extends Controller
             'sudah_disetor'   => false,
             'tanggal'         => now()->toDateString(),
             'keterangan'      => $data['keterangan'] ?? 'Setor ' . $sampah->sampah_name . ' ' . $beratKg . ' kg via pengepul',
+            'foto_dokumentasi' => $request->hasFile('foto_dokumentasi') ? $request->file('foto_dokumentasi')->store('dokumentasi_timbangan', 'public') : null,
         ]);
 
         // ── Update tabungan nasabah (hanya nilai harga beli) ─────────────
@@ -192,6 +194,7 @@ class PengepulController extends Controller
         $data = $request->validate([
             'transaksi_ids'   => 'required|array|min:1',
             'transaksi_ids.*' => 'integer|exists:transaksi_pengepul,id',
+            'foto_dokumentasi' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $pengepulId = session('user_id');
@@ -223,6 +226,7 @@ class PengepulController extends Controller
             'total_disetor'         => $totalDisetor,
             'transaksi_ids'         => $transaksi->pluck('id')->toArray(),
             'status'                => 'menunggu',
+            'foto_dokumentasi'      => $request->hasFile('foto_dokumentasi') ? $request->file('foto_dokumentasi')->store('dokumentasi_setoran', 'public') : null,
         ]);
 
         // Tandai semua transaksi sebagai sudah disetor

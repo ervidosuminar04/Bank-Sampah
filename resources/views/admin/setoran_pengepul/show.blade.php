@@ -282,7 +282,6 @@
 <body>
 <div class="topbar">
     <div class="topbar-brand">
-        <img src="{{ asset('images/logo Realive@3x.png') }}" alt="Realive Logo">
         <h1>Detail Setoran #{{ $setoran->id }}</h1>
     </div>
     <a href="{{ route('admin.setoran.index') }}">← Kembali ke Daftar</a>

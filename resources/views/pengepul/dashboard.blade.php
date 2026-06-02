@@ -404,7 +404,7 @@
     <!-- ═══════════════════════════════════════════ -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-brand">
-            <img src="{{ asset('images/logo Realive@3x.png') }}" alt="Realive Logo">
+            <img src="{{ asset('images/white logo@4x.png') }}" alt="Realive Logo">
         </div>
 
         <div class="sidebar-profile">
@@ -598,7 +598,7 @@
                 <div class="ui-block">
                     <div class="block-title">⚖️ Timbang &amp; Setor Sampah Nasabah</div>
 
-                    <form method="POST" action="{{ route('pengepul.setor') }}" id="formSetor">
+                    <form method="POST" action="{{ route('pengepul.setor') }}" id="formSetor" enctype="multipart/form-data">
                         @csrf
 
                         <div class="form-row">
@@ -634,6 +634,10 @@
                                 <div class="nilai-preview" id="nilaiPreview">
                                     💰 Nilai: <span id="nilaiText" style="font-family: 'JetBrains Mono', monospace; font-weight: 800;">Rp 0</span>
                                 </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Gambar Dokumentasi (Wajib)</label>
+                                <input type="file" name="foto_dokumentasi" class="form-control" accept="image/*" required style="padding-top:10px;">
                             </div>
                             <div class="form-group">
                                 <label>Keterangan (opsional)</label>
@@ -687,7 +691,7 @@
                             </div>
                         </div>
 
-                        <form method="POST" action="{{ route('pengepul.setoran.store') }}" id="formSetoran">
+                        <form method="POST" action="{{ route('pengepul.setoran.store') }}" id="formSetoran" enctype="multipart/form-data">
                             @csrf
                             <div class="table-wrap">
                                 <table>
@@ -718,6 +722,12 @@
                                         @endforeach
                                     </tbody>
                                 </table>
+                            </div>
+                            <div style="margin-top:20px;">
+                                <div class="form-group">
+                                    <label>Bukti Transfer / Dokumentasi Setoran (Wajib)</label>
+                                    <input type="file" name="foto_dokumentasi" class="form-control" accept="image/*" required style="padding-top:10px;">
+                                </div>
                             </div>
                             <div style="margin-top:20px;display:flex;justify-content:flex-end;">
                                 <button type="submit" class="btn-submit" style="width:auto;padding:12px 32px;"

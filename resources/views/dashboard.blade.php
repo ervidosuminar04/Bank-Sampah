@@ -181,7 +181,7 @@
             color: var(--color-canopy);
             padding: 2px 10px;
             border-radius: var(--radius-full);
-            font-weight: 700;
+            font-weight: 900;
             text-transform: uppercase;
             letter-spacing: 0.1em;
             align-self: flex-start;
@@ -298,9 +298,9 @@
         }
         
         .role-badge {
-            background-color: var(--color-mist);
-            color: var(--color-forest);
-            border: 2px solid var(--color-sprout);
+            background-color: var(--color-canopy);
+            color: var(--color-solar);
+            border: none;
             padding: 6px 16px;
             border-radius: var(--radius-full);
             font-weight: 700;
@@ -328,6 +328,141 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
+        /* ── Map Illustration Animations ── */
+        @keyframes pinDrop {
+            0%   { opacity: 0; transform: translate(-50%, -100%) translateY(-60px) scale(0.3); }
+            60%  { opacity: 1; transform: translate(-50%, -100%) translateY(8px) scale(1.1); }
+            80%  { transform: translate(-50%, -100%) translateY(-4px) scale(0.95); }
+            100% { opacity: 1; transform: translate(-50%, -100%) translateY(0) scale(1); }
+        }
+
+        @keyframes radarPulse {
+            0%   { transform: translate(-50%, -50%) scale(0); opacity: 0.7; }
+            100% { transform: translate(-50%, -50%) scale(4); opacity: 0; }
+        }
+
+        @keyframes pinBounce {
+            0%, 100% { transform: translate(-50%, -100%) translateY(0); }
+            40%      { transform: translate(-50%, -100%) translateY(-14px); }
+            60%      { transform: translate(-50%, -100%) translateY(-6px); }
+        }
+
+        @keyframes popupReveal {
+            0%   { opacity: 0; transform: translateX(-50%) translateY(4px) scale(0.9); }
+            100% { opacity: 1; transform: translateX(-50%) translateY(-10px) scale(1); }
+        }
+
+        @keyframes mapIdlePan {
+            0%   { background-position: center center; }
+            25%  { background-position: 48% 52%; }
+            50%  { background-position: 52% 48%; }
+            75%  { background-position: 50% 53%; }
+            100% { background-position: center center; }
+        }
+
+        @keyframes pinGlow {
+            0%, 100% { filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3)); }
+            50%      { filter: drop-shadow(0 0 16px rgba(125, 184, 37, 0.6)); }
+        }
+
+        @keyframes pinShadowPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(125, 184, 37, 0.4); }
+            50%      { box-shadow: 0 0 0 12px rgba(125, 184, 37, 0); }
+        }
+
+        .map-idle-pan {
+            animation: mapIdlePan 20s ease-in-out infinite;
+        }
+
+        .map-pin-animated {
+            position: absolute;
+            cursor: pointer;
+            transform: translate(-50%, -100%);
+            transition: all 0.26s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 2;
+        }
+
+        .map-pin-animated.drop-in {
+            animation: pinDrop 0.6s var(--ease-spring) both;
+        }
+
+        .map-pin-animated:hover,
+        .map-pin-animated.is-highlighted {
+            animation: pinBounce 0.8s ease infinite;
+            z-index: 20 !important;
+        }
+
+        .map-pin-animated:hover .pin-glow-ring,
+        .map-pin-animated.is-highlighted .pin-glow-ring {
+            animation: pinShadowPulse 1.4s ease infinite;
+        }
+
+        .map-pin-animated:hover .pin-icon-svg,
+        .map-pin-animated.is-highlighted .pin-icon-svg {
+            animation: pinGlow 1.6s ease infinite;
+        }
+
+        .map-popup-glass {
+            display: none;
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-10px) scale(1);
+            background: rgba(255,255,255,0.78);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 14px 18px;
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-md);
+            min-width: 180px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.5);
+            z-index: 30;
+            pointer-events: none;
+        }
+
+        .map-popup-glass.is-visible {
+            display: block;
+            animation: popupReveal 0.35s var(--ease-spring) both;
+        }
+
+        .map-radar-pulse {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(125, 184, 37, 0.35);
+            border: 2px solid var(--color-sprout);
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        .map-radar-pulse::before,
+        .map-radar-pulse::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            border: 2px solid var(--color-sprout);
+            animation: radarPulse 2.5s ease-out infinite;
+        }
+
+        .map-radar-pulse::after {
+            animation-delay: 1.25s;
+        }
+
+        .pin-glow-ring {
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 16px;
+            height: 6px;
+            border-radius: 50%;
+            background: rgba(125, 184, 37, 0.25);
+        }
+
         /* Card Elements */
         .welcome-section {
             background: var(--gradient-brand);
@@ -345,9 +480,10 @@
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background-image: radial-gradient(rgba(255,255,255,0.15) 2px, transparent 2px);
-            background-size: 20px 20px;
-            opacity: 0.6;
+            background-image: url('{{ asset("images/Pattern_2_3x.png") }}');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.7;
             pointer-events: none;
         }
 
@@ -379,16 +515,16 @@
         }
 
         .card-stat {
-            background-color: var(--bg-surface);
-            border-radius: var(--radius-md);
+            background-color: #FFFFFF;
+            border-radius: 24px 24px 16px 16px;
             padding: 24px;
             box-shadow: var(--shadow-md);
             display: flex;
             align-items: center;
             gap: 20px;
             transition: var(--transition);
-            border: 1px solid var(--color-smoke);
-            border-left: 4px solid var(--color-sprout);
+            border: none;
+            border-left: 3px solid var(--color-sprout);
         }
 
         .card-stat:hover {
@@ -434,11 +570,11 @@
 
         /* UI Blocks */
         .ui-block {
-            background-color: var(--bg-surface);
-            border-radius: var(--radius-lg);
+            background-color: #FFFFFF;
+            border-radius: var(--radius-md);
             padding: 32px;
             box-shadow: var(--shadow-md);
-            border: 1px solid var(--color-smoke);
+            border: none;
             margin-bottom: 32px;
         }
 
@@ -456,11 +592,11 @@
 
         /* E-Gamifikasi Center */
         .gamifikasi-card {
-            background: var(--color-black);
-            color: var(--color-white);
+            background: var(--color-solar);
+            color: var(--color-canopy);
             border-radius: var(--radius-lg);
             padding: 32px;
-            box-shadow: var(--shadow-lg);
+            box-shadow: var(--shadow-glow);
             margin-bottom: 32px;
             position: relative;
             overflow: hidden;
@@ -471,7 +607,7 @@
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background-image: radial-gradient(rgba(125, 184, 37, 0.2) 2px, transparent 2px);
+            background-image: radial-gradient(rgba(26, 58, 26, 0.05) 2px, transparent 2px);
             background-size: 20px 20px;
             pointer-events: none;
             opacity: 0.8;
@@ -500,11 +636,21 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            color: var(--color-solar);
-            text-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+            color: var(--color-canopy);
+            text-shadow: 0 0 20px rgba(26, 58, 26, 0.1);
         }
 
-        .gamifikasi-points span { font-size: 20px; font-weight: 700; color: var(--color-white); opacity: 0.9; }
+        .gamifikasi-points span { font-size: 20px; font-weight: 700; color: var(--color-canopy); opacity: 0.9; }
+
+        @keyframes pointRise {
+            0% { transform: scale(1) translateY(0); opacity: 0.5; }
+            50% { transform: scale(1.2) translateY(-10px); opacity: 1; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        .animate-pointRise {
+            animation: pointRise 0.45s var(--ease-spring);
+        }
 
         .level-progress {
             margin-top: 20px;
@@ -702,7 +848,7 @@
             background-color: var(--color-mist);
             padding: 16px;
             font-weight: 700;
-            color: var(--color-forest);
+            color: var(--color-canopy);
             border-bottom: 2px solid var(--color-smoke);
             text-transform: uppercase;
             letter-spacing: 0.05em;
@@ -872,7 +1018,7 @@
         <!-- ======================================================= -->
         <aside class="sidebar">
             <div class="sidebar-brand">
-                <span class="sidebar-brand-icon">🌿</span> Realive
+                <img src="{{ asset('images/white logo@4x.png') }}" alt="Realive Logo" style="height: 32px; margin: 12px 0;">
             </div>
             
             <div class="sidebar-profile">
@@ -958,6 +1104,11 @@
                     <li>
                         <a class="menu-link" data-tab="tab-gps" onclick="switchTab(event, 'tab-gps')">
                             📍 Cari Pengepul (GPS)
+                        </a>
+                    </li>
+                    <li>
+                        <a class="menu-link" data-tab="tab-harga-sampah" onclick="switchTab(event, 'tab-harga-sampah')">
+                            🏷️ Katalog Harga Sampah
                         </a>
                     </li>
                     <li>
@@ -1667,22 +1818,69 @@
 
                     <!-- 2. CARI PENGEPUL (GPS) TAB -->
                     <div id="tab-gps" class="tab-content">
-                        <div class="ui-block">
-                            <div class="gps-section">
-                                <div class="gps-header">
-                                    <div>
-                                        <h3 style="font-size:15.5px; font-weight:700; color:var(--color-forest); display:flex; align-items:center; gap:8px;">📍 Cari Pengepul Mitra Terdekat (Radius GPS)</h3>
-                                        <p style="font-size:12px; color:#555; margin-top:3px;">Aktifkan koordinat GPS perangkat Anda untuk menghitung radius jarak pengepul aktif secara real-time.</p>
+                        <div style="display: flex; flex-wrap: wrap; gap: 24px;">
+                            <!-- Panel Daftar Pengepul Kiri -->
+                            <div style="flex: 1 1 35%; max-width: 40%; max-height: calc(100vh - 140px); overflow-y: auto; padding-right: 10px;">
+                                <div class="ui-block" style="padding: 24px;">
+                                    <div class="gps-section" style="border: none; padding: 0;">
+                                        <div class="gps-header" style="flex-direction: column; align-items: flex-start; gap: 12px;">
+                                            <div>
+                                                <h3 style="font-size:15.5px; font-weight:700; color:var(--color-forest); display:flex; align-items:center; gap:8px;">📍 Cari Pengepul Mitra Terdekat</h3>
+                                                <p style="font-size:12px; color:#555; margin-top:3px;">Aktifkan koordinat GPS perangkat Anda untuk menghitung radius jarak pengepul aktif secara real-time.</p>
+                                            </div>
+                                            <button onclick="aktifkanGPS()" class="gps-btn" style="width: 100%; justify-content: center;">📡 Aktifkan GPS</button>
+                                        </div>
+
+                                        <div id="gps_status_msg" style="font-size:12.5px; color:#666; font-style:italic; margin-top: 12px; margin-bottom: 12px;">
+                                            *Tekan tombol "Aktifkan GPS" untuk melakukan pencarian berbasis lokasi.
+                                        </div>
+
+                                        <!-- GPS Sorted Output List -->
+                                        <div id="gps_render_list" class="gps-list" style="display:none; margin-top: 0;"></div>
                                     </div>
-                                    <button onclick="aktifkanGPS()" class="gps-btn">📡 Aktifkan GPS</button>
                                 </div>
-
-                                <div id="gps_status_msg" style="font-size:12.5px; color:#666; font-style:italic;">
-                                    *Tekan tombol "Aktifkan GPS" untuk melakukan pencarian berbasis lokasi.
+                            </div>
+                            
+                            <!-- Kontainer Peta Kanan -->
+                            <div style="flex: 1 1 58%; position: sticky; top: 0;">
+                                <div id="mapContainer" class="map-idle-pan" style="position: relative; width: 100%; height: calc(100vh - 140px); border-radius: var(--radius-lg); box-shadow: var(--shadow-md); background: url('{{ asset('images/map 1@4x-100.jpg') }}') center/cover no-repeat; overflow: hidden;">
+                                    <!-- Map overlay idle message -->
+                                    <div id="mapIdleOverlay" style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(244,247,240,0.45); backdrop-filter: blur(1px); z-index: 5; transition: all 0.5s ease;">
+                                        <div style="font-size: 48px; margin-bottom: 12px; animation: pinBounce 2s ease infinite;">📍</div>
+                                        <p style="font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 15px; color: var(--color-canopy); text-align: center;">Aktifkan GPS untuk<br>menampilkan pengepul terdekat</p>
+                                    </div>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
 
-                                <!-- GPS Sorted Output List -->
-                                <div id="gps_render_list" class="gps-list" style="display:none;"></div>
+                    <!-- 2B. KATALOG HARGA SAMPAH -->
+                    <div id="tab-harga-sampah" class="tab-content">
+                        <div class="ui-block">
+                            <div class="block-title" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                                <h2 style="font-size: 16px; font-weight: 800; color: var(--color-forest); display:flex; align-items:center; gap:8px;">
+                                    🏷️ Daftar Harga Beli Sampah Terkini
+                                </h2>
+                            </div>
+                            <p style="font-size: 13.5px; color: #555; margin-bottom: 20px; line-height: 1.5;">Katalog panduan jenis sampah yang dapat Anda setorkan ke bank sampah beserta harga estimasinya per satuan kilogram.</p>
+
+                            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px;">
+                                @foreach($allSampah as $sampah)
+                                    <div class="sampah-card" style="border: 1px solid var(--color-smoke); border-radius: var(--radius-md); padding: 16px; transition: var(--transition); background: var(--color-white); box-shadow: var(--shadow-sm);">
+                                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                                            <div>
+                                                <h4 style="font-size: 15px; font-weight: 800; color: var(--text-primary); margin-bottom: 4px;">{{ $sampah->sampah_name }}</h4>
+                                                <span class="status-badge" style="background-color: rgba(125, 184, 37, 0.1); color: var(--color-forest); font-size: 10px;">{{ $sampah->sampah_jenis }}</span>
+                                            </div>
+                                            <div style="font-size: 20px; color: var(--color-fog);">📦</div>
+                                        </div>
+                                        <div style="margin-bottom: 12px;">
+                                            <div style="font-size: 18px; font-weight: 800; color: var(--color-canopy);">Rp {{ number_format($sampah->sampah_harga_kg, 0, ',', '.') }}</div>
+                                            <div style="font-size: 11px; color: var(--color-fog); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700;">Harga per {{ $sampah->sampah_satuan }}</div>
+                                        </div>
+                                        <p style="font-size: 12px; color: #666; line-height: 1.4;">{{ $sampah->sampah_keterangan ?: 'Tidak ada keterangan.' }}</p>
+                                    </div>
+                                @endforeach
                             </div>
                         </div>
                     </div>
@@ -2205,7 +2403,7 @@
                                 : '<span class="status-badge open" style="background-color:#e3f2fd; color:#1565c0; margin-left: 8px;">🚛 Mitra Pengepul</span>';
 
                             const itemHtml = `
-                                <div class="gps-item">
+                                <div class="gps-item" onmouseenter="highlightMapPin(${loc.id_lokasi})" onmouseleave="resetMapPin(${loc.id_lokasi})">
                                     <div class="gps-meta">
                                         <h4 style="display:flex; align-items:center;">${loc.nama_lokasi} ${tipeBadge}</h4>
                                         <p>📍 Alamat: ${loc.alamat}</p>
@@ -2218,11 +2416,110 @@
                         });
 
                         renderList.style.display = 'flex';
+                        renderMapPins(scoredList);
                     },
                     (err) => {
                         statusMsg.innerHTML = '<span style="color:var(--color-flame);">⚠️ Gagal melacak lokasi. Mohon berikan izin akses GPS/Lokasi di browser Anda.</span>';
                     }
                 );
+            }
+
+            function renderMapPins(scoredList) {
+                const mapContainer = document.getElementById('mapContainer');
+
+                // Hapus overlay idle & hentikan animasi pan
+                const idleOverlay = document.getElementById('mapIdleOverlay');
+                if (idleOverlay) {
+                    idleOverlay.style.opacity = '0';
+                    setTimeout(() => idleOverlay.remove(), 500);
+                }
+                mapContainer.classList.remove('map-idle-pan');
+
+                // Bersihkan pin sebelumnya
+                mapContainer.innerHTML = '';
+
+                // Tambahkan radar pulse di tengah peta (posisi user)
+                const radarHtml = `<div class="map-radar-pulse" style="left: 50%; top: 50%; transform: translate(-50%, -50%);"></div>`;
+                mapContainer.innerHTML += radarHtml;
+
+                // Tambahkan label "Lokasi Anda" di dekat radar
+                const youLabel = `
+                    <div style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, 20px); z-index: 4;
+                        font-family: 'Nunito Sans', sans-serif; font-size: 11px; font-weight: 700; color: var(--color-forest);
+                        background: rgba(255,255,255,0.85); backdrop-filter: blur(6px); padding: 3px 10px; border-radius: var(--radius-full); box-shadow: var(--shadow-sm);">
+                        📍 Lokasi Anda
+                    </div>`;
+                mapContainer.innerHTML += youLabel;
+
+                // Spread pin-pin dari pusat secara radial berdasarkan jarak relatif
+                const maxDist = Math.max(...scoredList.map(l => l.distance), 1);
+
+                scoredList.forEach((loc, index) => {
+                    // Hitung posisi radial dari tengah peta berdasarkan jarak & sudut
+                    const angle = (index / scoredList.length) * 2 * Math.PI - Math.PI / 2;
+                    const radiusFraction = Math.min(loc.distance / maxDist, 1);
+                    const spread = 32 + radiusFraction * 15; // 32-47% radius dari pusat
+
+                    const leftPct = 50 + Math.cos(angle) * spread;
+                    const topPct  = 50 + Math.sin(angle) * spread;
+
+                    const isCabang = loc.tipe === 'Cabang Utama';
+                    const pinColor = isCabang ? 'var(--color-forest)' : 'var(--color-sprout)';
+                    const pinSize  = isCabang ? '42px' : '34px';
+                    const delay    = 0.15 + index * 0.12; // stagger masuk
+
+                    const pinHtml = `
+                        <div id="pin-${loc.id_lokasi}" class="map-pin-animated drop-in"
+                             style="left: ${leftPct.toFixed(1)}%; top: ${topPct.toFixed(1)}%; animation-delay: ${delay}s;"
+                             onclick="toggleMapPopup(${loc.id_lokasi})">
+                            <div class="pin-icon-svg" style="color: ${pinColor}; font-size: ${pinSize}; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3)); transition: filter 0.3s ease;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M128,16a88.1,88.1,0,0,0-88,88c0,75.3,80,132.17,83.41,134.55a8,8,0,0,0,9.18,0C136,236.17,216,179.3,216,104A88.1,88.1,0,0,0,128,16Zm0,112a24,24,0,1,1,24-24A24,24,0,0,1,128,128Z"></path></svg>
+                            </div>
+                            <div class="pin-glow-ring"></div>
+
+                            <!-- Glassmorphism Pop-up -->
+                            <div id="popup-${loc.id_lokasi}" class="map-popup-glass">
+                                <h5 style="font-size:12px; font-weight:800; color:var(--color-canopy); margin-bottom:4px;">${loc.nama_lokasi}</h5>
+                                <p style="font-size:10px; font-family:'JetBrains Mono', monospace; color:var(--color-forest); margin-bottom:2px;">${loc.distance.toFixed(2)} km</p>
+                                <p style="font-size:9px; color:var(--color-fog);">${isCabang ? '🏛️ Cabang Utama' : '🚛 Mitra Pengepul'}</p>
+                            </div>
+                        </div>
+                    `;
+                    mapContainer.innerHTML += pinHtml;
+                });
+            }
+
+            // Toggle popup saat klik pin di peta
+            function toggleMapPopup(id) {
+                // Tutup semua popup yang terbuka
+                document.querySelectorAll('.map-popup-glass.is-visible').forEach(p => {
+                    if (p.id !== 'popup-' + id) p.classList.remove('is-visible');
+                });
+                const popup = document.getElementById('popup-' + id);
+                if (popup) popup.classList.toggle('is-visible');
+            }
+
+            // Hover interactions dari daftar kiri
+            function highlightMapPin(id) {
+                const pin = document.getElementById('pin-' + id);
+                const popup = document.getElementById('popup-' + id);
+                if (pin) {
+                    pin.classList.add('is-highlighted');
+                }
+                if (popup) {
+                    popup.classList.add('is-visible');
+                }
+            }
+
+            function resetMapPin(id) {
+                const pin = document.getElementById('pin-' + id);
+                const popup = document.getElementById('popup-' + id);
+                if (pin) {
+                    pin.classList.remove('is-highlighted');
+                }
+                if (popup) {
+                    popup.classList.remove('is-visible');
+                }
             }
         @endif
 

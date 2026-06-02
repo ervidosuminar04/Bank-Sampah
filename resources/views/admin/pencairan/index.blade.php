@@ -242,7 +242,6 @@
 
 <div class="topbar">
     <div class="topbar-brand">
-        <img src="{{ asset('images/logo Realive@3x.png') }}" alt="Realive Logo">
         <h1>Kelola Pencairan Saldo</h1>
     </div>
     <a href="{{ url('/dashboard') }}">← Kembali ke Dashboard</a>

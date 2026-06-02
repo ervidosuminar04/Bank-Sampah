@@ -435,6 +435,13 @@
                 </div>
 
                 <div class="form-group">
+                    <label for="pengepul_gmaps_link">Link Google Maps (Pilihan)</label>
+                    <input type="text" name="gmaps_link" id="pengepul_gmaps_link"
+                           value="{{ old('gmaps_link') }}" placeholder="https://maps.app.goo.gl/...">
+                    <p style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">*Masukkan link Google Maps alamat Anda agar otomatis dikonversi menjadi titik kordinat (Latitude & Longitude) pada peta.</p>
+                </div>
+
+                <div class="form-group">
                     <label for="pengepul_telepon">Nomor Telepon</label>
                     <input type="text" name="telepon" id="pengepul_telepon"
                            value="{{ old('telepon') }}" maxlength="20" placeholder="08xxxxxxxxxx" required>

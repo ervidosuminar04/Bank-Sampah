@@ -25,6 +25,7 @@ class TransaksiPengepul extends Model
         'sudah_disetor',
         'tanggal',
         'keterangan',
+        'foto_dokumentasi',
     ];
 
     protected $casts = [
