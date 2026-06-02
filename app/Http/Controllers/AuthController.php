@@ -127,12 +127,39 @@ class AuthController extends Controller
     public function registerPengepul(Request $request)
     {
         $data = $request->validate([
-            'nama'     => 'required|string|max:100',
-            'alamat'   => 'required|string',
-            'telepon'  => 'required|string|max:20',
-            'username' => 'required|string|max:50|unique:pengepul,username',
-            'password' => 'required|string|min:6|confirmed',
+            'nama'       => 'required|string|max:100',
+            'alamat'     => 'required|string',
+            'telepon'    => 'required|string|max:20',
+            'username'   => 'required|string|max:50|unique:pengepul,username',
+            'password'   => 'required|string|min:6|confirmed',
+            'gmaps_link' => 'nullable|string'
         ]);
+
+        $latitude = null;
+        $longitude = null;
+        
+        if (!empty($data['gmaps_link'])) {
+            $url = $data['gmaps_link'];
+            // Coba resolve redirect jika menggunakan short link Google Maps
+            if (strpos($url, 'maps.app.goo.gl') !== false || strpos($url, 'goo.gl/maps') !== false) {
+                $headers = @get_headers($url, 1);
+                if ($headers && isset($headers['Location'])) {
+                    $url = is_array($headers['Location']) ? end($headers['Location']) : $headers['Location'];
+                }
+            }
+            
+            // Ekstrak latitude & longitude dari URL menggunakan Regex
+            if (preg_match('/@(-?\d+\.\d+),(-?\d+\.\d+)/', $url, $matches)) {
+                $latitude = $matches[1];
+                $longitude = $matches[2];
+            } elseif (preg_match('/q=(-?\d+\.\d+),(-?\d+\.\d+)/', $url, $matches)) {
+                $latitude = $matches[1];
+                $longitude = $matches[2];
+            } elseif (preg_match('/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/', $url, $matches)) {
+                $latitude = $matches[1];
+                $longitude = $matches[2];
+            }
+        }
 
         Pengepul::create([
             'nama'         => $data['nama'],
@@ -141,6 +168,8 @@ class AuthController extends Controller
             'username'     => $data['username'],
             'password'     => Hash::make($data['password']),
             'status_aktif' => false,
+            'latitude'     => $latitude,
+            'longitude'    => $longitude,
         ]);
 
         return redirect('/login')->with('success', 'Pendaftaran pengepul berhasil! Akun Anda sedang menunggu verifikasi oleh admin. Silakan login setelah diverifikasi.');

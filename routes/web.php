@@ -163,6 +163,7 @@ Route::get('/dashboard', function () {
             ->where('id_nasabah', $userId)
             ->orderBy('created_at', 'desc')
             ->get();
+        $data['allSampah'] = \App\Models\Sampah::orderBy('sampah_name', 'asc')->get();
         $data['minimalPencairan'] = 100000;
     }
 

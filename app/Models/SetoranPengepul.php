@@ -23,6 +23,7 @@ class SetoranPengepul extends Model
         'status',
         'id_admin',
         'catatan',
+        'foto_dokumentasi',
     ];
 
     protected $casts = [
