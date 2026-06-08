@@ -322,11 +322,11 @@
                                     <span style="font-size:11px;color:var(--color-fog);">{{ $t->nasabah->nasabah_username ?? '-' }}</span>
                                 </td>
                                 <td style="font-family:'JetBrains Mono',monospace;">{{ \Carbon\Carbon::parse($t->tanggal_tukar)->format('d/m/Y') }}</td>
-                                <td style="font-weight:700;color:var(--color-forest);">{{ $t->hadiah->nama_hadiah ?? 'Hadiah Dihapus' }}</td>
+                                <td style="font-weight:700;color:var(--color-forest);">{{ $t->hadiah->hadiah_nama ?? 'Hadiah Dihapus' }}</td>
                                 <td>{{ $t->jumlah }} pcs</td>
                                 <td style="font-family:'JetBrains Mono',monospace;font-weight:800;color:var(--color-forest);font-size:15px;">{{ $t->total_poin_ditukar }} Poin</td>
                                 <td>
-                                    <button class="btn btn-approve" onclick="openApprove({{ $t->id_penukaran }}, '{{ $t->nasabah->nasabah_nama ?? '' }}', '{{ $t->hadiah->nama_hadiah ?? '' }}', {{ $t->jumlah }})">✅ Serahkan Barang</button>
+                                    <button class="btn btn-approve" onclick="openApprove({{ $t->id_penukaran }}, '{{ $t->nasabah->nasabah_nama ?? '' }}', '{{ $t->hadiah->hadiah_nama ?? '' }}', {{ $t->jumlah }})">✅ Serahkan Barang</button>
                                     <button class="btn btn-reject" onclick="openReject({{ $t->id_penukaran }}, '{{ $t->nasabah->nasabah_nama ?? '' }}')">❌ Tolak</button>
                                 </td>
                             </tr>
@@ -367,7 +367,7 @@
                             <tr>
                                 <td><strong>{{ $t->nasabah->nasabah_nama ?? '-' }}</strong></td>
                                 <td style="font-family:'JetBrains Mono',monospace;">{{ \Carbon\Carbon::parse($t->tanggal_tukar)->format('d/m/Y') }}</td>
-                                <td style="font-weight:700;color:var(--color-forest);">{{ $t->hadiah->nama_hadiah ?? 'Hadiah Dihapus' }}</td>
+                                <td style="font-weight:700;color:var(--color-forest);">{{ $t->hadiah->hadiah_nama ?? 'Hadiah Dihapus' }}</td>
                                 <td>{{ $t->jumlah }} pcs</td>
                                 <td style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--color-forest);">{{ $t->total_poin_ditukar }} Poin</td>
                                 <td><span style="font-size:12.5px;color:var(--color-canopy);font-weight:700;">{{ $t->admin->admin_nama ?? 'Admin' }}</span></td>
@@ -402,7 +402,7 @@
                             <tr>
                                 <td><strong>{{ $t->nasabah->nasabah_nama ?? '-' }}</strong></td>
                                 <td style="font-family:'JetBrains Mono',monospace;">{{ \Carbon\Carbon::parse($t->tanggal_tukar)->format('d/m/Y') }}</td>
-                                <td style="font-weight:700;color:var(--color-canopy);">{{ $t->hadiah->nama_hadiah ?? 'Hadiah Dihapus' }}</td>
+                                <td style="font-weight:700;color:var(--color-canopy);">{{ $t->hadiah->hadiah_nama ?? 'Hadiah Dihapus' }}</td>
                                 <td>{{ $t->jumlah }} pcs</td>
                                 <td style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--color-flame);">+ {{ $t->total_poin_ditukar }} Poin</td>
                                 <td style="color:var(--color-flame);font-size:13px;font-weight:600;">{{ $t->catatan ?? '-' }}</td>
@@ -438,16 +438,16 @@
                     <tbody>
                         @forelse($hadiahs as $h)
                         <tr>
-                            <td><strong style="color:var(--color-canopy);">{{ $h->nama_hadiah }}</strong></td>
-                            <td style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--color-forest);">{{ $h->poin_butuh }} Eco Poin</td>
+                            <td><strong style="color:var(--color-canopy);">{{ $h->hadiah_nama }}</strong></td>
+                            <td style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--color-forest);">{{ $h->hadiah_poin_butuh }} Eco Poin</td>
                             <td>
-                                <strong style="{{ $h->stok > 0 ? 'color:var(--color-forest);' : 'color:var(--color-flame);' }}">
-                                    {{ $h->stok }} pcs
+                                <strong style="{{ $h->hadiah_stok > 0 ? 'color:var(--color-forest);' : 'color:var(--color-flame);' }}">
+                                    {{ $h->hadiah_stok }} pcs
                                 </strong>
                             </td>
-                            <td style="font-size:13px;color:var(--color-forest);line-height:1.4;">{{ $h->keterangan ?? '-' }}</td>
+                            <td style="font-size:13px;color:var(--color-forest);line-height:1.4;">{{ $h->hadiah_keterangan ?? '-' }}</td>
                             <td>
-                                <button class="btn btn-edit" onclick="openEditHadiah({{ $h->id_hadiah }}, '{{ $h->nama_hadiah }}', {{ $h->poin_butuh }}, {{ $h->stok }}, '{{ $h->keterangan ?? '' }}')">✏️ Edit</button>
+                                <button class="btn btn-edit" onclick="openEditHadiah({{ $h->id_hadiah }}, '{{ $h->hadiah_nama }}', {{ $h->hadiah_poin_butuh }}, {{ $h->hadiah_stok }}, '{{ $h->hadiah_keterangan ?? '' }}')">✏️ Edit</button>
                                 <form method="POST" action="/admin/hadiah/delete/{{ $h->id_hadiah }}" style="display:inline;" onsubmit="return confirm('Apakah Anda yakin ingin menghapus barang ini dari katalog?')">
                                     @csrf
                                     <button type="submit" class="btn btn-delete">🗑️ Hapus</button>
@@ -514,21 +514,21 @@
             @csrf
             <div class="form-group">
                 <label for="add_nama">Nama Barang</label>
-                <input type="text" name="nama_hadiah" id="add_nama" class="form-control" placeholder="Contoh: Sabun Cuci Piring Cair 400ml" required>
+                <input type="text" name="hadiah_nama" id="add_nama" class="form-control" placeholder="Contoh: Sabun Cuci Piring Cair 400ml" required>
             </div>
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
                 <div class="form-group">
                     <label for="add_poin">Biaya (Eco Poin)</label>
-                    <input type="number" name="poin_butuh" id="add_poin" class="form-control" min="1" placeholder="Contoh: 100" required>
+                    <input type="number" name="hadiah_poin_butuh" id="add_poin" class="form-control" min="1" placeholder="Contoh: 100" required>
                 </div>
                 <div class="form-group">
                     <label for="add_stok">Stok Awal (pcs)</label>
-                    <input type="number" name="stok" id="add_stok" class="form-control" min="0" placeholder="Contoh: 50" required>
+                    <input type="number" name="hadiah_stok" id="add_stok" class="form-control" min="0" placeholder="Contoh: 50" required>
                 </div>
             </div>
             <div class="form-group">
                 <label for="add_keterangan">Keterangan Barang</label>
-                <textarea name="keterangan" id="add_keterangan" class="form-control" rows="3" placeholder="Contoh: Sabun pencuci ramah lingkungan buatan lokal..."></textarea>
+                <textarea name="hadiah_keterangan" id="add_keterangan" class="form-control" rows="3" placeholder="Contoh: Sabun pencuci ramah lingkungan buatan lokal..."></textarea>
             </div>
             <div class="modal-actions">
                 <button type="button" class="btn btn-cancel" onclick="closeModal('modalAddHadiah')">Batal</button>
@@ -547,21 +547,21 @@
             @csrf
             <div class="form-group">
                 <label for="edit_nama">Nama Barang</label>
-                <input type="text" name="nama_hadiah" id="edit_nama" class="form-control" required>
+                <input type="text" name="hadiah_nama" id="edit_nama" class="form-control" required>
             </div>
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
                 <div class="form-group">
                     <label for="edit_poin">Biaya (Eco Poin)</label>
-                    <input type="number" name="poin_butuh" id="edit_poin" class="form-control" min="1" required>
+                    <input type="number" name="hadiah_poin_butuh" id="edit_poin" class="form-control" min="1" required>
                 </div>
                 <div class="form-group">
                     <label for="edit_stok">Stok Tersedia (pcs)</label>
-                    <input type="number" name="stok" id="edit_stok" class="form-control" min="0" required>
+                    <input type="number" name="hadiah_stok" id="edit_stok" class="form-control" min="0" required>
                 </div>
             </div>
             <div class="form-group">
                 <label for="edit_keterangan">Keterangan Barang</label>
-                <textarea name="keterangan" id="edit_keterangan" class="form-control" rows="3"></textarea>
+                <textarea name="hadiah_keterangan" id="edit_keterangan" class="form-control" rows="3"></textarea>
             </div>
             <div class="modal-actions">
                 <button type="button" class="btn btn-cancel" onclick="closeModal('modalEditHadiah')">Batal</button>

@@ -12,7 +12,7 @@ class Sampah extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'sampah_name',
+        'sampah_nama',
         'sampah_jenis',
         'sampah_satuan',
         'sampah_harga_kg',

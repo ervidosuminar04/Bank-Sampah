@@ -19,6 +19,7 @@ class TransaksiSetor extends Model
         'id_nasabah',
         'id_admin',
         'id_sampah',
+        'transaksi_setor_gambar',
     ];
 
     /**

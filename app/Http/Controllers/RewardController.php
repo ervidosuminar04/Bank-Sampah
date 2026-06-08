@@ -18,34 +18,34 @@ class RewardController extends Controller
         if (Hadiah::count() === 0) {
             $defaults = [
                 [
-                    'nama_hadiah' => 'Sabun Cuci Piring Cair',
-                    'poin_butuh' => 100,
-                    'stok' => 50,
-                    'keterangan' => 'Sabun pembersih ramah lingkungan ukuran 400ml.',
+                    'hadiah_nama'        => 'Sabun Cuci Piring Cair',
+                    'hadiah_poin_butuh'  => 100,
+                    'hadiah_stok'        => 50,
+                    'hadiah_keterangan'  => 'Sabun pembersih ramah lingkungan ukuran 400ml.',
                 ],
                 [
-                    'nama_hadiah' => 'Tas Totebag Kanvas Eco',
-                    'poin_butuh' => 150,
-                    'stok' => 30,
-                    'keterangan' => 'Tas belanja kanvas tebal reusable untuk kurangi plastik.',
+                    'hadiah_nama'        => 'Tas Totebag Kanvas Eco',
+                    'hadiah_poin_butuh'  => 150,
+                    'hadiah_stok'        => 30,
+                    'hadiah_keterangan'  => 'Tas belanja kanvas tebal reusable untuk kurangi plastik.',
                 ],
                 [
-                    'nama_hadiah' => 'Minyak Goreng 1L',
-                    'poin_butuh' => 300,
-                    'stok' => 20,
-                    'keterangan' => 'Minyak goreng kualitas premium kemasan botol 1 liter.',
+                    'hadiah_nama'        => 'Minyak Goreng 1L',
+                    'hadiah_poin_butuh'  => 300,
+                    'hadiah_stok'        => 20,
+                    'hadiah_keterangan'  => 'Minyak goreng kualitas premium kemasan botol 1 liter.',
                 ],
                 [
-                    'nama_hadiah' => 'Tumbler Kaca Eco',
-                    'poin_butuh' => 400,
-                    'stok' => 15,
-                    'keterangan' => 'Botol air minum kaca dilapisi pelindung silikon anti-slip.',
+                    'hadiah_nama'        => 'Tumbler Kaca Eco',
+                    'hadiah_poin_butuh'  => 400,
+                    'hadiah_stok'        => 15,
+                    'hadiah_keterangan'  => 'Botol air minum kaca dilapisi pelindung silikon anti-slip.',
                 ],
                 [
-                    'nama_hadiah' => 'Paket Sembako Premium',
-                    'poin_butuh' => 800,
-                    'stok' => 10,
-                    'keterangan' => 'Paket sembako berisi beras premium 5kg, gula pasir 1kg, dan teh celup.',
+                    'hadiah_nama'        => 'Paket Sembako Premium',
+                    'hadiah_poin_butuh'  => 800,
+                    'hadiah_stok'        => 10,
+                    'hadiah_keterangan'  => 'Paket sembako berisi beras premium 5kg, gula pasir 1kg, dan teh celup.',
                 ],
             ];
 
@@ -69,11 +69,11 @@ class RewardController extends Controller
         $nasabah   = Nasabah::with('gamifikasi')->findOrFail($nasabahId);
         $hadiah    = Hadiah::findOrFail($data['id_hadiah']);
 
-        $totalPoinButuh = $hadiah->poin_butuh * $data['jumlah'];
+        $totalPoinButuh = $hadiah->hadiah_poin_butuh * $data['jumlah'];
 
         // 1. Validasi stok cukup
-        if ($hadiah->stok < $data['jumlah']) {
-            return back()->with('error', 'Stok hadiah "' . $hadiah->nama_hadiah . '" tidak mencukupi saat ini.');
+        if ($hadiah->hadiah_stok < $data['jumlah']) {
+            return back()->with('error', 'Stok hadiah "' . $hadiah->hadiah_nama . '" tidak mencukupi saat ini.');
         }
 
         // 2. Validasi kecukupan poin diperoleh
@@ -83,13 +83,13 @@ class RewardController extends Controller
             return back()->with('error', 'Eco Poin Anda tidak mencukupi. Dibutuhkan ' . number_format($totalPoinButuh, 0, ',', '.') . ' Poin, milik Anda: ' . number_format($poinMilik, 0, ',', '.') . ' Poin.');
         }
 
-        // 3. Kurangi poin diperoleh (tidak mengurangi total_poin lifetime)
+        // 3. Kurangi poin diperoleh
         $gamifikasi->poin_diperoleh -= $totalPoinButuh;
-        $gamifikasi->tanggal_update = now();
+        $gamifikasi->tanggal_update  = now();
         $gamifikasi->save();
 
         // 4. Kurangi stok barang
-        $hadiah->stok -= $data['jumlah'];
+        $hadiah->hadiah_stok -= $data['jumlah'];
         $hadiah->save();
 
         // 5. Buat transaksi penukaran
@@ -98,11 +98,11 @@ class RewardController extends Controller
             'id_hadiah'          => $hadiah->id_hadiah,
             'jumlah'             => $data['jumlah'],
             'total_poin_ditukar' => $totalPoinButuh,
-            'status'             => 'menunggu',
+            'penukaran_status'   => 'menunggu',
             'tanggal_tukar'      => now()->toDateString(),
         ]);
 
-        return back()->with('success', 'Penukaran ' . $data['jumlah'] . 'x ' . $hadiah->nama_hadiah . ' seharga ' . number_format($totalPoinButuh, 0, ',', '.') . ' Eco Poin berhasil diajukan. Silakan ambil barang di kantor Bank Sampah dengan menunjukkan akun Anda.');
+        return back()->with('success', 'Penukaran ' . $data['jumlah'] . 'x ' . $hadiah->hadiah_nama . ' seharga ' . number_format($totalPoinButuh, 0, ',', '.') . ' Eco Poin berhasil diajukan. Silakan ambil barang di kantor Bank Sampah dengan menunjukkan akun Anda.');
     }
 
     /**
@@ -112,24 +112,22 @@ class RewardController extends Controller
     {
         $this->pastikanHadiahDefault();
 
-        // Penukaran berdasarkan status
         $menunggu = PenukaranReward::with(['nasabah', 'hadiah'])
-            ->where('status', 'menunggu')
-            ->orderByDesc('created_at')
+            ->where('penukaran_status', 'menunggu')
+            ->orderByDesc('id_penukaran')
             ->get();
 
         $diambil = PenukaranReward::with(['nasabah', 'hadiah', 'admin'])
-            ->where('status', 'diambil')
-            ->orderByDesc('created_at')
+            ->where('penukaran_status', 'diambil')
+            ->orderByDesc('id_penukaran')
             ->get();
 
         $ditolak = PenukaranReward::with(['nasabah', 'hadiah', 'admin'])
-            ->where('status', 'ditolak')
-            ->orderByDesc('created_at')
+            ->where('penukaran_status', 'ditolak')
+            ->orderByDesc('id_penukaran')
             ->get();
 
-        // Daftar katalog hadiah untuk CRUD
-        $hadiahs = Hadiah::orderBy('nama_hadiah')->get();
+        $hadiahs = Hadiah::orderBy('hadiah_nama')->get();
 
         return view('admin.reward.index', compact('menunggu', 'diambil', 'ditolak', 'hadiahs'));
     }
@@ -141,12 +139,12 @@ class RewardController extends Controller
     {
         $penukaran = PenukaranReward::findOrFail($id);
 
-        if ($penukaran->status !== 'menunggu') {
+        if ($penukaran->penukaran_status !== 'menunggu') {
             return back()->with('error', 'Pengajuan penukaran ini sudah diproses sebelumnya.');
         }
 
-        $penukaran->status   = 'diambil';
-        $penukaran->id_admin = session('user_id');
+        $penukaran->penukaran_status = 'diambil';
+        $penukaran->id_admin         = session('user_id');
         $penukaran->save();
 
         return back()->with('success', 'Penukaran barang berhasil disetujui. Barang telah diserahkan secara fisik kepada nasabah.');
@@ -159,13 +157,13 @@ class RewardController extends Controller
     {
         $penukaran = PenukaranReward::findOrFail($id);
 
-        if ($penukaran->status !== 'menunggu') {
+        if ($penukaran->penukaran_status !== 'menunggu') {
             return back()->with('error', 'Pengajuan penukaran ini sudah diproses sebelumnya.');
         }
 
-        $penukaran->status   = 'ditolak';
-        $penukaran->catatan  = $request->input('catatan', 'Ditolak oleh admin.');
-        $penukaran->id_admin = session('user_id');
+        $penukaran->penukaran_status = 'ditolak';
+        $penukaran->catatan          = $request->input('catatan', 'Ditolak oleh admin.');
+        $penukaran->id_admin         = session('user_id');
         $penukaran->save();
 
         // 1. Kembalikan poin diperoleh nasabah
@@ -178,7 +176,7 @@ class RewardController extends Controller
 
         // 2. Kembalikan stok hadiah
         $hadiah = Hadiah::findOrFail($penukaran->id_hadiah);
-        $hadiah->stok += $penukaran->jumlah;
+        $hadiah->hadiah_stok += $penukaran->jumlah;
         $hadiah->save();
 
         return back()->with('success', 'Pengajuan penukaran ditolak. ' . number_format($penukaran->total_poin_ditukar, 0, ',', '.') . ' Eco Poin dan stok barang telah dikembalikan secara otomatis.');
@@ -194,20 +192,20 @@ class RewardController extends Controller
     public function storeHadiah(Request $request)
     {
         $data = $request->validate([
-            'nama_hadiah' => 'required|string|max:100|unique:hadiah,nama_hadiah',
-            'poin_butuh'  => 'required|integer|min:1',
-            'stok'        => 'required|integer|min:0',
-            'keterangan'  => 'nullable|string',
+            'hadiah_nama'       => 'required|string|max:100|unique:hadiah,hadiah_nama',
+            'hadiah_poin_butuh' => 'required|integer|min:1',
+            'hadiah_stok'       => 'required|integer|min:0',
+            'hadiah_keterangan' => 'nullable|string',
         ]);
 
         Hadiah::create([
-            'nama_hadiah' => $data['nama_hadiah'],
-            'poin_butuh'  => $data['poin_butuh'],
-            'stok'        => $data['stok'],
-            'keterangan'  => $data['keterangan'] ?? null,
+            'hadiah_nama'       => $data['hadiah_nama'],
+            'hadiah_poin_butuh' => $data['hadiah_poin_butuh'],
+            'hadiah_stok'       => $data['hadiah_stok'],
+            'hadiah_keterangan' => $data['hadiah_keterangan'] ?? null,
         ]);
 
-        return back()->with('success', 'Hadiah "' . $data['nama_hadiah'] . '" berhasil ditambahkan ke katalog.');
+        return back()->with('success', 'Hadiah "' . $data['hadiah_nama'] . '" berhasil ditambahkan ke katalog.');
     }
 
     /**
@@ -218,20 +216,20 @@ class RewardController extends Controller
         $hadiah = Hadiah::findOrFail($id);
 
         $data = $request->validate([
-            'nama_hadiah' => 'required|string|max:100|unique:hadiah,nama_hadiah,' . $id . ',id_hadiah',
-            'poin_butuh'  => 'required|integer|min:1',
-            'stok'        => 'required|integer|min:0',
-            'keterangan'  => 'nullable|string',
+            'hadiah_nama'       => 'required|string|max:100|unique:hadiah,hadiah_nama,' . $id . ',id_hadiah',
+            'hadiah_poin_butuh' => 'required|integer|min:1',
+            'hadiah_stok'       => 'required|integer|min:0',
+            'hadiah_keterangan' => 'nullable|string',
         ]);
 
         $hadiah->update([
-            'nama_hadiah' => $data['nama_hadiah'],
-            'poin_butuh'  => $data['poin_butuh'],
-            'stok'        => $data['stok'],
-            'keterangan'  => $data['keterangan'] ?? null,
+            'hadiah_nama'       => $data['hadiah_nama'],
+            'hadiah_poin_butuh' => $data['hadiah_poin_butuh'],
+            'hadiah_stok'       => $data['hadiah_stok'],
+            'hadiah_keterangan' => $data['hadiah_keterangan'] ?? null,
         ]);
 
-        return back()->with('success', 'Detail hadiah "' . $hadiah->nama_hadiah . '" berhasil diperbarui.');
+        return back()->with('success', 'Detail hadiah "' . $hadiah->hadiah_nama . '" berhasil diperbarui.');
     }
 
     /**
@@ -240,7 +238,7 @@ class RewardController extends Controller
     public function deleteHadiah($id)
     {
         $hadiah = Hadiah::findOrFail($id);
-        $nama   = $hadiah->nama_hadiah;
+        $nama   = $hadiah->hadiah_nama;
         $hadiah->delete();
 
         return back()->with('success', 'Hadiah "' . $nama . '" berhasil dihapus dari katalog.');

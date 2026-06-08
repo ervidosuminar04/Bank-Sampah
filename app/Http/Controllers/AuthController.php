@@ -50,12 +50,12 @@ class AuthController extends Controller
         }
 
         // Then pengepul (only allow active)
-        $pengepul = Pengepul::where('username', $credentials['username'])->first();
-        if ($pengepul && Hash::check($credentials['password'], $pengepul->password)) {
-            if (!$pengepul->status_aktif) {
+        $pengepul = Pengepul::where('pengepul_username', $credentials['username'])->first();
+        if ($pengepul && Hash::check($credentials['password'], $pengepul->pengepul_password)) {
+            if ($pengepul->pengepul_status_aktif !== 'aktif') {
                 return back()->withErrors(['username' => 'Akun pengepul Anda sedang menunggu verifikasi oleh admin. Silakan tunggu hingga akun diaktifkan.'])->withInput();
             }
-            Session::put('user_id', $pengepul->id);
+            Session::put('user_id', $pengepul->id_pengepul);
             Session::put('user_type', 'pengepul');
             return redirect()->intended('/pengepul/dashboard');
         }
@@ -130,7 +130,7 @@ class AuthController extends Controller
             'nama'       => 'required|string|max:100',
             'alamat'     => 'required|string',
             'telepon'    => 'required|string|max:20',
-            'username'   => 'required|string|max:50|unique:pengepul,username',
+            'username'   => 'required|string|max:50|unique:pengepul,pengepul_username',
             'password'   => 'required|string|min:6|confirmed',
             'gmaps_link' => 'nullable|string'
         ]);
@@ -162,14 +162,14 @@ class AuthController extends Controller
         }
 
         Pengepul::create([
-            'nama'         => $data['nama'],
-            'alamat'       => $data['alamat'],
-            'telepon'      => $data['telepon'],
-            'username'     => $data['username'],
-            'password'     => Hash::make($data['password']),
-            'status_aktif' => false,
-            'latitude'     => $latitude,
-            'longitude'    => $longitude,
+            'pengepul_nama'         => $data['nama'],
+            'pengepul_alamat'       => $data['alamat'],
+            'pengepul_telepon'      => $data['telepon'],
+            'pengepul_username'     => $data['username'],
+            'pengepul_password'     => Hash::make($data['password']),
+            'pengepul_status_aktif' => 'nonaktif',
+            'pengepul_latitude'     => $latitude,
+            'pengepul_longitude'    => $longitude,
         ]);
 
         return redirect('/login')->with('success', 'Pendaftaran pengepul berhasil! Akun Anda sedang menunggu verifikasi oleh admin. Silakan login setelah diverifikasi.');
@@ -277,19 +277,19 @@ class AuthController extends Controller
 
         // Buat pengajuan penarikan berstatus pending
         TransaksiTarik::create([
-            'tarik_tanggal'    => now(),
-            'tarik_jumlah'     => $data['jumlah_tarik'],
-            'tarik_sisa_saldo' => $nasabah->tabungan->tabungan_saldo_akhir - $data['jumlah_tarik'],
-            'tarik_status'     => 'pending',
-            'id_nasabah'       => $userId,
-            'id_admin'         => null,
+            'transaksi_tarik_tanggal'    => now(),
+            'transaksi_tarik_jumlah'     => $data['jumlah_tarik'],
+            'transaksi_tarik_sisa_saldo' => $nasabah->tabungan->tabungan_saldo_akhir - $data['jumlah_tarik'],
+            'transaksi_tarik_status'     => 'menunggu',
+            'id_nasabah'                 => $userId,
+            'id_admin'                   => null,
         ]);
 
         return back()->with('success', 'Pengajuan penarikan Rp ' . number_format($data['jumlah_tarik'], 0, ',', '.') . ' berhasil dikirim dan sedang menunggu persetujuan admin.');
     }
 
     // 3. Approve or Reject withdrawal request (Admin)
-    public function persetujuanTarik($id, $action)
+    public function persetujuanTarik(Request $request, $id, $action)
     {
         $tarik = TransaksiTarik::find($id);
         if (!$tarik) {
@@ -300,26 +300,37 @@ class AuthController extends Controller
         $tabungan = Tabungan::where('id_nasabah', $tarik->id_nasabah)->first();
 
         if ($action === 'setuju') {
-            if ($tarik->tarik_jumlah > $tabungan->tabungan_saldo_akhir) {
-                $tarik->tarik_status = 'ditolak';
+            if ($tarik->transaksi_tarik_jumlah > $tabungan->tabungan_saldo_akhir) {
+                $tarik->transaksi_tarik_status = 'ditolak';
                 $tarik->id_admin = session('user_id');
                 $tarik->save();
                 return back()->with('error', 'Penarikan ditolak otomatis karena saldo nasabah saat ini tidak mencukupi.');
             }
 
+            $request->validate([
+                'bukti_pembayaran' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            ], [
+                'bukti_pembayaran.required' => 'Bukti transfer/pembayaran wajib diunggah.',
+                'bukti_pembayaran.image'    => 'Berkas harus berupa gambar.',
+            ]);
+
             // Kurangi saldo
-            $tabungan->tabungan_total_tarik += $tarik->tarik_jumlah;
-            $tabungan->tabungan_saldo_akhir -= $tarik->tarik_jumlah;
+            $tabungan->tabungan_total_tarik += $tarik->transaksi_tarik_jumlah;
+            $tabungan->tabungan_saldo_akhir -= $tarik->transaksi_tarik_jumlah;
             $tabungan->tabungan_tgl_update = now();
             $tabungan->save();
 
-            $nasabah->nasabah_saldo -= $tarik->tarik_jumlah;
+            $nasabah->nasabah_saldo -= $tarik->transaksi_tarik_jumlah;
             $nasabah->save();
 
-            $tarik->tarik_sisa_saldo = $tabungan->tabungan_saldo_akhir;
-            $tarik->tarik_status = 'disetujui';
+            // Simpan file
+            $gambarPath = $request->file('bukti_pembayaran')->store('bukti_pembayaran_tarik', 'public');
+
+            $tarik->transaksi_tarik_sisa_saldo = $tabungan->tabungan_saldo_akhir;
+            $tarik->transaksi_tarik_status = 'disetujui';
+            $tarik->transaksi_tarik_gambar = $gambarPath;
         } else {
-            $tarik->tarik_status = 'ditolak';
+            $tarik->transaksi_tarik_status = 'ditolak';
         }
 
         $tarik->id_admin = session('user_id');
@@ -451,70 +462,70 @@ class AuthController extends Controller
     public function storePengepul(Request $request)
     {
         $data = $request->validate([
-            'nama'         => 'required|string|max:100',
-            'alamat'       => 'required|string',
-            'telepon'      => 'nullable|string|max:20',
-            'username'     => 'required|string|max:50|unique:pengepul,username',
-            'password'     => 'required|string|min:6',
-            'latitude'     => 'nullable|numeric',
-            'longitude'    => 'nullable|numeric',
+            'pengepul_nama'     => 'required|string|max:100',
+            'pengepul_alamat'   => 'required|string',
+            'pengepul_telepon'  => 'nullable|string|max:20',
+            'pengepul_username' => 'required|string|max:50|unique:pengepul,pengepul_username',
+            'pengepul_password' => 'required|string|min:6',
+            'pengepul_latitude' => 'nullable|numeric',
+            'pengepul_longitude'=> 'nullable|numeric',
         ]);
 
         \App\Models\Pengepul::create([
-            'nama'         => $data['nama'],
-            'alamat'       => $data['alamat'],
-            'telepon'      => $data['telepon'] ?? null,
-            'username'     => $data['username'],
-            'password'     => Hash::make($data['password']),
-            'latitude'     => $data['latitude'] ?? null,
-            'longitude'    => $data['longitude'] ?? null,
-            'status_aktif' => false,
+            'pengepul_nama'        => $data['pengepul_nama'],
+            'pengepul_alamat'      => $data['pengepul_alamat'],
+            'pengepul_telepon'     => $data['pengepul_telepon'] ?? null,
+            'pengepul_username'    => $data['pengepul_username'],
+            'pengepul_password'    => Hash::make($data['pengepul_password']),
+            'pengepul_latitude'    => $data['pengepul_latitude'] ?? null,
+            'pengepul_longitude'   => $data['pengepul_longitude'] ?? null,
+            'pengepul_status_aktif'=> 'nonaktif',
         ]);
 
-        return back()->with('success', 'Akun pengepul "' . $data['nama'] . '" berhasil ditambahkan. Username: ' . $data['username']);
+        return back()->with('success', 'Akun pengepul "' . $data['pengepul_nama'] . '" berhasil ditambahkan. Username: ' . $data['pengepul_username']);
     }
     public function updatePengepul(Request $request, $id)
     {
         $pengepul = \App\Models\Pengepul::findOrFail($id);
 
         $rules = [
-            'nama'         => 'required|string|max:100',
-            'alamat'       => 'required|string',
-            'telepon'      => 'nullable|string|max:20',
-            'username'     => 'required|string|max:50|unique:pengepul,username,' . $id,
-            'password'     => 'nullable|string|min:6',
-            'status_aktif' => 'required|boolean',
+            'pengepul_nama'        => 'required|string|max:100',
+            'pengepul_alamat'      => 'required|string',
+            'pengepul_telepon'     => 'nullable|string|max:20',
+            'pengepul_username'    => 'required|string|max:50|unique:pengepul,pengepul_username,' . $id . ',id_pengepul',
+            'pengepul_password'    => 'nullable|string|min:6',
+            'pengepul_status_aktif'=> 'required|string|in:aktif,nonaktif',
         ];
 
-        if ($request->has('latitude')) {
-            $rules['latitude'] = 'nullable|numeric';
+        if ($request->has('pengepul_latitude')) {
+            $rules['pengepul_latitude'] = 'nullable|numeric';
         }
-        if ($request->has('longitude')) {
-            $rules['longitude'] = 'nullable|numeric';
+        if ($request->has('pengepul_longitude')) {
+            $rules['pengepul_longitude'] = 'nullable|numeric';
         }
 
         $data = $request->validate($rules);
 
-        $pengepul->nama         = $data['nama'];
-        $pengepul->alamat       = $data['alamat'];
-        $pengepul->telepon      = $data['telepon'] ?? null;
-        $pengepul->username     = $data['username'];
-        $pengepul->status_aktif = $data['status_aktif'];
+        $pengepul->pengepul_nama         = $data['pengepul_nama'];
+        $pengepul->pengepul_alamat       = $data['pengepul_alamat'];
+        $pengepul->pengepul_telepon      = $data['pengepul_telepon'] ?? null;
+        $pengepul->pengepul_username     = $data['pengepul_username'];
+        $pengepul->pengepul_status_aktif = $data['pengepul_status_aktif'];
 
-        if (array_key_exists('latitude', $data)) {
-            $pengepul->latitude = $data['latitude'];
+        if (array_key_exists('pengepul_latitude', $data)) {
+            $pengepul->pengepul_latitude = $data['pengepul_latitude'];
         }
-        if (array_key_exists('longitude', $data)) {
-            $pengepul->longitude = $data['longitude'];
+        if (array_key_exists('pengepul_longitude', $data)) {
+            $pengepul->pengepul_longitude = $data['pengepul_longitude'];
         }
 
         // Hanya update password jika diisi
-        if (!empty($data['password'])) {
-            $pengepul->password = Hash::make($data['password']);
+        if (!empty($data['pengepul_password'])) {
+            $pengepul->pengepul_password = Hash::make($data['pengepul_password']);
         }
 
         $pengepul->save();
-        return back()->with('success', 'Data pengepul "' . $pengepul->nama . '" berhasil diperbarui.');
+        return back()->with('success', 'Data pengepul "' . $pengepul->pengepul_nama . '" berhasil diperbarui.');
     }
     public function deletePengepul($id)
     {
@@ -523,16 +534,16 @@ class AuthController extends Controller
             return back()->with('error', 'Pengepul tidak ditemukan.');
         }
 
-        $namaPengepul = $pengepul->nama;
+        $namaPengepul = $pengepul->pengepul_nama;
         $pengepul->delete();
         return back()->with('success', 'Akun pengepul "' . $namaPengepul . '" berhasil dihapus.');
     }
     public function verifikasiPengepul($id)
     {
         $pengepul = \App\Models\Pengepul::findOrFail($id);
-        $pengepul->status_aktif = true;
+        $pengepul->pengepul_status_aktif = 'aktif';
         $pengepul->save();
-        return back()->with('success', 'Akun pengepul ' . $pengepul->nama . ' telah diverifikasi.');
+        return back()->with('success', 'Akun pengepul ' . $pengepul->pengepul_nama . ' telah diverifikasi.');
     }
 
 
@@ -548,44 +559,43 @@ class AuthController extends Controller
         $minimalPencairan = 100000;
 
         $data = $request->validate([
-            'tarik_jumlah'         => 'required|numeric|min:' . $minimalPencairan,
-            'tarik_bank_tujuan'    => 'required|string|max:50',
-            'tarik_nomor_rekening' => 'required|string|max:50',
-            'tarik_atas_nama'      => 'required|string|max:100',
+            'transaksi_tarik_jumlah'         => 'required|numeric|min:' . $minimalPencairan,
+            'transaksi_tarik_bank_tujuan'    => 'required|string|max:50',
+            'transaksi_tarik_nomor_rekening' => 'required|string|max:50',
+            'transaksi_tarik_atas_nama'      => 'required|string|max:100',
         ], [
-            'tarik_jumlah.min'     => 'Minimal pencairan adalah Rp ' . number_format($minimalPencairan, 0, ',', '.'),
-            'tarik_bank_tujuan.required'    => 'Bank/E-Wallet tujuan transfer wajib diisi.',
-            'tarik_nomor_rekening.required' => 'Nomor rekening/HP wajib diisi.',
-            'tarik_atas_nama.required'      => 'Nama pemilik rekening wajib diisi.',
+            'transaksi_tarik_jumlah.min'              => 'Minimal pencairan adalah Rp ' . number_format($minimalPencairan, 0, ',', '.'),
+            'transaksi_tarik_bank_tujuan.required'    => 'Bank/E-Wallet tujuan transfer wajib diisi.',
+            'transaksi_tarik_nomor_rekening.required' => 'Nomor rekening/HP wajib diisi.',
+            'transaksi_tarik_atas_nama.required'      => 'Nama pemilik rekening wajib diisi.',
         ]);
 
         $nasabahId = session('user_id');
         $nasabah   = Nasabah::findOrFail($nasabahId);
 
         // Validasi saldo cukup
-        if ($nasabah->nasabah_saldo < $data['tarik_jumlah']) {
+        if ($nasabah->nasabah_saldo < $data['transaksi_tarik_jumlah']) {
             return back()->with('error', 'Saldo Anda tidak mencukupi. Saldo saat ini: Rp ' . number_format($nasabah->nasabah_saldo, 0, ',', '.'));
         }
 
-        // Validasi saldo setelah pencairan tidak kurang dari 0
-        if (($nasabah->nasabah_saldo - $data['tarik_jumlah']) < 0) {
+        if (($nasabah->nasabah_saldo - $data['transaksi_tarik_jumlah']) < 0) {
             return back()->with('error', 'Jumlah pencairan melebihi saldo Anda.');
         }
 
         // Buat pengajuan pencairan (status menunggu)
         TransaksiTarik::create([
-            'tarik_tanggal'        => now()->toDateString(),
-            'tarik_jumlah'         => $data['tarik_jumlah'],
-            'tarik_bank_tujuan'    => $data['tarik_bank_tujuan'],
-            'tarik_nomor_rekening' => $data['tarik_nomor_rekening'],
-            'tarik_atas_nama'      => $data['tarik_atas_nama'],
-            'tarik_sisa_saldo'     => $nasabah->nasabah_saldo - $data['tarik_jumlah'],
-            'status'               => 'menunggu',
-            'id_nasabah'           => $nasabahId,
-            'id_admin'             => null,
+            'transaksi_tarik_tanggal'        => now()->toDateString(),
+            'transaksi_tarik_jumlah'         => $data['transaksi_tarik_jumlah'],
+            'transaksi_tarik_bank_tujuan'    => $data['transaksi_tarik_bank_tujuan'],
+            'transaksi_tarik_nomor_rekening' => $data['transaksi_tarik_nomor_rekening'],
+            'transaksi_tarik_atas_nama'      => $data['transaksi_tarik_atas_nama'],
+            'transaksi_tarik_sisa_saldo'     => $nasabah->nasabah_saldo - $data['transaksi_tarik_jumlah'],
+            'transaksi_tarik_status'         => 'menunggu',
+            'id_nasabah'                     => $nasabahId,
+            'id_admin'                       => null,
         ]);
 
-        return back()->with('success', 'Pengajuan pencairan Rp ' . number_format($data['tarik_jumlah'], 0, ',', '.') . ' berhasil dikirim. Menunggu persetujuan admin.');
+        return back()->with('success', 'Pengajuan pencairan Rp ' . number_format($data['transaksi_tarik_jumlah'], 0, ',', '.') . ' berhasil dikirim. Menunggu persetujuan admin.');
     }
 
     /**
@@ -593,10 +603,10 @@ class AuthController extends Controller
      */
     public function daftarPencairan()
     {
-        $menunggu    = TransaksiTarik::with('nasabah')->where('status', 'menunggu')->orderByDesc('tarik_tanggal')->get();
-        $disetujui   = TransaksiTarik::with('nasabah')->where('status', 'disetujui')->orderByDesc('tarik_tanggal')->get();
-        $ditolak     = TransaksiTarik::with('nasabah')->where('status', 'ditolak')->orderByDesc('tarik_tanggal')->get();
-        $totalDicairkan = TransaksiTarik::where('status', 'disetujui')->sum('tarik_jumlah');
+        $menunggu       = TransaksiTarik::with('nasabah')->where('transaksi_tarik_status', 'menunggu')->orderByDesc('transaksi_tarik_tanggal')->get();
+        $disetujui      = TransaksiTarik::with('nasabah')->where('transaksi_tarik_status', 'disetujui')->orderByDesc('transaksi_tarik_tanggal')->get();
+        $ditolak        = TransaksiTarik::with('nasabah')->where('transaksi_tarik_status', 'ditolak')->orderByDesc('transaksi_tarik_tanggal')->get();
+        $totalDicairkan = TransaksiTarik::where('transaksi_tarik_status', 'disetujui')->sum('transaksi_tarik_jumlah');
 
         return view('admin.pencairan.index', compact('menunggu', 'disetujui', 'ditolak', 'totalDicairkan'));
     }
@@ -608,38 +618,49 @@ class AuthController extends Controller
     {
         $tarik = TransaksiTarik::with('nasabah')->findOrFail($id);
 
-        if ($tarik->status !== 'menunggu') {
+        if ($tarik->transaksi_tarik_status !== 'menunggu') {
             return back()->with('error', 'Pengajuan ini sudah diproses sebelumnya.');
         }
 
         $nasabah = $tarik->nasabah;
 
         // Validasi ulang saldo nasabah
-        if ($nasabah->nasabah_saldo < $tarik->tarik_jumlah) {
+        if ($nasabah->nasabah_saldo < $tarik->transaksi_tarik_jumlah) {
             return back()->with('error', 'Saldo nasabah tidak mencukupi saat ini.');
         }
 
+        $request->validate([
+            'bukti_pembayaran' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ], [
+            'bukti_pembayaran.required' => 'Bukti transfer/pembayaran wajib diunggah.',
+            'bukti_pembayaran.image'    => 'Berkas harus berupa gambar.',
+        ]);
+
         // Kurangi saldo nasabah
-        $nasabah->nasabah_saldo -= $tarik->tarik_jumlah;
+        $nasabah->nasabah_saldo -= $tarik->transaksi_tarik_jumlah;
         $nasabah->save();
 
         // Update tabungan
         $tabungan = Tabungan::where('id_nasabah', $nasabah->id_nasabah)->first();
         if ($tabungan) {
-            $tabungan->tabungan_total_tarik += $tarik->tarik_jumlah;
+            $tabungan->tabungan_total_tarik += $tarik->transaksi_tarik_jumlah;
             $tabungan->tabungan_saldo_akhir  = $nasabah->nasabah_saldo;
             $tabungan->tabungan_tgl_update   = now();
             $tabungan->save();
         }
 
+        // Simpan file
+        $gambarPath = $request->file('bukti_pembayaran')->store('bukti_pembayaran_tarik', 'public');
+
         // Update status pencairan
-        $tarik->status   = 'disetujui';
-        $tarik->id_admin = session('user_id');
-        $tarik->catatan  = $request->input('catatan', 'Disetujui oleh admin.');
-        $tarik->tarik_sisa_saldo = $nasabah->nasabah_saldo;
+        $tarik->transaksi_tarik_status      = 'disetujui';
+        $tarik->id_admin                    = session('user_id');
+        $tarik->transaksi_tarik_catatan     = $request->input('catatan', 'Disetujui oleh admin.');
+        $tarik->transaksi_tarik_sisa_saldo  = $nasabah->nasabah_saldo;
+        $tarik->transaksi_tarik_gambar      = $gambarPath;
         $tarik->save();
 
-        return back()->with('success', 'Pencairan Rp ' . number_format($tarik->tarik_jumlah, 0, ',', '.') . ' untuk nasabah ' . $nasabah->nasabah_nama . ' berhasil disetujui.');
+        return back()->with('success', 'Pencairan Rp ' . number_format($tarik->transaksi_tarik_jumlah, 0, ',', '.') . ' untuk nasabah ' . $nasabah->nasabah_nama . ' berhasil disetujui.');
     }
 
     /**
@@ -649,13 +670,13 @@ class AuthController extends Controller
     {
         $tarik = TransaksiTarik::with('nasabah')->findOrFail($id);
 
-        if ($tarik->status !== 'menunggu') {
+        if ($tarik->transaksi_tarik_status !== 'menunggu') {
             return back()->with('error', 'Pengajuan ini sudah diproses sebelumnya.');
         }
 
-        $tarik->status   = 'ditolak';
-        $tarik->id_admin = session('user_id');
-        $tarik->catatan  = $request->input('catatan', 'Ditolak oleh admin.');
+        $tarik->transaksi_tarik_status  = 'ditolak';
+        $tarik->id_admin                = session('user_id');
+        $tarik->transaksi_tarik_catatan = $request->input('catatan', 'Ditolak oleh admin.');
         $tarik->save();
 
         return back()->with('success', 'Pengajuan pencairan nasabah ' . $tarik->nasabah->nasabah_nama . ' telah ditolak.');

@@ -63,26 +63,26 @@ Route::get('/dashboard', function () {
         $data['totalBeratSampahBulanIni'] = TransaksiSetor::whereMonth('setor_tanggal', now()->month)
             ->whereYear('setor_tanggal', now()->year)
             ->sum('setor_berat_kg') +
-            \App\Models\TransaksiPengepul::whereMonth('tanggal', now()->month)
-            ->whereYear('tanggal', now()->year)
+            \App\Models\TransaksiPengepul::whereMonth('transaksi_pengepul_tanggal', now()->month)
+            ->whereYear('transaksi_pengepul_tanggal', now()->year)
             ->sum('berat_kg');
         $data['totalKasMasuk']  = Tabungan::sum('tabungan_total_setor');
-        $data['totalKasKeluar'] = TransaksiTarik::where('status', 'disetujui')->sum('tarik_jumlah');
-        $data['setoranMenunggu'] = SetoranPengepul::where('status', 'menunggu')->count();
-        $data['totalPendapatanAdmin'] = SetoranPengepul::where('status', 'terverifikasi')->sum('total_bagian_admin');
-        $data['rewardsMenunggu'] = \App\Models\PenukaranReward::where('status', 'menunggu')->count();
+        $data['totalKasKeluar'] = TransaksiTarik::where('transaksi_tarik_status', 'disetujui')->sum('transaksi_tarik_jumlah');
+        $data['setoranMenunggu'] = SetoranPengepul::where('setoran_pengepul_status', 'menunggu')->count();
+        $data['totalPendapatanAdmin'] = SetoranPengepul::where('setoran_pengepul_status', 'terverifikasi')->sum('total_bagian_admin');
+        $data['rewardsMenunggu'] = \App\Models\PenukaranReward::where('penukaran_status', 'menunggu')->count();
 
         $data['activeNasabahs']     = Nasabah::where('nasabah_status', 'aktif')->orderBy('nasabah_nama', 'asc')->get();
         $data['pendingNasabahs']    = Nasabah::where('nasabah_status', 'pending')->orderBy('id_nasabah', 'desc')->get();
         $data['pendingTarikRequests'] = TransaksiTarik::with('nasabah')
-            ->where('status', 'menunggu')
+            ->where('transaksi_tarik_status', 'menunggu')
             ->orderBy('id_tarik', 'desc')
             ->get();
-        $data['allSampah']    = Sampah::orderBy('sampah_name', 'asc')->get();
+        $data['allSampah']    = Sampah::orderBy('sampah_nama', 'asc')->get();
         $data['allGeolokasi'] = Geolokasi::orderBy('id_lokasi', 'desc')->get();
         $data['nasabahs']     = Nasabah::orderBy('id_nasabah', 'desc')->take(5)->get();
-        $data['allPengepul']  = \App\Models\Pengepul::orderBy('nama')->get();
-        $data['pendingPengepul'] = \App\Models\Pengepul::where('status_aktif', false)->orderBy('created_at', 'desc')->get();
+        $data['allPengepul']  = \App\Models\Pengepul::orderBy('pengepul_nama')->get();
+        $data['pendingPengepul'] = \App\Models\Pengepul::where('pengepul_status_aktif', 'nonaktif')->orderBy('id_pengepul', 'desc')->get();
 
     } else {
         // Nasabah
@@ -119,12 +119,12 @@ Route::get('/dashboard', function () {
         $data['totalSampahDisetorKg'] = TransaksiSetor::where('id_nasabah', $userId)->sum('setor_berat_kg') +
             \App\Models\TransaksiPengepul::where('nasabah_id', $userId)->sum('berat_kg');
         $activeGeolokasi = Geolokasi::where('status_aktif', 'aktif')
-            ->select('nama_lokasi', 'alamat', 'latitude', 'longitude', 'jam_operasional')
+            ->select('nama_lokasi', 'geolokasi_alamat', 'latitude', 'longitude', 'jam_operasional')
             ->get()
             ->map(function ($item) {
                 return [
                     'nama_lokasi'     => $item->nama_lokasi,
-                    'alamat'          => $item->alamat,
+                    'alamat'          => $item->geolokasi_alamat,
                     'latitude'        => $item->latitude,
                     'longitude'       => $item->longitude,
                     'jam_operasional' => $item->jam_operasional,
@@ -132,16 +132,16 @@ Route::get('/dashboard', function () {
                 ];
             });
 
-        $activePengepul = \App\Models\Pengepul::where('status_aktif', 1)
-            ->whereNotNull('latitude')
-            ->whereNotNull('longitude')
+        $activePengepul = \App\Models\Pengepul::where('pengepul_status_aktif', 'aktif')
+            ->whereNotNull('pengepul_latitude')
+            ->whereNotNull('pengepul_longitude')
             ->get()
             ->map(function ($item) {
                 return [
-                    'nama_lokasi'     => $item->nama,
-                    'alamat'          => $item->alamat,
-                    'latitude'        => $item->latitude,
-                    'longitude'       => $item->longitude,
+                    'nama_lokasi'     => $item->pengepul_nama,
+                    'alamat'          => $item->pengepul_alamat,
+                    'latitude'        => $item->pengepul_latitude,
+                    'longitude'       => $item->pengepul_longitude,
                     'jam_operasional' => '08:00 - 17:00 (Setiap Hari)',
                     'tipe'            => 'Mitra Pengepul'
                 ];
@@ -154,16 +154,16 @@ Route::get('/dashboard', function () {
             ->take(10)
             ->get();
         $data['recentPenarikans'] = TransaksiTarik::where('id_nasabah', $userId)
-            ->orderBy('tarik_tanggal', 'desc')
+            ->orderBy('transaksi_tarik_tanggal', 'desc')
             ->take(10)
             ->get();
         $data['saldoNasabah'] = $nasabah->nasabah_saldo ?? 0;
-        $data['allHadiahs'] = \App\Models\Hadiah::orderBy('poin_butuh')->get();
+        $data['allHadiahs'] = \App\Models\Hadiah::orderBy('hadiah_poin_butuh')->get();
         $data['recentPenukaranRewards'] = \App\Models\PenukaranReward::with('hadiah')
             ->where('id_nasabah', $userId)
-            ->orderBy('created_at', 'desc')
+            ->orderBy('tanggal_tukar', 'desc')
             ->get();
-        $data['allSampah'] = \App\Models\Sampah::orderBy('sampah_name', 'asc')->get();
+        $data['allSampah'] = \App\Models\Sampah::orderBy('sampah_nama', 'asc')->get();
         $data['minimalPencairan'] = 100000;
     }
 
@@ -210,15 +210,40 @@ Route::middleware(['role:admin'])->group(function () {
         $bulan = $request->query('bulan', date('m'));
         $tahun = $request->query('tahun', date('Y'));
 
-        $setorans = TransaksiSetor::with(['nasabah', 'sampah'])
+        $setoransDirect = TransaksiSetor::with(['nasabah', 'sampah'])
             ->whereMonth('setor_tanggal', $bulan)
             ->whereYear('setor_tanggal', $tahun)
-            ->get();
+            ->get()
+            ->map(function ($item) {
+                return (object) [
+                    'setor_tanggal'     => $item->setor_tanggal,
+                    'setor_berat_kg'    => $item->setor_berat_kg,
+                    'setor_harga_total' => $item->setor_harga_total,
+                    'nasabah'           => (object) ['nasabah_nama' => $item->nasabah->nasabah_nama ?? '-'],
+                    'sampah'            => (object) ['sampah_nama'  => $item->sampah->sampah_nama ?? '-']
+                ];
+            });
+
+        $setoransPengepul = \App\Models\TransaksiPengepul::with(['nasabah', 'sampah'])
+            ->whereMonth('transaksi_pengepul_tanggal', $bulan)
+            ->whereYear('transaksi_pengepul_tanggal', $tahun)
+            ->get()
+            ->map(function ($item) {
+                return (object) [
+                    'setor_tanggal'     => $item->transaksi_pengepul_tanggal,
+                    'setor_berat_kg'    => $item->berat_kg,
+                    'setor_harga_total' => $item->nilai_idr,
+                    'nasabah'           => (object) ['nasabah_nama' => $item->nasabah->nasabah_nama ?? '-'],
+                    'sampah'            => (object) ['sampah_nama'  => $item->sampah->sampah_nama ?? '-']
+                ];
+            });
+
+        $setorans = $setoransDirect->concat($setoransPengepul)->sortBy('setor_tanggal');
 
         $penarikans = TransaksiTarik::with(['nasabah'])
-            ->whereMonth('tarik_tanggal', $bulan)
-            ->whereYear('tarik_tanggal', $tahun)
-            ->where('status', 'disetujui')
+            ->whereMonth('transaksi_tarik_tanggal', $bulan)
+            ->whereYear('transaksi_tarik_tanggal', $tahun)
+            ->where('transaksi_tarik_status', 'disetujui')
             ->get();
 
         return view('admin.laporan_cetak', [
@@ -259,6 +284,12 @@ Route::middleware(['role:nasabah'])->group(function () {
 });
 
 // ============================================================
+// Public Pengepul selection routes (Passwordless Entry)
+// ============================================================
+Route::get('/pengepul/pilih', [PengepulController::class, 'showPilihPengepul'])->name('pengepul.pilih');
+Route::get('/pengepul/pilih/{id}', [PengepulController::class, 'selectPengepul'])->name('pengepul.select');
+
+// ============================================================
 // Pengepul-only routes
 // ============================================================
 Route::middleware(['role:pengepul'])->group(function () {
@@ -276,4 +307,9 @@ Route::middleware(['role:pengepul'])->group(function () {
 
     Route::post('/pengepul/update-lokasi', [PengepulController::class, 'updateLokasi'])
         ->name('pengepul.update_lokasi');
+
+    // CRUD Transaksi Pengepul (Edit & Delete)
+    Route::get('/pengepul/transaksi/{id}/edit', [PengepulController::class, 'editSetor'])->name('pengepul.transaksi.edit');
+    Route::post('/pengepul/transaksi/{id}/update', [PengepulController::class, 'updateSetor'])->name('pengepul.transaksi.update');
+    Route::post('/pengepul/transaksi/{id}/delete', [PengepulController::class, 'deleteSetor'])->name('pengepul.transaksi.delete');
 });

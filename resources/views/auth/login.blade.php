@@ -266,6 +266,8 @@
             <button type="submit" class="btn">Masuk</button>
         </form>
 
+
+
         <p class="footer-link">
             Belum punya akun? <a href="{{ url('/register') }}">Daftar di sini</a>
         </p>

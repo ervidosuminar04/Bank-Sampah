@@ -13,22 +13,22 @@ class SetoranPengepulController extends Controller
      */
     public function index()
     {
-        $setoranMenunggu     = SetoranPengepul::with('pengepul')
-            ->where('status', 'menunggu')
-            ->orderByDesc('created_at')
+        $setoranMenunggu = SetoranPengepul::with('pengepul')
+            ->where('setoran_pengepul_status', 'menunggu')
+            ->orderByDesc('id_setoran_pengepul')
             ->get();
 
         $setoranTerverifikasi = SetoranPengepul::with('pengepul')
-            ->where('status', 'terverifikasi')
-            ->orderByDesc('created_at')
+            ->where('setoran_pengepul_status', 'terverifikasi')
+            ->orderByDesc('id_setoran_pengepul')
             ->get();
 
         $setoranDitolak = SetoranPengepul::with('pengepul')
-            ->where('status', 'ditolak')
-            ->orderByDesc('created_at')
+            ->where('setoran_pengepul_status', 'ditolak')
+            ->orderByDesc('id_setoran_pengepul')
             ->get();
 
-        $totalPendapatanAdmin = SetoranPengepul::where('status', 'terverifikasi')
+        $totalPendapatanAdmin = SetoranPengepul::where('setoran_pengepul_status', 'terverifikasi')
             ->sum('total_bagian_admin');
 
         return view('admin.setoran_pengepul.index', compact(
@@ -46,8 +46,12 @@ class SetoranPengepulController extends Controller
     {
         $setoran = SetoranPengepul::with('pengepul')->findOrFail($id);
 
+        $ids = is_array($setoran->transaksi_ids)
+            ? $setoran->transaksi_ids
+            : json_decode($setoran->transaksi_ids, true) ?? [];
+
         $transaksi = TransaksiPengepul::with(['nasabah', 'sampah'])
-            ->whereIn('id', $setoran->transaksi_ids)
+            ->whereIn('id_transaksi_pengepul', $ids)
             ->get();
 
         return view('admin.setoran_pengepul.show', compact('setoran', 'transaksi'));
@@ -60,11 +64,11 @@ class SetoranPengepulController extends Controller
     {
         $setoran = SetoranPengepul::findOrFail($id);
 
-        if ($setoran->status !== 'menunggu') {
+        if ($setoran->setoran_pengepul_status !== 'menunggu') {
             return back()->with('error', 'Setoran ini sudah diproses sebelumnya.');
         }
 
-        $setoran->status   = 'terverifikasi';
+        $setoran->setoran_pengepul_status = 'terverifikasi';
         $setoran->id_admin = session('user_id');
         $setoran->catatan  = $request->input('catatan');
         $setoran->save();
@@ -79,17 +83,21 @@ class SetoranPengepulController extends Controller
     {
         $setoran = SetoranPengepul::findOrFail($id);
 
-        if ($setoran->status !== 'menunggu') {
+        if ($setoran->setoran_pengepul_status !== 'menunggu') {
             return back()->with('error', 'Setoran ini sudah diproses sebelumnya.');
         }
 
-        $setoran->status   = 'ditolak';
+        $setoran->setoran_pengepul_status = 'ditolak';
         $setoran->id_admin = session('user_id');
         $setoran->catatan  = $request->input('catatan', 'Ditolak oleh admin.');
         $setoran->save();
 
         // Reset transaksi terkait agar bisa disetor ulang
-        TransaksiPengepul::whereIn('id', $setoran->transaksi_ids)
+        $ids = is_array($setoran->transaksi_ids)
+            ? $setoran->transaksi_ids
+            : json_decode($setoran->transaksi_ids, true) ?? [];
+
+        TransaksiPengepul::whereIn('id_transaksi_pengepul', $ids)
             ->update(['sudah_disetor' => false]);
 
         return back()->with('success', 'Setoran telah ditolak. Transaksi terkait dapat disetor ulang oleh pengepul.');

@@ -15,7 +15,6 @@ class Admin extends Model
         'admin_nama',
         'admin_username',
         'admin_password',
-        'admin_level',
         'admin_status',
     ];
 

@@ -1289,18 +1289,18 @@
                                         <tbody>
                                             @foreach($pendingPengepul as $pp)
                                             <tr>
-                                                <td><strong>{{ $pp->nama }}</strong></td>
-                                                <td><code>{{ $pp->username }}</code></td>
-                                                <td>{{ $pp->alamat }}</td>
-                                                <td>{{ $pp->telepon ?? '-' }}</td>
+                                                <td><strong>{{ $pp->pengepul_nama }}</strong></td>
+                                                <td><code>{{ $pp->pengepul_username }}</code></td>
+                                                <td>{{ $pp->pengepul_alamat }}</td>
+                                                <td>{{ $pp->pengepul_telepon ?? '-' }}</td>
                                                 <td>{{ $pp->created_at ? $pp->created_at->format('d M Y H:i') : '-' }}</td>
                                                 <td style="display:flex;gap:6px;flex-wrap:wrap;">
-                                                    <form method="POST" action="{{ route('admin.pengepul.verify', $pp->id) }}" style="display:inline;">
+                                                    <form method="POST" action="{{ route('admin.pengepul.verify', $pp->id_pengepul) }}" style="display:inline;">
                                                         @csrf
                                                         <button type="submit" class="btn-action-sm btn-success">✅ Verifikasi</button>
                                                     </form>
-                                                    <form method="POST" action="{{ route('admin.pengepul.reject', $pp->id) }}" 
-                                                          onsubmit="return confirm('Tolak dan hapus pendaftaran {{ $pp->nama }}?')" style="display:inline;">
+                                                    <form method="POST" action="{{ route('admin.pengepul.reject', $pp->id_pengepul) }}" 
+                                                          onsubmit="return confirm('Tolak dan hapus pendaftaran {{ $pp->pengepul_nama }}?')" style="display:inline;">
                                                         @csrf
                                                         <button type="submit" class="btn-action-sm btn-danger">❌ Tolak</button>
                                                     </form>
@@ -1335,74 +1335,74 @@
                                         <tbody>
                                             @foreach($allPengepul as $pg)
                                             <tr>
-                                                <td><strong>{{ $pg->nama }}</strong></td>
-                                                <td><code>{{ $pg->username }}</code></td>
-                                                <td>{{ $pg->alamat }}</td>
-                                                <td>{{ $pg->telepon ?? '-' }}</td>
+                                                <td><strong>{{ $pg->pengepul_nama }}</strong></td>
+                                                <td><code>{{ $pg->pengepul_username }}</code></td>
+                                                <td>{{ $pg->pengepul_alamat }}</td>
+                                                <td>{{ $pg->pengepul_telepon ?? '-' }}</td>
                                                 <td>
-                                                    @if($pg->latitude && $pg->longitude)
-                                                        <code style="font-size:11px;">{{ $pg->latitude }}, {{ $pg->longitude }}</code>
+                                                    @if($pg->pengepul_latitude && $pg->pengepul_longitude)
+                                                        <code style="font-size:11px;">{{ $pg->pengepul_latitude }}, {{ $pg->pengepul_longitude }}</code>
                                                     @else
                                                         <span style="color:#aaa; font-style:italic; font-size:11.5px;">Belum aktif (GPS)</span>
                                                     @endif
                                                 </td>
                                                 <td>
-                                                    <span class="status-badge {{ $pg->status_aktif ? 'open' : 'closed' }}">
-                                                        {{ $pg->status_aktif ? 'Aktif' : 'Nonaktif' }}
+                                                    <span class="status-badge {{ $pg->pengepul_status_aktif === 'aktif' ? 'open' : 'closed' }}">
+                                                        {{ $pg->pengepul_status_aktif === 'aktif' ? 'Aktif' : 'Nonaktif' }}
                                                     </span>
                                                 </td>
                                                 <td style="display:flex;gap:6px;flex-wrap:wrap;">
                                                     <!-- Tombol Edit (toggle form inline) -->
                                                     <button class="btn-action-sm btn-success"
-                                                        onclick="toggleEditPengepul({{ $pg->id }})">✏️ Edit</button>
+                                                        onclick="toggleEditPengepul({{ $pg->id_pengepul }})">✏️ Edit</button>
                                                     <!-- Tombol Hapus -->
-                                                    <form method="POST" action="{{ route('admin.pengepul.delete', $pg->id) }}"
-                                                        onsubmit="return confirm('Hapus pengepul {{ $pg->nama }}?')">
+                                                    <form method="POST" action="{{ route('admin.pengepul.delete', $pg->id_pengepul) }}"
+                                                        onsubmit="return confirm('Hapus pengepul {{ $pg->pengepul_nama }}?')">
                                                         @csrf
                                                         <button type="submit" class="btn-action-sm btn-danger">🗑️ Hapus</button>
                                                     </form>
                                                 </td>
                                             </tr>
                                             <!-- Form Edit Inline (tersembunyi) -->
-                                            <tr id="edit-pengepul-{{ $pg->id }}" style="display:none;background:#f9fdf9;">
+                                            <tr id="edit-pengepul-{{ $pg->id_pengepul }}" style="display:none;background:#f9fdf9;">
                                                 <td colspan="7" style="padding:16px;">
-                                                    <form method="POST" action="{{ route('admin.pengepul.update', $pg->id) }}">
+                                                    <form method="POST" action="{{ route('admin.pengepul.update', $pg->id_pengepul) }}">
                                                         @csrf
                                                         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
                                                             <div class="form-group" style="margin:0;">
                                                                 <label style="font-size:12px;">Nama</label>
-                                                                <input type="text" name="nama" class="form-control" value="{{ $pg->nama }}" required>
+                                                                <input type="text" name="pengepul_nama" class="form-control" value="{{ $pg->pengepul_nama }}" required>
                                                             </div>
                                                             <div class="form-group" style="margin:0;">
                                                                 <label style="font-size:12px;">Telepon</label>
-                                                                <input type="text" name="telepon" class="form-control" value="{{ $pg->telepon }}">
+                                                                <input type="text" name="pengepul_telepon" class="form-control" value="{{ $pg->pengepul_telepon }}">
                                                             </div>
                                                             <div class="form-group" style="margin:0;">
                                                                 <label style="font-size:12px;">Username</label>
-                                                                <input type="text" name="username" class="form-control" value="{{ $pg->username }}" required>
+                                                                <input type="text" name="pengepul_username" class="form-control" value="{{ $pg->pengepul_username }}" required>
                                                             </div>
                                                         </div>
                                                         <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px;margin-top:8px;">
                                                             <div class="form-group" style="margin:0;">
                                                                 <label style="font-size:12px;">Alamat</label>
-                                                                <input type="text" name="alamat" class="form-control" value="{{ $pg->alamat }}" required>
+                                                                <input type="text" name="pengepul_alamat" class="form-control" value="{{ $pg->pengepul_alamat }}" required>
                                                             </div>
                                                             <div class="form-group" style="margin:0;">
                                                                 <label style="font-size:12px;">Password baru (kosongkan jika tidak diubah)</label>
-                                                                <input type="password" name="password" class="form-control" placeholder="Opsional">
+                                                                <input type="password" name="pengepul_password" class="form-control" placeholder="Opsional">
                                                             </div>
                                                             <div class="form-group" style="margin:0;">
                                                                 <label style="font-size:12px;">Status</label>
-                                                                <select name="status_aktif" class="form-control">
-                                                                    <option value="1" {{ $pg->status_aktif ? 'selected' : '' }}>Aktif</option>
-                                                                    <option value="0" {{ !$pg->status_aktif ? 'selected' : '' }}>Nonaktif</option>
+                                                                <select name="pengepul_status_aktif" class="form-control">
+                                                                    <option value="aktif" {{ $pg->pengepul_status_aktif === 'aktif' ? 'selected' : '' }}>Aktif</option>
+                                                                    <option value="nonaktif" {{ $pg->pengepul_status_aktif !== 'aktif' ? 'selected' : '' }}>Nonaktif</option>
                                                                 </select>
                                                             </div>
                                                         </div>
                                                         <div style="margin-top:10px;display:flex;gap:8px;">
                                                             <button type="submit" class="btn-action-sm btn-success">💾 Simpan</button>
                                                             <button type="button" class="btn-action-sm btn-secondary"
-                                                                onclick="toggleEditPengepul({{ $pg->id }})">Batal</button>
+                                                                onclick="toggleEditPengepul({{ $pg->id_pengepul }})">Batal</button>
                                                         </div>
                                                     </form>
                                                 </td>
@@ -1471,13 +1471,10 @@
                                             @foreach($pendingTarikRequests as $tr)
                                                 <tr>
                                                     <td><strong>{{ $tr->nasabah->nasabah_nama }}</strong></td>
-                                                    <td>{{ \Carbon\Carbon::parse($tr->tarik_tanggal)->format('d M Y H:i') }}</td>
-                                                    <td><strong style="color:var(--color-flame)">Rp {{ number_format($tr->tarik_jumlah, 0, ',', '.') }}</strong></td>
+                                                    <td>{{ \Carbon\Carbon::parse($tr->transaksi_tarik_tanggal)->format('d M Y H:i') }}</td>
+                                                    <td><strong style="color:var(--color-flame)">Rp {{ number_format($tr->transaksi_tarik_jumlah, 0, ',', '.') }}</strong></td>
                                                     <td>
-                                                        <form method="POST" action="{{ route('admin.persetujuan_tarik', [$tr->id_tarik, 'setuju']) }}" style="display:inline;">
-                                                            @csrf
-                                                            <button type="submit" class="btn-action-sm btn-success">✅ Setujui</button>
-                                                        </form>
+                                                        <button type="button" onclick="openApproveTarikModal('{{ route('admin.persetujuan_tarik', [$tr->id_tarik, 'setuju']) }}')" class="btn-action-sm btn-success">✅ Setujui</button>
                                                         <form method="POST" action="{{ route('admin.persetujuan_tarik', [$tr->id_tarik, 'tolak']) }}" style="display:inline; margin-left: 5px;">
                                                             @csrf
                                                             <button type="submit" class="btn-action-sm btn-danger">❌ Tolak</button>
@@ -1909,8 +1906,8 @@
                             <form method="POST" action="{{ route('nasabah.pencairan.store') }}">
                                 @csrf
                                 <div class="form-group">
-                                    <label for="tarik_jumlah">Nominal Pencairan (Rp)</label>
-                                    <input type="number" name="tarik_jumlah" id="tarik_jumlah" class="form-control"
+                                    <label for="transaksi_tarik_jumlah">Nominal Pencairan (Rp)</label>
+                                    <input type="number" name="transaksi_tarik_jumlah" id="transaksi_tarik_jumlah" class="form-control"
                                         min="{{ $minimalPencairan }}"
                                         max="{{ $saldoNasabah ?? 0 }}"
                                         step="1000"
@@ -1919,8 +1916,8 @@
                                     <span style="font-size: 11px; color:#888; display:block; margin-top:4px;">*Minimal pencairan Rp {{ number_format($minimalPencairan,0,',','.') }}</span>
                                 </div>
                                 <div class="form-group" style="margin-top: 15px;">
-                                    <label for="tarik_bank_tujuan">Bank / E-Wallet Tujuan Transfer</label>
-                                    <select name="tarik_bank_tujuan" id="tarik_bank_tujuan" class="form-control" required
+                                    <label for="transaksi_tarik_bank_tujuan">Bank / E-Wallet Tujuan Transfer</label>
+                                    <select name="transaksi_tarik_bank_tujuan" id="transaksi_tarik_bank_tujuan" class="form-control" required
                                         {{ ($saldoNasabah ?? 0) < $minimalPencairan ? 'disabled' : '' }}>
                                         <option value="" disabled selected>-- Pilih Bank / E-Wallet --</option>
                                         <option value="BCA">Bank BCA</option>
@@ -1936,14 +1933,14 @@
                                     </select>
                                 </div>
                                 <div class="form-group" style="margin-top: 15px;">
-                                    <label for="tarik_nomor_rekening">Nomor Rekening / No. HP E-Wallet</label>
-                                    <input type="text" name="tarik_nomor_rekening" id="tarik_nomor_rekening" class="form-control"
+                                    <label for="transaksi_tarik_nomor_rekening">Nomor Rekening / No. HP E-Wallet</label>
+                                    <input type="text" name="transaksi_tarik_nomor_rekening" id="transaksi_tarik_nomor_rekening" class="form-control"
                                         placeholder="Contoh: 1234567890 atau 08123456789" required
                                         {{ ($saldoNasabah ?? 0) < $minimalPencairan ? 'disabled' : '' }}>
                                 </div>
                                 <div class="form-group" style="margin-top: 15px; margin-bottom: 20px;">
-                                    <label for="tarik_atas_nama">Nama Pemilik Rekening / Akun</label>
-                                    <input type="text" name="tarik_atas_nama" id="tarik_atas_nama" class="form-control"
+                                    <label for="transaksi_tarik_atas_nama">Nama Pemilik Rekening / Akun</label>
+                                    <input type="text" name="transaksi_tarik_atas_nama" id="transaksi_tarik_atas_nama" class="form-control"
                                         placeholder="Contoh: Budi Susanto" required
                                         {{ ($saldoNasabah ?? 0) < $minimalPencairan ? 'disabled' : '' }}>
                                 </div>
@@ -2009,32 +2006,35 @@
                                         <tbody>
                                             @foreach($recentPenarikans as $rp)
                                                 <tr>
-                                                    <td>{{ \Carbon\Carbon::parse($rp->tarik_tanggal)->format('d M Y') }}</td>
-                                                    <td><strong style="color:var(--color-flame)">Rp {{ number_format($rp->tarik_jumlah, 0, ',', '.') }}</strong></td>
-                                                    <td>Rp {{ number_format($rp->tarik_sisa_saldo, 0, ',', '.') }}</td>
+                                                    <td>{{ \Carbon\Carbon::parse($rp->transaksi_tarik_tanggal)->format('d M Y') }}</td>
+                                                    <td><strong style="color:var(--color-flame)">Rp {{ number_format($rp->transaksi_tarik_jumlah, 0, ',', '.') }}</strong></td>
+                                                    <td>Rp {{ number_format($rp->transaksi_tarik_sisa_saldo, 0, ',', '.') }}</td>
                                                     <td>
-                                                        @if($rp->tarik_bank_tujuan)
+                                                        @if($rp->transaksi_tarik_bank_tujuan)
                                                             <div style="font-size: 13px; font-weight: 700; color: #333;">
-                                                                {{ $rp->tarik_bank_tujuan }} - {{ $rp->tarik_nomor_rekening }}
+                                                                {{ $rp->transaksi_tarik_bank_tujuan }} - {{ $rp->transaksi_tarik_nomor_rekening }}
                                                             </div>
                                                             <div style="font-size: 11.5px; color: #666; margin-top: 2px;">
-                                                                a/n {{ $rp->tarik_atas_nama }}
+                                                                a/n {{ $rp->transaksi_tarik_atas_nama }}
                                                             </div>
                                                         @else
                                                             <span style="color:#aaa; font-style:italic;">Manual / Tunai</span>
                                                         @endif
                                                     </td>
                                                     <td>
-                                                        @if($rp->status === 'menunggu')
+                                                        @if($rp->transaksi_tarik_status === 'menunggu')
                                                             <span class="status-badge" style="background-color:rgba(255, 183, 15, 0.1); color:var(--color-flame);">⏳ Menunggu</span>
-                                                        @elseif($rp->status === 'disetujui')
+                                                        @elseif($rp->transaksi_tarik_status === 'disetujui')
                                                             <span class="status-badge" style="background-color:rgba(125, 184, 37, 0.1); color:var(--color-forest);">✅ Disetujui</span>
+                                                            @if($rp->transaksi_tarik_gambar)
+                                                                <a href="{{ asset('storage/' . $rp->transaksi_tarik_gambar) }}" target="_blank" class="status-badge" style="background-color:rgba(45, 106, 45, 0.15); color:var(--color-forest); text-decoration:none; display:inline-block; margin-top:4px;">🖼️ Bukti Transfer</a>
+                                                            @endif
                                                         @else
                                                             <span class="status-badge" style="background-color:rgba(255, 87, 34, 0.1); color:var(--color-flame);">❌ Ditolak</span>
                                                         @endif
                                                     </td>
-                                                    @if($rp->catatan)
-                                                    <td style="font-size:12px;color:#888;">{{ $rp->catatan }}</td>
+                                                    @if($rp->transaksi_tarik_catatan)
+                                                    <td style="font-size:12px;color:#888;">{{ $rp->transaksi_tarik_catatan }}</td>
                                                     @endif
                                                 </tr>
                                             @endforeach
@@ -2154,6 +2154,24 @@
 
     <!-- Edit Geolokasi Modal (Admin Only, triggered by JS) -->
     @if($userType === 'admin')
+        <!-- Approve Tarik Modal -->
+        <div id="approve_tarik_modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
+            <div class="ui-block" style="background:#fff; padding:25px; border-radius:12px; width:400px; max-width:90%; border-top: 5px solid var(--color-forest); box-shadow: var(--shadow-xl);">
+                <h3 style="margin-top:0; margin-bottom:15px; font-family:'Nunito',sans-serif; color:var(--color-canopy); font-size:16px; font-weight:700;">✅ Setujui Penarikan</h3>
+                <form id="form_approve_tarik" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="form-group" style="margin-bottom:15px;">
+                        <label style="display:block; font-weight:700; font-size:13px; margin-bottom:8px; color:var(--color-canopy);">Bukti Transfer / Pembayaran <span style="color:var(--color-flame)">*</span></label>
+                        <input type="file" name="bukti_pembayaran" class="form-control" accept="image/*" required style="padding-top:10px;">
+                    </div>
+                    <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:20px;">
+                        <button type="button" onclick="document.getElementById('approve_tarik_modal').style.display='none'" class="btn-action-sm btn-secondary" style="padding:8px 16px;">Batal</button>
+                        <button type="submit" class="btn-action-sm btn-success" style="padding:8px 16px;">Setujui &amp; Upload</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         <div id="edit_geo_modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
             <div class="ui-block" style="width:100%; max-width:550px; margin: 0 15px; border-top: 5px solid var(--color-canopy);">
                 <h3 style="font-size:16px; font-weight:700; margin-bottom:15px; color:var(--color-forest);">Ubah Data Geolokasi</h3>
@@ -2343,6 +2361,15 @@
                 document.getElementById('edit_status_aktif').value = geo.status_aktif;
                 
                 modal.style.display = 'flex';
+            }
+
+            function openApproveTarikModal(actionUrl) {
+                const modal = document.getElementById('approve_tarik_modal');
+                const form = document.getElementById('form_approve_tarik');
+                if (modal && form) {
+                    form.action = actionUrl;
+                    modal.style.display = 'flex';
+                }
             }
 
             // Map initialization removed since dynamic GPS coordinates are self-updated by Pengepul.

@@ -25,14 +25,14 @@ class PengepulController extends Controller
         $totalTransaksi   = $pengepul->transaksi()->count();
         $totalBeratKg     = $pengepul->transaksi()->sum('berat_kg');
         $totalNilaiRupiah = $pengepul->transaksi()->sum('nilai_idr');
-        $totalKomisi      = $pengepul->transaksi()->sum('komisi_pengepul');
+        $totalKomisi      = $pengepul->transaksi()->sum('transaksi_pengepul_komisi_pengepul');
 
         // Transaksi bulan ini (untuk tab Dashboard)
         $transaksibulanIni = $pengepul->transaksi()
             ->with(['nasabah', 'sampah'])
-            ->whereMonth('tanggal', now()->month)
-            ->whereYear('tanggal', now()->year)
-            ->orderByDesc('tanggal')
+            ->whereMonth('transaksi_pengepul_tanggal', now()->month)
+            ->whereYear('transaksi_pengepul_tanggal', now()->year)
+            ->orderByDesc('transaksi_pengepul_tanggal')
             ->get();
 
         // Daftar nasabah aktif untuk dropdown timbangan
@@ -41,23 +41,23 @@ class PengepulController extends Controller
             ->get();
 
         // Daftar jenis sampah untuk dropdown timbangan
-        $sampahs = Sampah::orderBy('sampah_name')->get();
+        $sampahs = Sampah::orderBy('sampah_nama')->get();
 
         // Transaksi yang belum disetor (untuk tab Setoran)
         $transaksiBelumDisetor = $pengepul->transaksiBelumDisetor()
             ->with(['nasabah', 'sampah'])
-            ->orderByDesc('tanggal')
+            ->orderByDesc('transaksi_pengepul_tanggal')
             ->get();
 
         $totalBelumDisetor         = $transaksiBelumDisetor->sum('nilai_idr');
         $totalSelisihBelumDisetor  = $transaksiBelumDisetor->sum('selisih_total');
-        $totalKomisiBelum          = $transaksiBelumDisetor->sum('komisi_pengepul');
+        $totalKomisiBelum          = $transaksiBelumDisetor->sum('transaksi_pengepul_komisi_pengepul');
         $totalAdminBelum           = $transaksiBelumDisetor->sum('bagian_admin');
         $totalHarusDisetor         = $totalBelumDisetor + $totalAdminBelum;
 
         // Riwayat setoran
         $riwayatSetoran = $pengepul->setoran()
-            ->orderByDesc('created_at')
+            ->orderByDesc('id_setoran_pengepul')
             ->get();
 
         // Data laporan – diload saat filter dikirim via query param
@@ -65,13 +65,13 @@ class PengepulController extends Controller
         $laporanTahun     = $request->query('tahun', now()->format('Y'));
         $laporanTransaksi = $pengepul->transaksi()
             ->with(['nasabah', 'sampah'])
-            ->whereMonth('tanggal', $laporanBulan)
-            ->whereYear('tanggal', $laporanTahun)
-            ->orderBy('tanggal')
+            ->whereMonth('transaksi_pengepul_tanggal', $laporanBulan)
+            ->whereYear('transaksi_pengepul_tanggal', $laporanTahun)
+            ->orderBy('transaksi_pengepul_tanggal')
             ->get();
-        $laporanTotalBerat = $laporanTransaksi->sum('berat_kg');
-        $laporanTotalNilai = $laporanTransaksi->sum('nilai_idr');
-        $laporanTotalKomisi = $laporanTransaksi->sum('komisi_pengepul');
+        $laporanTotalBerat  = $laporanTransaksi->sum('berat_kg');
+        $laporanTotalNilai  = $laporanTransaksi->sum('nilai_idr');
+        $laporanTotalKomisi = $laporanTransaksi->sum('transaksi_pengepul_komisi_pengepul');
 
         return view('pengepul.dashboard', compact(
             'pengepul',
@@ -100,15 +100,14 @@ class PengepulController extends Controller
 
     /**
      * Proses timbangan & setor sampah nasabah
-     * – menghitung nilai_idr (saldo nasabah), selisih, komisi pengepul, bagian admin
      */
     public function storeSetor(Request $request)
     {
         $data = $request->validate([
-            'nasabah_id'  => 'required|integer|exists:nasabah,id_nasabah',
-            'id_sampah'   => 'required|integer|exists:sampah,id_sampah',
-            'berat_kg'    => 'required|numeric|min:0.01',
-            'keterangan'  => 'nullable|string|max:255',
+            'nasabah_id'       => 'required|integer|exists:nasabah,id_nasabah',
+            'id_sampah'        => 'required|integer|exists:sampah,id_sampah',
+            'berat_kg'         => 'required|numeric|min:0.01',
+            'keterangan'       => 'nullable|string|max:255',
             'foto_dokumentasi' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
@@ -118,37 +117,37 @@ class PengepulController extends Controller
         $sampah     = Sampah::find($data['id_sampah']);
 
         // ── Kalkulasi finansial ──────────────────────────────────────────
-        $hargaBeliKg  = $sampah->sampah_harga_kg;                         // harga ke nasabah
-        $hargaPasarKg = $sampah->sampah_harga_pasar ?? $hargaBeliKg;      // harga jual ke luar
+        $hargaBeliKg  = $sampah->sampah_harga_kg;
+        $hargaPasarKg = $sampah->sampah_harga_pasar ?? $hargaBeliKg;
         $beratKg      = $data['berat_kg'];
 
-        $nilaiIdr     = round($hargaBeliKg  * $beratKg, 2);               // saldo ke nasabah
-        $nilaiPasar   = round($hargaPasarKg * $beratKg, 2);               // nilai jual ke luar
-        $selisihTotal = round($nilaiPasar - $nilaiIdr, 2);                // margin kotor
+        $nilaiIdr     = round($hargaBeliKg  * $beratKg, 2);
+        $nilaiPasar   = round($hargaPasarKg * $beratKg, 2);
+        $selisihTotal = round($nilaiPasar - $nilaiIdr, 2);
 
-        $komisiPersen    = $pengepul->komisi_persen ?? 50;
-        $komisiPengepul  = round($selisihTotal * $komisiPersen / 100, 2); // bagian pengepul
-        $bagianAdmin     = round($selisihTotal - $komisiPengepul, 2);     // bagian admin
+        $komisiPersen   = $pengepul->pengepul_komisi_persen ?? 50;
+        $komisiPengepul = round($selisihTotal * $komisiPersen / 100, 2);
+        $bagianAdmin    = round($selisihTotal - $komisiPengepul, 2);
 
         // ── Simpan transaksi pengepul ────────────────────────────────────
         TransaksiPengepul::create([
-            'pengepul_id'     => $pengepulId,
-            'nasabah_id'      => $data['nasabah_id'],
-            'id_sampah'       => $data['id_sampah'],
-            'berat_kg'        => $beratKg,
-            'harga_beli_kg'   => $hargaBeliKg,
-            'harga_pasar_kg'  => $hargaPasarKg,
-            'nilai_idr'       => $nilaiIdr,
-            'selisih_total'   => $selisihTotal,
-            'komisi_pengepul' => $komisiPengepul,
-            'bagian_admin'    => $bagianAdmin,
-            'sudah_disetor'   => false,
-            'tanggal'         => now()->toDateString(),
-            'keterangan'      => $data['keterangan'] ?? 'Setor ' . $sampah->sampah_name . ' ' . $beratKg . ' kg via pengepul',
-            'foto_dokumentasi' => $request->hasFile('foto_dokumentasi') ? $request->file('foto_dokumentasi')->store('dokumentasi_timbangan', 'public') : null,
+            'pengepul_id'                         => $pengepulId,
+            'nasabah_id'                          => $data['nasabah_id'],
+            'id_sampah'                           => $data['id_sampah'],
+            'berat_kg'                            => $beratKg,
+            'harga_beli_kg'                       => $hargaBeliKg,
+            'harga_pasar_kg'                      => $hargaPasarKg,
+            'nilai_idr'                           => $nilaiIdr,
+            'selisih_total'                       => $selisihTotal,
+            'transaksi_pengepul_komisi_pengepul'  => $komisiPengepul,
+            'bagian_admin'                        => $bagianAdmin,
+            'sudah_disetor'                       => false,
+            'transaksi_pengepul_tanggal'          => now()->toDateString(),
+            'transaksi_pengepul_keterangan'       => $data['keterangan'] ?? 'Setor ' . $sampah->sampah_nama . ' ' . $beratKg . ' kg via pengepul',
+            'transaksi_pengepul_gambar'           => $request->hasFile('foto_dokumentasi') ? $request->file('foto_dokumentasi')->store('dokumentasi_timbangan', 'public') : null,
         ]);
 
-        // ── Update tabungan nasabah (hanya nilai harga beli) ─────────────
+        // ── Update tabungan nasabah ──────────────────────────────────────
         $tabungan = Tabungan::where('id_nasabah', $data['nasabah_id'])->first();
         if ($tabungan) {
             $tabungan->tabungan_total_setor += $nilaiIdr;
@@ -157,7 +156,7 @@ class PengepulController extends Controller
             $tabungan->save();
         }
 
-        // ── Update saldo denormalisasi di tabel nasabah ──────────────────
+        // ── Update saldo nasabah ─────────────────────────────────────────
         $nasabah->nasabah_saldo += $nilaiIdr;
         $nasabah->save();
 
@@ -187,21 +186,20 @@ class PengepulController extends Controller
     }
 
     /**
-     * Pengepul membuat setoran ke admin (batch dari transaksi yang belum disetor)
+     * Pengepul membuat setoran ke admin (batch)
      */
     public function storeSetoran(Request $request)
     {
         $data = $request->validate([
-            'transaksi_ids'   => 'required|array|min:1',
-            'transaksi_ids.*' => 'integer|exists:transaksi_pengepul,id',
+            'transaksi_ids'    => 'required|array|min:1',
+            'transaksi_ids.*'  => 'integer|exists:transaksi_pengepul,id_transaksi_pengepul',
             'foto_dokumentasi' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $pengepulId = session('user_id');
         $pengepul   = Pengepul::findOrFail($pengepulId);
 
-        // Ambil transaksi yang dipilih (harus milik pengepul ini & belum disetor)
-        $transaksi = TransaksiPengepul::whereIn('id', $data['transaksi_ids'])
+        $transaksi = TransaksiPengepul::whereIn('id_transaksi_pengepul', $data['transaksi_ids'])
             ->where('pengepul_id', $pengepulId)
             ->where('sudah_disetor', false)
             ->get();
@@ -210,27 +208,25 @@ class PengepulController extends Controller
             return back()->with('error', 'Tidak ada transaksi valid yang dipilih.');
         }
 
-        $totalNilaiNasabah    = $transaksi->sum('nilai_idr');
-        $totalSelisih         = $transaksi->sum('selisih_total');
-        $totalKomisiPengepul  = $transaksi->sum('komisi_pengepul');
-        $totalBagianAdmin     = $transaksi->sum('bagian_admin');
-        $totalDisetor         = $totalNilaiNasabah + $totalBagianAdmin;
+        $totalNilaiNasabah   = $transaksi->sum('nilai_idr');
+        $totalSelisih        = $transaksi->sum('selisih_total');
+        $totalKomisiPengepul = $transaksi->sum('transaksi_pengepul_komisi_pengepul');
+        $totalBagianAdmin    = $transaksi->sum('bagian_admin');
+        $totalDisetor        = $totalNilaiNasabah + $totalBagianAdmin;
 
-        // Buat record setoran
         $setoran = SetoranPengepul::create([
-            'pengepul_id'           => $pengepulId,
-            'total_nilai_nasabah'   => $totalNilaiNasabah,
-            'total_selisih'         => $totalSelisih,
-            'total_komisi_pengepul' => $totalKomisiPengepul,
-            'total_bagian_admin'    => $totalBagianAdmin,
-            'total_disetor'         => $totalDisetor,
-            'transaksi_ids'         => $transaksi->pluck('id')->toArray(),
-            'status'                => 'menunggu',
-            'foto_dokumentasi'      => $request->hasFile('foto_dokumentasi') ? $request->file('foto_dokumentasi')->store('dokumentasi_setoran', 'public') : null,
+            'pengepul_id'             => $pengepulId,
+            'total_nilai_nasabah'     => $totalNilaiNasabah,
+            'total_selisih'           => $totalSelisih,
+            'total_komisi_pengepul'   => $totalKomisiPengepul,
+            'total_bagian_admin'      => $totalBagianAdmin,
+            'total_disetor'           => $totalDisetor,
+            'transaksi_ids'           => json_encode($transaksi->pluck('id_transaksi_pengepul')->toArray()),
+            'setoran_pengepul_status' => 'menunggu',
+            'setoran_pengepul_gambar' => $request->hasFile('foto_dokumentasi') ? $request->file('foto_dokumentasi')->store('dokumentasi_setoran', 'public') : null,
         ]);
 
-        // Tandai semua transaksi sebagai sudah disetor
-        TransaksiPengepul::whereIn('id', $transaksi->pluck('id'))->update(['sudah_disetor' => true]);
+        TransaksiPengepul::whereIn('id_transaksi_pengepul', $transaksi->pluck('id_transaksi_pengepul'))->update(['sudah_disetor' => true]);
 
         return redirect()->route('pengepul.dashboard')
             ->with('success', 'Setoran berhasil dibuat! Total disetor ke admin: Rp ' . number_format($totalDisetor, 0, ',', '.') . '. Menunggu verifikasi admin.');
@@ -249,14 +245,14 @@ class PengepulController extends Controller
 
         $transaksi = $pengepul->transaksi()
             ->with(['nasabah', 'sampah'])
-            ->whereMonth('tanggal', $bulan)
-            ->whereYear('tanggal', $tahun)
-            ->orderBy('tanggal')
+            ->whereMonth('transaksi_pengepul_tanggal', $bulan)
+            ->whereYear('transaksi_pengepul_tanggal', $tahun)
+            ->orderBy('transaksi_pengepul_tanggal')
             ->get();
 
         $totalBerat  = $transaksi->sum('berat_kg');
         $totalNilai  = $transaksi->sum('nilai_idr');
-        $totalKomisi = $transaksi->sum('komisi_pengepul');
+        $totalKomisi = $transaksi->sum('transaksi_pengepul_komisi_pengepul');
 
         if ($request->query('cetak') == '1') {
             return view('pengepul.laporan', compact(
@@ -281,11 +277,203 @@ class PengepulController extends Controller
         $pengepulId = session('user_id');
         $pengepul   = Pengepul::findOrFail($pengepulId);
 
-        $pengepul->latitude  = $data['latitude'];
-        $pengepul->longitude = $data['longitude'];
+        $pengepul->pengepul_latitude  = $data['latitude'];
+        $pengepul->pengepul_longitude = $data['longitude'];
         $pengepul->save();
 
         return redirect()->route('pengepul.dashboard')
             ->with('success', 'Lokasi GPS Anda berhasil diperbarui ke: ' . $data['latitude'] . ', ' . $data['longitude']);
+    }
+
+    /**
+     * Tampilkan halaman pilihan profil pengepul (passwordless)
+     */
+    public function showPilihPengepul()
+    {
+        $pengepuls = Pengepul::where('pengepul_status_aktif', 'aktif')->orderBy('pengepul_nama')->get();
+        return view('pengepul.pilih', compact('pengepuls'));
+    }
+
+    /**
+     * Pilih pengepul untuk masuk ke session
+     */
+    public function selectPengepul($id)
+    {
+        $pengepul = Pengepul::where('pengepul_status_aktif', 'aktif')->findOrFail($id);
+        session([
+            'user_id'   => $pengepul->id_pengepul,
+            'user_type' => 'pengepul',
+        ]);
+
+        return redirect()->route('pengepul.dashboard')->with('success', 'Berhasil masuk sebagai Pengepul: ' . $pengepul->pengepul_nama);
+    }
+
+    /**
+     * Tampilkan form edit transaksi
+     */
+    public function editSetor($id)
+    {
+        $pengepulId = session('user_id');
+        $transaksi  = TransaksiPengepul::where('pengepul_id', $pengepulId)->findOrFail($id);
+
+        if ($transaksi->sudah_disetor) {
+            return redirect()->route('pengepul.dashboard')->with('error', 'Transaksi yang sudah dikelompokkan ke setoran tidak dapat diedit.');
+        }
+
+        $sampahs = Sampah::orderBy('sampah_nama')->get();
+        return view('pengepul.edit_transaksi', compact('transaksi', 'sampahs'));
+    }
+
+    /**
+     * Proses update transaksi + penyesuaian finansial nasabah
+     */
+    public function updateSetor(Request $request, $id)
+    {
+        $data = $request->validate([
+            'id_sampah'        => 'required|integer|exists:sampah,id_sampah',
+            'berat_kg'         => 'required|numeric|min:0.01',
+            'keterangan'       => 'nullable|string|max:255',
+            'foto_dokumentasi' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        $pengepulId = session('user_id');
+        $pengepul   = Pengepul::findOrFail($pengepulId);
+        $transaksi  = TransaksiPengepul::where('pengepul_id', $pengepulId)->findOrFail($id);
+
+        if ($transaksi->sudah_disetor) {
+            return redirect()->route('pengepul.dashboard')->with('error', 'Transaksi yang sudah dikelompokkan ke setoran tidak dapat diedit.');
+        }
+
+        $nasabahId = $transaksi->nasabah_id;
+        $nasabah   = Nasabah::findOrFail($nasabahId);
+        $sampah    = Sampah::findOrFail($data['id_sampah']);
+
+        // Nilai lama
+        $oldNilaiIdr = $transaksi->nilai_idr;
+        $oldBeratKg  = $transaksi->berat_kg;
+
+        // Kalkulasi baru
+        $hargaBeliKg  = $sampah->sampah_harga_kg;
+        $hargaPasarKg = $sampah->sampah_harga_pasar ?? $hargaBeliKg;
+        $beratKg      = $data['berat_kg'];
+
+        $nilaiIdr     = round($hargaBeliKg  * $beratKg, 2);
+        $nilaiPasar   = round($hargaPasarKg * $beratKg, 2);
+        $selisihTotal = round($nilaiPasar - $nilaiIdr, 2);
+
+        $komisiPersen   = $pengepul->pengepul_komisi_persen ?? 50;
+        $komisiPengepul = round($selisihTotal * $komisiPersen / 100, 2);
+        $bagianAdmin    = round($selisihTotal - $komisiPengepul, 2);
+
+        // 1. Sesuaikan saldo Nasabah
+        $nasabah->nasabah_saldo = round($nasabah->nasabah_saldo - $oldNilaiIdr + $nilaiIdr, 2);
+        $nasabah->save();
+
+        // 2. Sesuaikan Tabungan
+        $tabungan = Tabungan::where('id_nasabah', $nasabahId)->first();
+        if ($tabungan) {
+            $tabungan->tabungan_total_setor = round($tabungan->tabungan_total_setor - $oldNilaiIdr + $nilaiIdr, 2);
+            $tabungan->tabungan_saldo_akhir = round($tabungan->tabungan_saldo_akhir - $oldNilaiIdr + $nilaiIdr, 2);
+            $tabungan->tabungan_tgl_update   = now();
+            $tabungan->save();
+        }
+
+        // 3. Sesuaikan Gamifikasi
+        $oldPoin    = round($oldBeratKg * 10);
+        $newPoin    = round($beratKg * 10);
+        $gamifikasi = Gamifikasi::where('id_nasabah', $nasabahId)->first();
+        if ($gamifikasi) {
+            $gamifikasi->poin_diperoleh = max(0, $gamifikasi->poin_diperoleh - $oldPoin + $newPoin);
+            $gamifikasi->total_poin     = max(0, $gamifikasi->total_poin - $oldPoin + $newPoin);
+            $totalPoin = $gamifikasi->total_poin;
+            if ($totalPoin >= 500) {
+                $gamifikasi->level_nasabah = 'Bintang';
+                $gamifikasi->badge         = 'Penyetor Bintang';
+            } elseif ($totalPoin >= 100) {
+                $gamifikasi->level_nasabah = 'Aktif';
+                $gamifikasi->badge         = 'Penyetor Konsisten';
+            } else {
+                $gamifikasi->level_nasabah = 'Pemula';
+                $gamifikasi->badge         = 'Eco Starter';
+            }
+            $gamifikasi->tanggal_update = now();
+            $gamifikasi->save();
+        }
+
+        // 4. Update transaksi
+        $transaksi->id_sampah                          = $data['id_sampah'];
+        $transaksi->berat_kg                           = $beratKg;
+        $transaksi->harga_beli_kg                      = $hargaBeliKg;
+        $transaksi->harga_pasar_kg                     = $hargaPasarKg;
+        $transaksi->nilai_idr                          = $nilaiIdr;
+        $transaksi->selisih_total                      = $selisihTotal;
+        $transaksi->transaksi_pengepul_komisi_pengepul = $komisiPengepul;
+        $transaksi->bagian_admin                       = $bagianAdmin;
+        $transaksi->transaksi_pengepul_keterangan      = $data['keterangan'] ?? $transaksi->transaksi_pengepul_keterangan;
+
+        if ($request->hasFile('foto_dokumentasi')) {
+            $transaksi->transaksi_pengepul_gambar = $request->file('foto_dokumentasi')->store('dokumentasi_timbangan', 'public');
+        }
+
+        $transaksi->save();
+
+        return redirect()->route('pengepul.dashboard')->with('success', 'Transaksi berhasil diperbarui dan saldo nasabah telah disesuaikan.');
+    }
+
+    /**
+     * Hapus transaksi + penyesuaian finansial nasabah
+     */
+    public function deleteSetor($id)
+    {
+        $pengepulId = session('user_id');
+        $transaksi  = TransaksiPengepul::where('pengepul_id', $pengepulId)->findOrFail($id);
+
+        if ($transaksi->sudah_disetor) {
+            return redirect()->route('pengepul.dashboard')->with('error', 'Transaksi yang sudah dikelompokkan ke setoran tidak dapat dihapus.');
+        }
+
+        $nasabahId   = $transaksi->nasabah_id;
+        $nasabah     = Nasabah::findOrFail($nasabahId);
+        $oldNilaiIdr = $transaksi->nilai_idr;
+        $oldBeratKg  = $transaksi->berat_kg;
+
+        // 1. Kurangi saldo nasabah
+        $nasabah->nasabah_saldo = max(0, round($nasabah->nasabah_saldo - $oldNilaiIdr, 2));
+        $nasabah->save();
+
+        // 2. Kurangi di tabungan
+        $tabungan = Tabungan::where('id_nasabah', $nasabahId)->first();
+        if ($tabungan) {
+            $tabungan->tabungan_total_setor = max(0, round($tabungan->tabungan_total_setor - $oldNilaiIdr, 2));
+            $tabungan->tabungan_saldo_akhir = max(0, round($tabungan->tabungan_saldo_akhir - $oldNilaiIdr, 2));
+            $tabungan->tabungan_tgl_update  = now();
+            $tabungan->save();
+        }
+
+        // 3. Kurangi poin gamifikasi
+        $oldPoin    = round($oldBeratKg * 10);
+        $gamifikasi = Gamifikasi::where('id_nasabah', $nasabahId)->first();
+        if ($gamifikasi) {
+            $gamifikasi->poin_diperoleh = max(0, $gamifikasi->poin_diperoleh - $oldPoin);
+            $gamifikasi->total_poin     = max(0, $gamifikasi->total_poin - $oldPoin);
+            $totalPoin = $gamifikasi->total_poin;
+            if ($totalPoin >= 500) {
+                $gamifikasi->level_nasabah = 'Bintang';
+                $gamifikasi->badge         = 'Penyetor Bintang';
+            } elseif ($totalPoin >= 100) {
+                $gamifikasi->level_nasabah = 'Aktif';
+                $gamifikasi->badge         = 'Penyetor Konsisten';
+            } else {
+                $gamifikasi->level_nasabah = 'Pemula';
+                $gamifikasi->badge         = 'Eco Starter';
+            }
+            $gamifikasi->tanggal_update = now();
+            $gamifikasi->save();
+        }
+
+        // 4. Hapus record transaksi
+        $transaksi->delete();
+
+        return redirect()->route('pengepul.dashboard')->with('success', 'Transaksi berhasil dihapus dan saldo nasabah telah disesuaikan.');
     }
 }

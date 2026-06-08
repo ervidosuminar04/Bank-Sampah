@@ -319,12 +319,12 @@
                 @foreach($transaksi as $i => $t)
                 <tr>
                     <td>{{ $i + 1 }}</td>
-                    <td class="mono-col">{{ \Carbon\Carbon::parse($t->tanggal)->format('d/m/Y') }}</td>
+                    <td class="mono-col">{{ \Carbon\Carbon::parse($t->transaksi_pengepul_tanggal)->format('d/m/Y') }}</td>
                     <td><strong>{{ $t->nasabah->nasabah_nama ?? '-' }}</strong></td>
-                    <td>{{ $t->sampah->sampah_name ?? '-' }}</td>
+                    <td>{{ $t->sampah->sampah_nama ?? '-' }}</td>
                     <td class="mono-col" style="text-align:right;">{{ number_format($t->berat_kg, 2) }}</td>
                     <td class="mono-col" style="text-align:right;">Rp {{ number_format($t->nilai_idr, 0, ',', '.') }}</td>
-                    <td>{{ $t->keterangan ?? '-' }}</td>
+                    <td>{{ $t->transaksi_pengepul_keterangan ?? '-' }}</td>
                 </tr>
                 @endforeach
             </tbody>

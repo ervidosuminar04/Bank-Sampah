@@ -307,24 +307,24 @@
                                 <strong>{{ $t->nasabah->nasabah_nama ?? '-' }}</strong><br>
                                 <span style="font-size:11px;color:var(--color-fog);">{{ $t->nasabah->nasabah_username ?? '-' }}</span>
                             </td>
-                            <td class="mono-col">{{ \Carbon\Carbon::parse($t->tarik_tanggal)->format('d/m/Y') }}</td>
-                            <td class="mono-col" style="font-weight:800;color:var(--color-flame);font-size:15px;">Rp {{ number_format($t->tarik_jumlah,0,',','.') }}</td>
+                            <td class="mono-col">{{ \Carbon\Carbon::parse($t->transaksi_tarik_tanggal)->format('d/m/Y') }}</td>
+                            <td class="mono-col" style="font-weight:800;color:var(--color-flame);font-size:15px;">Rp {{ number_format($t->transaksi_tarik_jumlah,0,',','.') }}</td>
                             <td>
-                                @if($t->tarik_bank_tujuan)
+                                @if($t->transaksi_tarik_bank_tujuan)
                                     <div style="font-weight: 700; color: var(--color-forest);">
-                                        {{ $t->tarik_bank_tujuan }} - {{ $t->tarik_nomor_rekening }}
+                                        {{ $t->transaksi_tarik_bank_tujuan }} - {{ $t->transaksi_tarik_nomor_rekening }}
                                     </div>
                                     <div style="font-size: 11px; color: var(--color-canopy); margin-top: 2px;">
-                                        a/n {{ $t->tarik_atas_nama }}
+                                        a/n {{ $t->transaksi_tarik_atas_nama }}
                                     </div>
                                 @else
                                     <span style="color:var(--color-fog); font-style:italic;">Manual / Tunai</span>
                                 @endif
                             </td>
-                            <td class="mono-col">Rp {{ number_format($t->tarik_sisa_saldo,0,',','.') }}</td>
+                            <td class="mono-col">Rp {{ number_format($t->transaksi_tarik_sisa_saldo,0,',','.') }}</td>
                             <td class="mono-col">Rp {{ number_format($t->nasabah->nasabah_saldo ?? 0,0,',','.') }}</td>
                             <td>
-                                <button class="btn btn-approve" onclick="openApprove({{ $t->id_tarik }}, '{{ $t->nasabah->nasabah_nama ?? '' }}', {{ $t->tarik_jumlah }}, '{{ $t->tarik_bank_tujuan }}', '{{ $t->tarik_nomor_rekening }}', '{{ $t->tarik_atas_nama }}')">✅ Setujui</button>
+                                <button class="btn btn-approve" onclick="openApprove({{ $t->id_tarik }}, '{{ $t->nasabah->nasabah_nama ?? '' }}', {{ $t->transaksi_tarik_jumlah }}, '{{ $t->transaksi_tarik_bank_tujuan }}', '{{ $t->transaksi_tarik_nomor_rekening }}', '{{ $t->transaksi_tarik_atas_nama }}')">✅ Setujui</button>
                                 <button class="btn btn-reject" onclick="openReject({{ $t->id_tarik }}, '{{ $t->nasabah->nasabah_nama ?? '' }}')">❌ Tolak</button>
                             </td>
                         </tr>
@@ -364,22 +364,29 @@
                         @forelse($disetujui as $t)
                         <tr>
                             <td><strong>{{ $t->nasabah->nasabah_nama ?? '-' }}</strong></td>
-                            <td class="mono-col">{{ \Carbon\Carbon::parse($t->tarik_tanggal)->format('d/m/Y') }}</td>
-                            <td class="mono-col" style="font-weight:700;color:var(--color-forest);">Rp {{ number_format($t->tarik_jumlah,0,',','.') }}</td>
+                            <td class="mono-col">{{ \Carbon\Carbon::parse($t->transaksi_tarik_tanggal)->format('d/m/Y') }}</td>
+                            <td class="mono-col" style="font-weight:700;color:var(--color-forest);">Rp {{ number_format($t->transaksi_tarik_jumlah,0,',','.') }}</td>
                             <td>
-                                @if($t->tarik_bank_tujuan)
+                                @if($t->transaksi_tarik_bank_tujuan)
                                     <div style="font-weight: 700; color: var(--color-canopy);">
-                                        {{ $t->tarik_bank_tujuan }} - {{ $t->tarik_nomor_rekening }}
+                                        {{ $t->transaksi_tarik_bank_tujuan }} - {{ $t->transaksi_tarik_nomor_rekening }}
                                     </div>
                                     <div style="font-size: 11px; color: var(--color-fog);">
-                                        a/n {{ $t->tarik_atas_nama }}
+                                        a/n {{ $t->transaksi_tarik_atas_nama }}
                                     </div>
                                 @else
                                     <span style="color:var(--color-fog); font-style:italic;">Manual / Tunai</span>
                                 @endif
+                                @if($t->transaksi_tarik_gambar)
+                                    <div style="margin-top: 6px;">
+                                        <a href="{{ asset('storage/' . $t->transaksi_tarik_gambar) }}" target="_blank" class="badge badge-terverifikasi" style="text-decoration:none; display:inline-flex; align-items:center; gap:4px; font-size:11px;">
+                                            🖼️ Lihat Bukti
+                                        </a>
+                                    </div>
+                                @endif
                             </td>
-                            <td class="mono-col">Rp {{ number_format($t->tarik_sisa_saldo,0,',','.') }}</td>
-                            <td style="color:var(--color-forest);font-size:13px;">{{ $t->catatan ?? '-' }}</td>
+                            <td class="mono-col">Rp {{ number_format($t->transaksi_tarik_sisa_saldo,0,',','.') }}</td>
+                            <td style="color:var(--color-forest);font-size:13px;">{{ $t->transaksi_tarik_catatan ?? '-' }}</td>
                         </tr>
                         @empty
                         <tr><td colspan="6"><div class="empty-state"><p style="font-weight:700;">Belum ada pencairan yang disetujui</p></div></td></tr>
@@ -409,21 +416,21 @@
                         @forelse($ditolak as $t)
                         <tr>
                             <td><strong>{{ $t->nasabah->nasabah_nama ?? '-' }}</strong></td>
-                            <td class="mono-col">{{ \Carbon\Carbon::parse($t->tarik_tanggal)->format('d/m/Y') }}</td>
-                            <td class="mono-col" style="color:var(--color-flame);font-weight:700;">Rp {{ number_format($t->tarik_jumlah,0,',','.') }}</td>
+                            <td class="mono-col">{{ \Carbon\Carbon::parse($t->transaksi_tarik_tanggal)->format('d/m/Y') }}</td>
+                            <td class="mono-col" style="color:var(--color-flame);font-weight:700;">Rp {{ number_format($t->transaksi_tarik_jumlah,0,',','.') }}</td>
                             <td>
-                                @if($t->tarik_bank_tujuan)
+                                @if($t->transaksi_tarik_bank_tujuan)
                                     <div style="font-weight: 700; color: var(--color-canopy);">
-                                        {{ $t->tarik_bank_tujuan }} - {{ $t->tarik_nomor_rekening }}
+                                        {{ $t->transaksi_tarik_bank_tujuan }} - {{ $t->transaksi_tarik_nomor_rekening }}
                                     </div>
                                     <div style="font-size: 11px; color: var(--color-fog);">
-                                        a/n {{ $t->tarik_atas_nama }}
+                                        a/n {{ $t->transaksi_tarik_atas_nama }}
                                     </div>
                                 @else
                                     <span style="color:var(--color-fog); font-style:italic;">Manual / Tunai</span>
                                 @endif
                             </td>
-                            <td style="color:var(--color-flame);font-size:13px;font-weight:600;">{{ $t->catatan ?? '-' }}</td>
+                            <td style="color:var(--color-flame);font-size:13px;font-weight:600;">{{ $t->transaksi_tarik_catatan ?? '-' }}</td>
                         </tr>
                         @empty
                         <tr><td colspan="5"><div class="empty-state"><p style="font-weight:700;">Tidak ada pencairan yang ditolak</p></div></td></tr>
@@ -441,8 +448,12 @@
     <div class="modal-box">
         <div class="modal-title">✅ Setujui Pencairan</div>
         <div class="modal-sub" id="approveDesc"></div>
-        <form method="POST" id="formApprove">
+        <form method="POST" id="formApprove" enctype="multipart/form-data">
             @csrf
+            <div class="form-group">
+                <label>Bukti Transfer / Pembayaran <span style="color:var(--color-flame)">*</span></label>
+                <input type="file" name="bukti_pembayaran" class="form-control" accept="image/*" required style="padding-top:10px;">
+            </div>
             <div class="form-group">
                 <label>Catatan (opsional)</label>
                 <input type="text" name="catatan" class="form-control" placeholder="Catatan persetujuan...">

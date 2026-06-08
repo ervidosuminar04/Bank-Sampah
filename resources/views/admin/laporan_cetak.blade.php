@@ -274,7 +274,7 @@
         </div>
         <div class="card">
             <h3>Total Saldo Ditarik</h3>
-            <p>Rp {{ number_format($penarikans->sum('tarik_jumlah'), 0, ',', '.') }}</p>
+            <p>Rp {{ number_format($penarikans->sum('transaksi_tarik_jumlah'), 0, ',', '.') }}</p>
         </div>
     </div>
 
@@ -301,7 +301,7 @@
                         <td class="text-center">{{ $index + 1 }}</td>
                         <td class="mono-col">{{ \Carbon\Carbon::parse($setor->setor_tanggal)->format('d/m/Y') }}</td>
                         <td><strong>{{ $setor->nasabah->nasabah_nama }}</strong></td>
-                        <td>{{ $setor->sampah->sampah_name }}</td>
+                        <td>{{ $setor->sampah->sampah_nama }}</td>
                         <td class="text-right mono-col">{{ number_format($setor->setor_berat_kg, 2, ',', '.') }} kg</td>
                         <td class="text-right mono-col">Rp {{ number_format($setor->setor_harga_total, 0, ',', '.') }}</td>
                     </tr>
@@ -334,14 +334,14 @@
                 @foreach($penarikans as $index => $tarik)
                     <tr>
                         <td class="text-center">{{ $index + 1 }}</td>
-                        <td class="mono-col">{{ \Carbon\Carbon::parse($tarik->tarik_tanggal)->format('d/m/Y') }}</td>
+                        <td class="mono-col">{{ \Carbon\Carbon::parse($tarik->transaksi_tarik_tanggal)->format('d/m/Y') }}</td>
                         <td><strong>{{ $tarik->nasabah->nasabah_nama }}</strong></td>
-                        <td class="text-right mono-col">Rp {{ number_format($tarik->tarik_jumlah, 0, ',', '.') }}</td>
+                        <td class="text-right mono-col">Rp {{ number_format($tarik->transaksi_tarik_jumlah, 0, ',', '.') }}</td>
                     </tr>
                 @endforeach
                 <tr style="font-weight: bold; background: var(--color-mist);">
                     <td colspan="3" class="text-right">TOTAL PENARIKAN:</td>
-                    <td class="text-right mono-col">Rp {{ number_format($penarikans->sum('tarik_jumlah'), 0, ',', '.') }}</td>
+                    <td class="text-right mono-col">Rp {{ number_format($penarikans->sum('transaksi_tarik_jumlah'), 0, ',', '.') }}</td>
                 </tr>
             @endif
         </tbody>
@@ -359,7 +359,18 @@
             <p>Jakarta, {{ \Carbon\Carbon::now()->locale('id')->isoFormat('D MMMM YYYY') }}</p>
             <p><strong>Petugas Administrasi,</strong></p>
             <div class="sig-space"></div>
-            <p class="sig-name">{{ session('user_type') === 'admin' ? Auth::user() ? Auth::user()->name : 'Petugas Admin' : 'Petugas Admin' }}</p>
+            <p class="sig-name">
+                @php
+                    $adminNama = 'Petugas Admin';
+                    if (session('user_type') === 'admin' && session('user_id')) {
+                        $adm = \App\Models\Admin::find(session('user_id'));
+                        if ($adm) {
+                            $adminNama = $adm->admin_nama;
+                        }
+                    }
+                @endphp
+                {{ $adminNama }}
+            </p>
             <p>Staff Operasional</p>
         </div>
     </div>

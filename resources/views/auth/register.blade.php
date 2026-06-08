@@ -327,18 +327,6 @@
         </div>
         <h2>Buat Akun Baru</h2>
 
-        <!-- Role Selector Tabs -->
-        <div class="role-selector">
-            <button type="button" class="role-tab active" onclick="switchRole('nasabah')" id="tab-nasabah">
-                <span class="role-icon">👤</span>
-                Nasabah
-            </button>
-            <button type="button" class="role-tab" onclick="switchRole('pengepul')" id="tab-pengepul">
-                <span class="role-icon">🚛</span>
-                Pengepul
-            </button>
-        </div>
-
         @if ($errors->any())
             <div class="alert-error">
                 <ul>
@@ -350,127 +338,63 @@
         @endif
 
         <!-- ============ FORM NASABAH ============ -->
-        <div id="form-nasabah" class="form-panel active">
-            <form method="POST" action="{{ url('/register') }}">
-                @csrf
+        <form method="POST" action="{{ url('/register') }}">
+            @csrf
 
-                <p class="section-title">Data Pribadi</p>
+            <p class="section-title">Data Pribadi</p>
 
-                <div class="form-group">
-                    <label for="nasabah_nama">Nama Lengkap</label>
-                    <input type="text" name="nasabah_nama" id="nasabah_nama"
-                           value="{{ old('nasabah_nama') }}" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="nasabah_nik">NIK (Nomor Induk Kependudukan)</label>
-                    <input type="text" name="nasabah_nik" id="nasabah_nik"
-                           value="{{ old('nasabah_nik') }}" maxlength="20" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="nasabah_alamat">Alamat</label>
-                    <textarea name="nasabah_alamat" id="nasabah_alamat" rows="3" required>{{ old('nasabah_alamat') }}</textarea>
-                </div>
-
-                <div class="form-group">
-                    <label for="nasabah_telepon">Nomor Telepon</label>
-                    <input type="text" name="nasabah_telepon" id="nasabah_telepon"
-                           value="{{ old('nasabah_telepon') }}" maxlength="20" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="nasabah_email">Email</label>
-                    <input type="email" name="nasabah_email" id="nasabah_email"
-                           value="{{ old('nasabah_email') }}" required>
-                </div>
-
-                <hr class="divider">
-                <p class="section-title">Akun & Keamanan</p>
-
-                <div class="form-group">
-                    <label for="nasabah_username">Username</label>
-                    <input type="text" name="nasabah_username" id="nasabah_username"
-                           value="{{ old('nasabah_username') }}" maxlength="50" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="nasabah_password">Password</label>
-                    <input type="password" name="nasabah_password" id="nasabah_password"
-                           minlength="6" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="nasabah_password_confirmation">Konfirmasi Password</label>
-                    <input type="password" name="nasabah_password_confirmation"
-                           id="nasabah_password_confirmation" required>
-                </div>
-
-                <button type="submit" class="btn">Daftar Sebagai Nasabah</button>
-            </form>
-        </div>
-
-        <!-- ============ FORM PENGEPUL ============ -->
-        <div id="form-pengepul" class="form-panel">
-            <div class="info-box">
-                <span class="info-icon">ℹ️</span>
-                Akun pengepul yang baru mendaftar akan berstatus <strong>menunggu verifikasi</strong> oleh admin. 
-                Anda dapat login setelah akun diverifikasi.
+            <div class="form-group">
+                <label for="nasabah_nama">Nama Lengkap</label>
+                <input type="text" name="nasabah_nama" id="nasabah_nama"
+                       value="{{ old('nasabah_nama') }}" required>
             </div>
 
-            <form method="POST" action="{{ url('/register/pengepul') }}">
-                @csrf
+            <div class="form-group">
+                <label for="nasabah_nik">NIK (Nomor Induk Kependudukan)</label>
+                <input type="text" name="nasabah_nik" id="nasabah_nik"
+                       value="{{ old('nasabah_nik') }}" maxlength="20" required>
+            </div>
 
-                <p class="section-title">Data Pengepul</p>
+            <div class="form-group">
+                <label for="nasabah_alamat">Alamat</label>
+                <textarea name="nasabah_alamat" id="nasabah_alamat" rows="3" required>{{ old('nasabah_alamat') }}</textarea>
+            </div>
 
-                <div class="form-group">
-                    <label for="pengepul_nama">Nama Lengkap / Nama Usaha</label>
-                    <input type="text" name="nama" id="pengepul_nama"
-                           value="{{ old('nama') }}" placeholder="Contoh: Budi Santoso / CV Maju Jaya" required>
-                </div>
+            <div class="form-group">
+                <label for="nasabah_telepon">Nomor Telepon</label>
+                <input type="text" name="nasabah_telepon" id="nasabah_telepon"
+                       value="{{ old('nasabah_telepon') }}" maxlength="20" required>
+            </div>
 
-                <div class="form-group">
-                    <label for="pengepul_alamat">Alamat Lengkap</label>
-                    <textarea name="alamat" id="pengepul_alamat" rows="3" placeholder="Alamat tempat usaha atau domisili" required>{{ old('alamat') }}</textarea>
-                </div>
+            <div class="form-group">
+                <label for="nasabah_email">Email</label>
+                <input type="email" name="nasabah_email" id="nasabah_email"
+                       value="{{ old('nasabah_email') }}" required>
+            </div>
 
-                <div class="form-group">
-                    <label for="pengepul_gmaps_link">Link Google Maps (Pilihan)</label>
-                    <input type="text" name="gmaps_link" id="pengepul_gmaps_link"
-                           value="{{ old('gmaps_link') }}" placeholder="https://maps.app.goo.gl/...">
-                    <p style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">*Masukkan link Google Maps alamat Anda agar otomatis dikonversi menjadi titik kordinat (Latitude & Longitude) pada peta.</p>
-                </div>
+            <hr class="divider">
+            <p class="section-title">Akun & Keamanan</p>
 
-                <div class="form-group">
-                    <label for="pengepul_telepon">Nomor Telepon</label>
-                    <input type="text" name="telepon" id="pengepul_telepon"
-                           value="{{ old('telepon') }}" maxlength="20" placeholder="08xxxxxxxxxx" required>
-                </div>
+            <div class="form-group">
+                <label for="nasabah_username">Username</label>
+                <input type="text" name="nasabah_username" id="nasabah_username"
+                       value="{{ old('nasabah_username') }}" maxlength="50" required>
+            </div>
 
-                <hr class="divider">
-                <p class="section-title">Akun & Keamanan</p>
+            <div class="form-group">
+                <label for="nasabah_password">Password</label>
+                <input type="password" name="nasabah_password" id="nasabah_password"
+                       minlength="6" required>
+            </div>
 
-                <div class="form-group">
-                    <label for="pengepul_username">Username (untuk login)</label>
-                    <input type="text" name="username" id="pengepul_username"
-                           value="{{ old('username') }}" maxlength="50" placeholder="Contoh: pengepul_budi" required>
-                </div>
+            <div class="form-group">
+                <label for="nasabah_password_confirmation">Konfirmasi Password</label>
+                <input type="password" name="nasabah_password_confirmation"
+                       id="nasabah_password_confirmation" required>
+            </div>
 
-                <div class="form-group">
-                    <label for="pengepul_password">Password</label>
-                    <input type="password" name="password" id="pengepul_password"
-                           minlength="6" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="pengepul_password_confirmation">Konfirmasi Password</label>
-                    <input type="password" name="password_confirmation"
-                           id="pengepul_password_confirmation" required>
-                </div>
-
-                <button type="submit" class="btn">Daftar Sebagai Pengepul</button>
-            </form>
-        </div>
+            <button type="submit" class="btn">Daftar Sebagai Nasabah</button>
+        </form>
 
         <p class="footer-link">
             Sudah punya akun? <a href="{{ url('/login') }}">Masuk di sini</a>
@@ -478,20 +402,7 @@
     </div>
 
     <script>
-        function switchRole(role) {
-            // Toggle tabs
-            document.getElementById('tab-nasabah').classList.toggle('active', role === 'nasabah');
-            document.getElementById('tab-pengepul').classList.toggle('active', role === 'pengepul');
-            
-            // Toggle form panels
-            document.getElementById('form-nasabah').classList.toggle('active', role === 'nasabah');
-            document.getElementById('form-pengepul').classList.toggle('active', role === 'pengepul');
-        }
-
-        // If there are old pengepul fields, auto-switch to pengepul tab
-        @if(old('username') || old('nama'))
-            switchRole('pengepul');
-        @endif
+        // No client-side switcher needed
     </script>
 </body>
 </html>

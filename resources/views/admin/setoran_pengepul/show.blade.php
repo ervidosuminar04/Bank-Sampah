@@ -309,9 +309,9 @@
             <div class="info-row"><span class="lbl">Tanggal Setoran</span><span class="val" style="font-family:'JetBrains Mono',monospace;">{{ $setoran->created_at->format('d/m/Y H:i') }}</span></div>
             <div class="info-row"><span class="lbl">Jumlah Transaksi</span><span class="val">{{ count($setoran->transaksi_ids) }} transaksi</span></div>
             <div class="info-row"><span class="lbl">Status</span>
-                <span class="badge badge-{{ $setoran->status }}">
-                    @if($setoran->status==='terverifikasi') ✅ Terverifikasi
-                    @elseif($setoran->status==='menunggu') ⏳ Menunggu
+                <span class="badge badge-{{ $setoran->setoran_pengepul_status }}">
+                    @if($setoran->setoran_pengepul_status==='terverifikasi') ✅ Terverifikasi
+                    @elseif($setoran->setoran_pengepul_status==='menunggu') ⏳ Menunggu
                     @else ❌ Ditolak @endif
                 </span>
             </div>
@@ -320,6 +320,19 @@
             @endif
         </div>
     </div>
+
+    {{-- Bukti Pembayaran / Transfer Pengepul --}}
+    @if($setoran->setoran_pengepul_gambar)
+    <div class="card" style="margin-bottom: 28px;">
+        <div class="card-head">📸 Bukti Transfer / Pembayaran Pengepul</div>
+        <div style="padding: 20px; text-align: center;">
+            <a href="{{ asset('storage/' . $setoran->setoran_pengepul_gambar) }}" target="_blank">
+                <img src="{{ asset('storage/' . $setoran->setoran_pengepul_gambar) }}" alt="Bukti Transfer Pengepul" style="max-width: 100%; max-height: 400px; border-radius: var(--radius-md); box-shadow: var(--shadow-sm); border: 1px solid var(--border-default);">
+            </a>
+            <p style="margin-top: 10px; font-size: 13px; color: var(--color-fog);">Klik gambar untuk memperbesar</p>
+        </div>
+    </div>
+    @endif
 
     {{-- Ringkasan Finansial --}}
     <div class="summary-grid">
@@ -347,7 +360,7 @@
     </div>
 
     {{-- Tombol Aksi (hanya jika menunggu) --}}
-    @if($setoran->status === 'menunggu')
+    @if($setoran->setoran_pengepul_status === 'menunggu')
     <div class="actions">
         <button class="btn btn-verify" onclick="document.getElementById('modalVerify').classList.add('show')">✅ Verifikasi Setoran</button>
         <button class="btn btn-reject" onclick="document.getElementById('modalReject').classList.add('show')">❌ Tolak Setoran</button>
@@ -370,14 +383,14 @@
                     @forelse($transaksi as $i => $t)
                     <tr>
                         <td>{{ $i+1 }}</td>
-                        <td class="mono-col">{{ \Carbon\Carbon::parse($t->tanggal)->format('d/m/Y') }}</td>
+                        <td class="mono-col">{{ \Carbon\Carbon::parse($t->transaksi_pengepul_tanggal)->format('d/m/Y') }}</td>
                         <td><strong>{{ $t->nasabah->nasabah_nama ?? '-' }}</strong></td>
-                        <td>{{ $t->sampah->sampah_name ?? '-' }}</td>
+                        <td>{{ $t->sampah->sampah_nama ?? '-' }}</td>
                         <td class="mono-col">{{ number_format($t->berat_kg,2) }}</td>
                         <td class="mono-col">Rp {{ number_format($t->harga_beli_kg,0,',','.') }}</td>
                         <td class="mono-col">Rp {{ number_format($t->harga_pasar_kg,0,',','.') }}</td>
                         <td class="mono-col">Rp {{ number_format($t->nilai_idr,0,',','.') }}</td>
-                        <td class="mono-col" style="color:var(--color-sunburst);font-weight:700;">Rp {{ number_format($t->komisi_pengepul,0,',','.') }}</td>
+                        <td class="mono-col" style="color:var(--color-sunburst);font-weight:700;">Rp {{ number_format($t->transaksi_pengepul_komisi_pengepul,0,',','.') }}</td>
                         <td class="mono-col" style="color:var(--color-forest);font-weight:700;">Rp {{ number_format($t->bagian_admin,0,',','.') }}</td>
                     </tr>
                     @empty

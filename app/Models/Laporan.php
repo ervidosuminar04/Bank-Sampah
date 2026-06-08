@@ -7,9 +7,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Laporan extends Model
 {
-    protected $table = 'laporan';
+    protected $table      = 'laporan';
     protected $primaryKey = 'id_laporan';
-    public $timestamps = false;
+    public $timestamps    = false;
 
     protected $fillable = [
         'laporan_jenis',
@@ -20,9 +20,6 @@ class Laporan extends Model
         'id_admin',
     ];
 
-    /**
-     * Get the admin that created the report.
-     */
     public function admin(): BelongsTo
     {
         return $this->belongsTo(Admin::class, 'id_admin', 'id_admin');

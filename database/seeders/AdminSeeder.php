@@ -20,7 +20,6 @@ class AdminSeeder extends Seeder
             'admin_username' => 'admin',
             'admin_password' => Hash::make('admin123'),
             'admin_nama'     => 'Administrator',
-            'admin_level'    => 'admin',
             'admin_status'   => 'aktif',
         ]);
     }
