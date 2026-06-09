@@ -61,4 +61,10 @@ class TransaksiPengepul extends Model
     {
         return $query->where('sudah_disetor', true);
     }
+
+    /** Virtual attribute ->id mapping ke id_transaksi_pengepul untuk kompatibilitas view */
+    public function getIdAttribute()
+    {
+        return $this->id_transaksi_pengepul;
+    }
 }

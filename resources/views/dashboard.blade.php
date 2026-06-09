@@ -1045,13 +1045,8 @@
                         </a>
                     </li>
                     <li>
-                        <a class="menu-link" data-tab="tab-pengepul" onclick="switchTab(event, 'tab-pengepul')" style="display:flex;justify-content:space-between;align-items:center;">
+                        <a class="menu-link" data-tab="tab-pengepul" onclick="switchTab(event, 'tab-pengepul')">
                             🚛 Kelola Pengepul
-                            @if(($pendingPengepul ?? collect())->count() > 0)
-                                <span style="background:var(--color-flame);color:var(--color-white);border-radius:10px;padding:2px 8px;font-size:11px;font-weight:bold;">
-                                    {{ $pendingPengepul->count() }}
-                                </span>
-                            @endif
                         </a>
                     </li>
                     <li>
@@ -1256,66 +1251,60 @@
                     <!-- 2. KELOLA PENGEPUL TAB -->
                     <div id="tab-pengepul" class="tab-content">
 
-                        <!-- Verifikasi Pendaftaran Pengepul -->
-                        <div class="ui-block" style="margin-bottom:24px;">
-                            <h2 class="block-title" style="display:flex;justify-content:space-between;align-items:center;">
-                                <span>🔔 Verifikasi Pendaftaran Pengepul</span>
-                                @if(($pendingPengepul ?? collect())->count() > 0)
-                                    <span style="background:var(--color-flame);color:var(--color-white);border-radius:var(--radius-full);padding:4px 14px;font-size:12px;font-weight:700;">
-                                        {{ $pendingPengepul->count() }} Menunggu
-                                    </span>
-                                @endif
-                            </h2>
-                            <p style="font-size:13px; color:#666; margin-bottom:16px;">Pengepul yang mendaftar secara mandiri akan muncul di sini. Verifikasi untuk mengaktifkan akun mereka.</p>
-                            
-                            @if(($pendingPengepul ?? collect())->isEmpty())
-                                <div style="text-align:center;padding:32px 20px;background:var(--color-mist);border-radius:var(--radius-md);border:1px dashed var(--color-smoke);">
-                                    <span style="font-size:40px;display:block;margin-bottom:12px;">✅</span>
-                                    <p style="color:var(--color-fog);font-size:14px;font-weight:600;">Tidak ada pendaftaran pengepul yang menunggu verifikasi.</p>
-                                </div>
-                            @else
-                                <div class="table-wrap">
-                                    <table>
-                                        <thead>
-                                            <tr>
-                                                <th>Nama</th>
-                                                <th>Username</th>
-                                                <th>Alamat</th>
-                                                <th>Telepon</th>
-                                                <th>Tanggal Daftar</th>
-                                                <th>Aksi</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach($pendingPengepul as $pp)
-                                            <tr>
-                                                <td><strong>{{ $pp->pengepul_nama }}</strong></td>
-                                                <td><code>{{ $pp->pengepul_username }}</code></td>
-                                                <td>{{ $pp->pengepul_alamat }}</td>
-                                                <td>{{ $pp->pengepul_telepon ?? '-' }}</td>
-                                                <td>{{ $pp->created_at ? $pp->created_at->format('d M Y H:i') : '-' }}</td>
-                                                <td style="display:flex;gap:6px;flex-wrap:wrap;">
-                                                    <form method="POST" action="{{ route('admin.pengepul.verify', $pp->id_pengepul) }}" style="display:inline;">
-                                                        @csrf
-                                                        <button type="submit" class="btn-action-sm btn-success">✅ Verifikasi</button>
-                                                    </form>
-                                                    <form method="POST" action="{{ route('admin.pengepul.reject', $pp->id_pengepul) }}" 
-                                                          onsubmit="return confirm('Tolak dan hapus pendaftaran {{ $pp->pengepul_nama }}?')" style="display:inline;">
-                                                        @csrf
-                                                        <button type="submit" class="btn-action-sm btn-danger">❌ Tolak</button>
-                                                    </form>
-                                                </td>
-                                            </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
-                            @endif
-                        </div>
+
 
                         <!-- Daftar Pengepul -->
                         <div class="ui-block">
-                            <h2 class="block-title">📋 Daftar Pengepul Terdaftar</h2>
+                            <h2 class="block-title" style="display:flex;justify-content:space-between;align-items:center;">
+                                <span>📋 Daftar Pengepul Terdaftar</span>
+                                <button onclick="toggleForm('form_tambah_pengepul')" class="btn-action-sm btn-success">➕ Tambah Pengepul Baru</button>
+                            </h2>
+
+                            <!-- Form Tambah Pengepul -->
+                            <div id="form_tambah_pengepul" style="display:none; background-color: #f5f6f5; padding: 24px; border-radius: var(--radius-md); margin-bottom: 25px; border: 1px solid #d1d5d1;">
+                                <h3 style="font-size:15px; font-weight:700; margin-bottom:15px; color: var(--color-forest);">Tambah Pengepul Baru</h3>
+                                <form method="POST" action="{{ route('admin.pengepul.store') }}">
+                                    @csrf
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                        <div class="form-group">
+                                            <label for="pengepul_nama">Nama Lengkap</label>
+                                            <input type="text" name="pengepul_nama" id="pengepul_nama" class="form-control" required placeholder="Nama Lengkap Pengepul">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="pengepul_telepon">Nomor Telepon</label>
+                                            <input type="text" name="pengepul_telepon" id="pengepul_telepon" class="form-control" placeholder="Contoh: 08123456789">
+                                        </div>
+                                    </div>
+                                    <div class="form-group" style="margin-top: 10px;">
+                                        <label for="pengepul_alamat">Alamat Lengkap</label>
+                                        <input type="text" name="pengepul_alamat" id="pengepul_alamat" class="form-control" required placeholder="Alamat Domisili/Gudang Pengepul">
+                                    </div>
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px;">
+                                        <div class="form-group">
+                                            <label for="pengepul_latitude">Latitude GPS (Opsional)</label>
+                                            <input type="number" step="0.000001" name="pengepul_latitude" id="pengepul_latitude" class="form-control" placeholder="-6.182400">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="pengepul_longitude">Longitude GPS (Opsional)</label>
+                                            <input type="number" step="0.000001" name="pengepul_longitude" id="pengepul_longitude" class="form-control" placeholder="106.829400">
+                                        </div>
+                                    </div>
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px;">
+                                        <div class="form-group">
+                                            <label for="pengepul_username">Username Login</label>
+                                            <input type="text" name="pengepul_username" id="pengepul_username" class="form-control" required placeholder="Username unik Pengepul">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="pengepul_password">Password</label>
+                                            <input type="password" name="pengepul_password" id="pengepul_password" class="form-control" required minlength="6" placeholder="Minimal 6 karakter">
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; gap: 10px; margin-top: 20px;">
+                                        <button type="submit" class="btn-action-sm btn-success" style="padding: 9px 18px;">💾 Simpan Pengepul</button>
+                                        <button type="button" onclick="toggleForm('form_tambah_pengepul')" class="btn-action-sm btn-secondary" style="padding: 9px 18px;">Batal</button>
+                                    </div>
+                                </form>
+                            </div>
                             <div class="table-wrap">
                                 @if($allPengepul->isEmpty())
                                     <p style="color:#888;text-align:center;padding:20px 0;">Belum ada pengepul terdaftar.</p>
@@ -1418,41 +1407,6 @@
                     <!-- 3. PERSETUJUAN & VERIFIKASI TAB -->
                     <div id="tab-persetujuan" class="tab-content">
                         <div class="ui-block">
-                            <h2 class="block-title">🔔 Persetujuan Pendaftaran Nasabah Baru (Pending)</h2>
-                            <div class="table-wrap" style="margin-bottom: 30px;">
-                                @if($pendingNasabahs->isEmpty())
-                                    <p style="font-size: 13.5px; color: #888; text-align: center; padding: 15px 0;">Tidak ada pendaftaran baru yang tertunda.</p>
-                                @else
-                                    <table>
-                                        <thead>
-                                            <tr>
-                                                <th>Nama Lengkap</th>
-                                                <th>NIK Identitas</th>
-                                                <th>Alamat Domisili</th>
-                                                <th>Telepon</th>
-                                                <th>Aksi</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach($pendingNasabahs as $pn)
-                                                <tr>
-                                                    <td><strong>{{ $pn->nasabah_nama }}</strong></td>
-                                                    <td><code>{{ $pn->nasabah_nik }}</code></td>
-                                                    <td>{{ $pn->nasabah_alamat }}</td>
-                                                    <td>{{ $pn->nasabah_telepon }}</td>
-                                                    <td>
-                                                        <form method="POST" action="{{ route('admin.verifikasi', $pn->id_nasabah) }}" style="display:inline;">
-                                                            @csrf
-                                                            <button type="submit" class="btn-action-sm btn-success">✅ Setujui</button>
-                                                        </form>
-                                                    </td>
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                @endif
-                            </div>
-
                             <h2 class="block-title">🔔 Persetujuan Pengajuan Tarik Uang</h2>
                             <div class="table-wrap">
                                 @if($pendingTarikRequests->isEmpty())
@@ -1515,8 +1469,13 @@
                                                     <td><strong>{{ $sam->sampah_name }}</strong></td>
                                                     <td>{{ $sam->sampah_jenis }}</td>
                                                     <td><strong style="color:var(--color-canopy)">Rp {{ number_format($sam->sampah_harga_kg, 0, ',', '.') }}</strong></td>
-                                                    <td>
+                                                    <td style="display:flex;gap:6px;flex-wrap:wrap;">
                                                         <button onclick="openEditPriceForm({{ $sam->id_sampah }}, '{{ $sam->sampah_name }}', {{ $sam->sampah_harga_kg }})" class="btn-action-sm btn-success">✏️ Edit Harga</button>
+                                                        <form method="POST" action="{{ route('admin.master_sampah.delete', $sam->id_sampah) }}"
+                                                            onsubmit="return confirm('Hapus jenis sampah {{ $sam->sampah_name }}?')">
+                                                            @csrf
+                                                            <button type="submit" class="btn-action-sm btn-danger">🗑️ Hapus</button>
+                                                        </form>
                                                     </td>
                                                 </tr>
                                             @endforeach

@@ -377,6 +377,7 @@
                         <th>No</th><th>Tanggal</th><th>Nasabah</th><th>Jenis Sampah</th>
                         <th>Berat (kg)</th><th>Harga Beli/kg</th><th>Harga Pasar/kg</th>
                         <th>Nilai Nasabah</th><th>Komisi</th><th>Bagian Admin</th>
+                        <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -392,6 +393,9 @@
                         <td class="mono-col">Rp {{ number_format($t->nilai_idr,0,',','.') }}</td>
                         <td class="mono-col" style="color:var(--color-sunburst);font-weight:700;">Rp {{ number_format($t->transaksi_pengepul_komisi_pengepul,0,',','.') }}</td>
                         <td class="mono-col" style="color:var(--color-forest);font-weight:700;">Rp {{ number_format($t->bagian_admin,0,',','.') }}</td>
+                        <td>
+                            <button class="btn-action-sm btn-success" style="padding: 4px 10px; font-size:12px; font-weight:700; border-radius: var(--radius-sm); border:none; cursor:pointer; background:var(--color-sprout); color:#fff;" onclick="openEditTransaksiModal({{ json_encode($t) }})">✏️ Edit</button>
+                        </td>
                     </tr>
                     @empty
                     <tr><td colspan="10" style="text-align:center;color:var(--color-fog);padding:24px;font-weight:700;">Tidak ada transaksi ditemukan</td></tr>
@@ -441,10 +445,62 @@
     </div>
 </div>
 
+{{-- Modal Edit Transaksi --}}
+<div class="modal-overlay" id="modalEditTransaksi">
+    <div class="modal-box">
+        <div class="modal-title">✏️ Edit Transaksi Pengepul</div>
+        <form method="POST" id="formEditTransaksi" action="">
+            @csrf
+            <div class="form-group">
+                <label>Nasabah</label>
+                <input type="text" id="edit_transaksi_nasabah" class="form-control" readonly style="background:#eee;">
+            </div>
+
+            <div class="form-group">
+                <label>Jenis Sampah <span style="color:var(--color-flame)">*</span></label>
+                <select name="id_sampah" id="edit_transaksi_sampah" class="form-control" required>
+                    @foreach($allSampah as $sampah)
+                        <option value="{{ $sampah->id_sampah }}">{{ $sampah->sampah_name }} (Rp {{ number_format($sampah->sampah_harga_kg,0,',','.') }}/kg)</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Berat (kg) <span style="color:var(--color-flame)">*</span></label>
+                <input type="number" step="0.01" min="0.01" name="berat_kg" id="edit_transaksi_berat" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+                <label>Keterangan (opsional)</label>
+                <input type="text" name="keterangan" id="edit_transaksi_keterangan" class="form-control" placeholder="Keterangan transaksi...">
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" class="btn btn-cancel" onclick="document.getElementById('modalEditTransaksi').classList.remove('show')">Batal</button>
+                <button type="submit" class="btn btn-verify">💾 Simpan Perubahan</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script>
 document.querySelectorAll('.modal-overlay').forEach(m => {
     m.addEventListener('click', e => { if (e.target === m) m.classList.remove('show'); });
 });
+
+function openEditTransaksiModal(t) {
+    const modal = document.getElementById('modalEditTransaksi');
+    const form = document.getElementById('formEditTransaksi');
+    
+    form.action = `/admin/transaksi-pengepul/update/${t.id_transaksi_pengepul}`;
+    
+    document.getElementById('edit_transaksi_nasabah').value = t.nasabah ? t.nasabah.nasabah_nama : '-';
+    document.getElementById('edit_transaksi_sampah').value = t.id_sampah;
+    document.getElementById('edit_transaksi_berat').value = t.berat_kg;
+    document.getElementById('edit_transaksi_keterangan').value = t.transaksi_pengepul_keterangan || '';
+    
+    modal.classList.add('show');
+}
 </script>
 </body>
 </html>

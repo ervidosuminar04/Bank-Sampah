@@ -12,7 +12,7 @@ class SetoranPengepul extends Model
 
     protected $table      = 'setoran_pengepul';
     protected $primaryKey = 'id_setoran_pengepul';
-    public $timestamps    = false;
+    public $timestamps    = true;
 
     protected $fillable = [
         'pengepul_id',
@@ -30,6 +30,27 @@ class SetoranPengepul extends Model
 
     // transaksi_ids disimpan sebagai TEXT, decode manual saat digunakan
     protected $casts = [];
+
+    /** Accessor untuk transaksi_ids agar selalu didecode menjadi array */
+    public function getTransaksiIdsAttribute($value)
+    {
+        if (is_array($value)) {
+            return $value;
+        }
+        return json_decode($value, true) ?: [];
+    }
+
+    /** Mutator untuk transaksi_ids agar bisa menerima array maupun string json */
+    public function setTransaksiIdsAttribute($value)
+    {
+        $this->attributes['transaksi_ids'] = is_array($value) ? json_encode($value) : $value;
+    }
+
+    /** Virtual attribute ->id mapping ke id_setoran_pengepul untuk kompatibilitas view */
+    public function getIdAttribute()
+    {
+        return $this->id_setoran_pengepul;
+    }
 
     /** Pengepul yang melakukan setoran. */
     public function pengepul(): BelongsTo

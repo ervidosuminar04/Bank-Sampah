@@ -21,6 +21,17 @@ class Sampah extends Model
         'sampah_keterangan',
     ];
 
+    /** Virtual attribute ->sampah_name mapping ke sampah_nama untuk kompatibilitas */
+    public function getSampahNameAttribute()
+    {
+        return $this->sampah_nama;
+    }
+
+    public function setSampahNameAttribute($value)
+    {
+        $this->attributes['sampah_nama'] = $value;
+    }
+
     /**
      * Get deposit transactions containing this garbage type.
      */

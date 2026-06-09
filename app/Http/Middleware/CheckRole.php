@@ -32,6 +32,26 @@ class CheckRole
             abort(403, 'Akses ditolak. Halaman ini khusus untuk pengguna dengan peran: ' . ucfirst($role));
         }
 
+        // 3. Verifikasi apakah data user tersebut benar-benar ada di database (mencegah error jika DB di-reset/reseed)
+        $userId = session('user_id');
+        $userExists = false;
+
+        if ($role === 'admin') {
+            $userExists = \App\Models\Admin::where('id_admin', $userId)->exists();
+        } elseif ($role === 'nasabah') {
+            $userExists = \App\Models\Nasabah::where('id_nasabah', $userId)->exists();
+        } elseif ($role === 'pengepul') {
+            $userExists = \App\Models\Pengepul::where('id_pengepul', $userId)->exists();
+        }
+
+        if (!$userExists) {
+            session()->flush();
+            if ($role === 'pengepul') {
+                return redirect()->route('pengepul.pilih');
+            }
+            return redirect()->route('login')->withErrors(['username' => 'Sesi Anda telah kedaluwarsa atau tidak valid. Silakan masuk kembali.']);
+        }
+
         return $next($request);
     }
 }

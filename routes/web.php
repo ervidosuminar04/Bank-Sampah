@@ -28,7 +28,6 @@ Route::post('/login', [AuthController::class, 'login']);
 
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
 Route::post('/register', [AuthController::class, 'register']);
-Route::post('/register/pengepul', [AuthController::class, 'registerPengepul'])->name('register.pengepul');
 
 Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::post('/logout', [AuthController::class, 'logout']);
@@ -56,6 +55,10 @@ Route::get('/dashboard', function () {
 
     if ($userType === 'admin') {
         $admin        = Admin::find($userId);
+        if (!$admin) {
+            session()->flush();
+            return redirect()->route('login')->withErrors(['username' => 'Sesi Anda telah kedaluwarsa atau tidak valid. Silakan masuk kembali.']);
+        }
         $data['user'] = $admin;
 
         $data['totalNasabah']             = Nasabah::where('nasabah_status', 'aktif')->count();
@@ -73,7 +76,6 @@ Route::get('/dashboard', function () {
         $data['rewardsMenunggu'] = \App\Models\PenukaranReward::where('penukaran_status', 'menunggu')->count();
 
         $data['activeNasabahs']     = Nasabah::where('nasabah_status', 'aktif')->orderBy('nasabah_nama', 'asc')->get();
-        $data['pendingNasabahs']    = Nasabah::where('nasabah_status', 'pending')->orderBy('id_nasabah', 'desc')->get();
         $data['pendingTarikRequests'] = TransaksiTarik::with('nasabah')
             ->where('transaksi_tarik_status', 'menunggu')
             ->orderBy('id_tarik', 'desc')
@@ -82,19 +84,16 @@ Route::get('/dashboard', function () {
         $data['allGeolokasi'] = Geolokasi::orderBy('id_lokasi', 'desc')->get();
         $data['nasabahs']     = Nasabah::orderBy('id_nasabah', 'desc')->take(5)->get();
         $data['allPengepul']  = \App\Models\Pengepul::orderBy('pengepul_nama')->get();
-        $data['pendingPengepul'] = \App\Models\Pengepul::where('pengepul_status_aktif', 'nonaktif')->orderBy('id_pengepul', 'desc')->get();
 
     } else {
         // Nasabah
         $nasabah = Nasabah::with(['tabungan', 'gamifikasi'])->find($userId);
-
-        if ($nasabah && $nasabah->nasabah_status === 'pending') {
-            \Illuminate\Support\Facades\Session::flush();
-            return redirect()->route('login')
-                ->withErrors(['username' => 'Akun Anda sedang dalam proses verifikasi oleh admin. Silakan coba lagi nanti.']);
+        if (!$nasabah) {
+            session()->flush();
+            return redirect()->route('login')->withErrors(['username' => 'Sesi Anda telah kedaluwarsa atau tidak valid. Silakan masuk kembali.']);
         }
 
-        if ($nasabah && !$nasabah->tabungan) {
+        if (!$nasabah->tabungan) {
             $nasabah->tabungan()->create([
                 'tabungan_no_rekening' => 'BS-' . date('Ymd') . '-' . str_pad($nasabah->id_nasabah, 4, '0', STR_PAD_LEFT),
                 'tabungan_total_setor' => 0,
@@ -180,10 +179,10 @@ Route::middleware(['role:admin'])->group(function () {
     })->name('admin.settings');
 
     Route::post('/admin/setor-sampah', [AuthController::class, 'setorSampah'])->name('admin.setor');
-    Route::post('/admin/verifikasi-nasabah/{id}', [AuthController::class, 'verifikasiNasabah'])->name('admin.verifikasi');
     Route::post('/admin/persetujuan-tarik/{id}/{action}', [AuthController::class, 'persetujuanTarik'])->name('admin.persetujuan_tarik');
     Route::post('/admin/master-sampah/update', [AuthController::class, 'updateMasterSampah'])->name('admin.master_sampah.update');
     Route::post('/admin/master-sampah/store', [AuthController::class, 'storeMasterSampah'])->name('admin.master_sampah.store');
+    Route::post('/admin/master-sampah/delete/{id}', [AuthController::class, 'deleteMasterSampah'])->name('admin.master_sampah.delete');
     Route::post('/admin/master-geolokasi/store', [AuthController::class, 'storeGeolokasi'])->name('admin.master_geolokasi.store');
     Route::post('/admin/master-geolokasi/update/{id}', [AuthController::class, 'updateGeolokasi'])->name('admin.master_geolokasi.update');
     Route::post('/admin/master-geolokasi/delete/{id}', [AuthController::class, 'deleteGeolokasi'])->name('admin.master_geolokasi.delete');
@@ -192,14 +191,13 @@ Route::middleware(['role:admin'])->group(function () {
     Route::post('/admin/pengepul/store', [AuthController::class, 'storePengepul'])->name('admin.pengepul.store');
     Route::post('/admin/pengepul/update/{id}', [AuthController::class, 'updatePengepul'])->name('admin.pengepul.update');
     Route::post('/admin/pengepul/delete/{id}', [AuthController::class, 'deletePengepul'])->name('admin.pengepul.delete');
-    Route::post('/admin/pengepul/verify/{id}', [AuthController::class, 'verifikasiPengepul'])->name('admin.pengepul.verify');
-    Route::post('/admin/pengepul/reject/{id}', [AuthController::class, 'rejectPengepul'])->name('admin.pengepul.reject');
 
     // Setoran Pengepul – Admin
     Route::get('/admin/setoran-pengepul', [SetoranPengepulController::class, 'index'])->name('admin.setoran.index');
     Route::get('/admin/setoran-pengepul/{id}', [SetoranPengepulController::class, 'show'])->name('admin.setoran.show');
     Route::post('/admin/setoran-pengepul/{id}/verify', [SetoranPengepulController::class, 'verify'])->name('admin.setoran.verify');
     Route::post('/admin/setoran-pengepul/{id}/reject', [SetoranPengepulController::class, 'reject'])->name('admin.setoran.reject');
+    Route::post('/admin/transaksi-pengepul/update/{id}', [SetoranPengepulController::class, 'updateTransaksi'])->name('admin.transaksi_pengepul.update');
 
     // Pencairan Saldo Nasabah – Admin
     Route::get('/admin/pencairan', [AuthController::class, 'daftarPencairan'])->name('admin.pencairan.index');

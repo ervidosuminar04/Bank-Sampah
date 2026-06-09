@@ -92,6 +92,7 @@ class AuthController extends Controller
         $nasabah->nasabah_password = Hash::make($data['nasabah_password']);
         $nasabah->nasabah_saldo    = 0;
         $nasabah->nasabah_tgl_daftar = now();
+        $nasabah->nasabah_status   = 'aktif';
         $nasabah->save();
 
         // Generate nomor rekening tabungan unik secara otomatis
@@ -123,66 +124,7 @@ class AuthController extends Controller
         return redirect('/dashboard');
     }
 
-    // Process pengepul registration (public self-registration)
-    public function registerPengepul(Request $request)
-    {
-        $data = $request->validate([
-            'nama'       => 'required|string|max:100',
-            'alamat'     => 'required|string',
-            'telepon'    => 'required|string|max:20',
-            'username'   => 'required|string|max:50|unique:pengepul,pengepul_username',
-            'password'   => 'required|string|min:6|confirmed',
-            'gmaps_link' => 'nullable|string'
-        ]);
 
-        $latitude = null;
-        $longitude = null;
-        
-        if (!empty($data['gmaps_link'])) {
-            $url = $data['gmaps_link'];
-            // Coba resolve redirect jika menggunakan short link Google Maps
-            if (strpos($url, 'maps.app.goo.gl') !== false || strpos($url, 'goo.gl/maps') !== false) {
-                $headers = @get_headers($url, 1);
-                if ($headers && isset($headers['Location'])) {
-                    $url = is_array($headers['Location']) ? end($headers['Location']) : $headers['Location'];
-                }
-            }
-            
-            // Ekstrak latitude & longitude dari URL menggunakan Regex
-            if (preg_match('/@(-?\d+\.\d+),(-?\d+\.\d+)/', $url, $matches)) {
-                $latitude = $matches[1];
-                $longitude = $matches[2];
-            } elseif (preg_match('/q=(-?\d+\.\d+),(-?\d+\.\d+)/', $url, $matches)) {
-                $latitude = $matches[1];
-                $longitude = $matches[2];
-            } elseif (preg_match('/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/', $url, $matches)) {
-                $latitude = $matches[1];
-                $longitude = $matches[2];
-            }
-        }
-
-        Pengepul::create([
-            'pengepul_nama'         => $data['nama'],
-            'pengepul_alamat'       => $data['alamat'],
-            'pengepul_telepon'      => $data['telepon'],
-            'pengepul_username'     => $data['username'],
-            'pengepul_password'     => Hash::make($data['password']),
-            'pengepul_status_aktif' => 'nonaktif',
-            'pengepul_latitude'     => $latitude,
-            'pengepul_longitude'    => $longitude,
-        ]);
-
-        return redirect('/login')->with('success', 'Pendaftaran pengepul berhasil! Akun Anda sedang menunggu verifikasi oleh admin. Silakan login setelah diverifikasi.');
-    }
-
-    // Admin rejects (deletes) a pending pengepul registration
-    public function rejectPengepul($id)
-    {
-        $pengepul = Pengepul::findOrFail($id);
-        $nama = $pengepul->nama;
-        $pengepul->delete();
-        return back()->with('success', 'Pendaftaran pengepul "' . $nama . '" telah ditolak.');
-    }
 
     // Logout user
     public function logout()
@@ -339,19 +281,7 @@ class AuthController extends Controller
         return back()->with('success', 'Pengajuan penarikan nasabah berhasil ' . ($action === 'setuju' ? 'disetujui' : 'ditolak') . '.');
     }
 
-    // 4. Verify new registered nasabah (Admin)
-    public function verifikasiNasabah($id)
-    {
-        $nasabah = Nasabah::find($id);
-        if (!$nasabah) {
-            return back()->with('error', 'Nasabah tidak ditemukan.');
-        }
 
-        $nasabah->nasabah_status = 'aktif';
-        $nasabah->save();
-
-        return back()->with('success', 'Nasabah ' . $nasabah->nasabah_nama . ' berhasil diverifikasi dan sekarang aktif!');
-    }
 
     // 5. Update trash price (Admin Master Sampah)
     public function updateMasterSampah(Request $request)
@@ -372,7 +302,7 @@ class AuthController extends Controller
     public function storeMasterSampah(Request $request)
     {
         $data = $request->validate([
-            'sampah_name'       => 'required|string|max:100|unique:sampah,sampah_name',
+            'sampah_name'       => 'required|string|max:100|unique:sampah,sampah_nama',
             'sampah_jenis'      => 'required|string|max:20',
             'sampah_satuan'     => 'required|string|max:10',
             'sampah_harga_kg'   => 'required|numeric|min:0',
@@ -388,6 +318,23 @@ class AuthController extends Controller
         ]);
 
         return back()->with('success', 'Sampah baru "' . $sampah->sampah_name . '" berhasil ditambahkan dengan harga Rp ' . number_format($sampah->sampah_harga_kg, 0, ',', '.') . '/kg.');
+    }
+
+    // 5c. Delete trash type (Admin Master Sampah)
+    public function deleteMasterSampah($id)
+    {
+        $sampah = Sampah::find($id);
+        if (!$sampah) {
+            return back()->with('error', 'Jenis sampah tidak ditemukan.');
+        }
+
+        try {
+            $namaSampah = $sampah->sampah_name;
+            $sampah->delete();
+            return back()->with('success', 'Jenis sampah "' . $namaSampah . '" berhasil dihapus.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal menghapus jenis sampah. Kemungkinan sampah ini masih memiliki riwayat transaksi.');
+        }
     }
 
     // 6. CRUD Geolokasi (Admin Master Geolokasi)
@@ -479,7 +426,7 @@ class AuthController extends Controller
             'pengepul_password'    => Hash::make($data['pengepul_password']),
             'pengepul_latitude'    => $data['pengepul_latitude'] ?? null,
             'pengepul_longitude'   => $data['pengepul_longitude'] ?? null,
-            'pengepul_status_aktif'=> 'nonaktif',
+            'pengepul_status_aktif'=> 'aktif',
         ]);
 
         return back()->with('success', 'Akun pengepul "' . $data['pengepul_nama'] . '" berhasil ditambahkan. Username: ' . $data['pengepul_username']);
@@ -538,13 +485,7 @@ class AuthController extends Controller
         $pengepul->delete();
         return back()->with('success', 'Akun pengepul "' . $namaPengepul . '" berhasil dihapus.');
     }
-    public function verifikasiPengepul($id)
-    {
-        $pengepul = \App\Models\Pengepul::findOrFail($id);
-        $pengepul->pengepul_status_aktif = 'aktif';
-        $pengepul->save();
-        return back()->with('success', 'Akun pengepul ' . $pengepul->pengepul_nama . ' telah diverifikasi.');
-    }
+
 
 
     // ──────────────────────────────────────────────────────────

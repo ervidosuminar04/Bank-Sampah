@@ -19,7 +19,11 @@ class PengepulController extends Controller
     public function dashboard(Request $request)
     {
         $pengepulId = session('user_id');
-        $pengepul   = Pengepul::findOrFail($pengepulId);
+        $pengepul   = Pengepul::find($pengepulId);
+        if (!$pengepul) {
+            session()->flush();
+            return redirect()->route('login')->withErrors(['username' => 'Sesi Anda telah kedaluwarsa atau tidak valid. Silakan masuk kembali.']);
+        }
 
         // Statistik umum
         $totalTransaksi   = $pengepul->transaksi()->count();
