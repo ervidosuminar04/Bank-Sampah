@@ -12,7 +12,7 @@ class Sampah extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'sampah_name',
+        'sampah_nama',
         'sampah_jenis',
         'sampah_satuan',
         'sampah_harga_kg',
@@ -20,6 +20,17 @@ class Sampah extends Model
         'sampah_gambar',
         'sampah_keterangan',
     ];
+
+    /** Virtual attribute ->sampah_name mapping ke sampah_nama untuk kompatibilitas */
+    public function getSampahNameAttribute()
+    {
+        return $this->sampah_nama;
+    }
+
+    public function setSampahNameAttribute($value)
+    {
+        $this->attributes['sampah_nama'] = $value;
+    }
 
     /**
      * Get deposit transactions containing this garbage type.

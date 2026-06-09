@@ -14,7 +14,7 @@ class Geolokasi extends Model
 
     protected $fillable = [
         'nama_lokasi',
-        'alamat',
+        'geolokasi_alamat',
         'latitude',
         'longitude',
         'jam_operasional',

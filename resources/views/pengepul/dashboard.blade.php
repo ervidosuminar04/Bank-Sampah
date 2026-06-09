@@ -538,9 +538,9 @@
                             <tbody>
                                 @forelse($transaksibulanIni as $t)
                                 <tr>
-                                    <td class="mono-col">{{ \Carbon\Carbon::parse($t->tanggal)->format('d/m/Y') }}</td>
+                                    <td class="mono-col">{{ \Carbon\Carbon::parse($t->transaksi_pengepul_tanggal)->format('d/m/Y') }}</td>
                                     <td><strong>{{ $t->nasabah->nasabah_nama ?? '-' }}</strong></td>
-                                    <td>{{ $t->sampah->sampah_name ?? '-' }}</td>
+                                    <td>{{ $t->sampah->sampah_nama ?? '-' }}</td>
                                     <td class="mono-col">{{ number_format($t->berat_kg, 2) }}</td>
                                     <td class="mono-col">Rp {{ number_format($t->nilai_idr, 0, ',', '.') }}</td>
                                 </tr>
@@ -617,7 +617,7 @@
                                     <option value="">-- Pilih Jenis Sampah --</option>
                                     @foreach($sampahs as $s)
                                         <option value="{{ $s->id_sampah }}" data-harga="{{ $s->sampah_harga_kg }}">
-                                            {{ $s->sampah_name }} – Rp {{ number_format($s->sampah_harga_kg, 0, ',', '.') }}/kg
+                                            {{ $s->sampah_nama }} – Rp {{ number_format($s->sampah_harga_kg, 0, ',', '.') }}/kg
                                         </option>
                                     @endforeach
                                 </select>
@@ -705,19 +705,33 @@
                                             <th>Nilai Nasabah</th>
                                             <th>Komisi Saya</th>
                                             <th>Bagian Admin</th>
+                                            <th>Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @foreach($transaksiBelumDisetor as $t)
                                         <tr>
                                             <td><input type="checkbox" name="transaksi_ids[]" value="{{ $t->id }}" class="trx-check" checked></td>
-                                            <td class="mono-col">{{ \Carbon\Carbon::parse($t->tanggal)->format('d/m/Y') }}</td>
+                                            <td class="mono-col">{{ \Carbon\Carbon::parse($t->transaksi_pengepul_tanggal)->format('d/m/Y') }}</td>
                                             <td><strong>{{ $t->nasabah->nasabah_nama ?? '-' }}</strong></td>
-                                            <td>{{ $t->sampah->sampah_name ?? '-' }}</td>
+                                            <td>{{ $t->sampah->sampah_nama ?? '-' }}</td>
                                             <td class="mono-col">{{ number_format($t->berat_kg,2) }}</td>
                                             <td class="mono-col">Rp {{ number_format($t->nilai_idr,0,',','.') }}</td>
-                                            <td class="mono-col" style="color:var(--color-sunburst);">Rp {{ number_format($t->komisi_pengepul,0,',','.') }}</td>
+                                            <td class="mono-col" style="color:var(--color-sunburst);">Rp {{ number_format($t->transaksi_pengepul_komisi_pengepul,0,',','.') }}</td>
                                             <td class="mono-col" style="color:var(--color-flame);">Rp {{ number_format($t->bagian_admin,0,',','.') }}</td>
+                                            <td>
+                                                <div style="display:flex;gap:8px;align-items:center;">
+                                                    <a href="{{ route('pengepul.transaksi.edit', $t->id) }}" class="btn-filter" style="font-size:12px;padding:6px 12px;background-color:var(--color-forest);text-decoration:none;display:inline-flex;align-items:center;gap:4px;">
+                                                        ✏️ Edit
+                                                    </a>
+                                                    <form method="POST" action="{{ route('pengepul.transaksi.delete', $t->id) }}" style="margin:0;" onsubmit="return confirm('Apakah Anda yakin ingin menghapus transaksi ini? Saldo dan poin nasabah akan disesuaikan secara otomatis.')">
+                                                        @csrf
+                                                        <button type="submit" class="btn-filter" style="font-size:12px;padding:6px 12px;background-color:var(--color-flame);border:none;cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
+                                                            🗑️ Hapus
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </td>
                                         </tr>
                                         @endforeach
                                     </tbody>
@@ -764,9 +778,9 @@
                                     <td class="mono-col" style="color:var(--color-sunburst);">Rp {{ number_format($s->total_komisi_pengepul,0,',','.') }}</td>
                                     <td class="mono-col" style="color:var(--color-forest);font-weight:700;">Rp {{ number_format($s->total_disetor,0,',','.') }}</td>
                                     <td>
-                                        @if($s->status === 'terverifikasi')
+                                        @if($s->setoran_pengepul_status === 'terverifikasi')
                                             <span style="background:var(--color-mist);color:var(--color-forest);padding:4px 12px;border-radius:12px;font-size:12px;font-weight:700;border:1px solid rgba(45,106,45,0.15);">✅ Terverifikasi</span>
-                                        @elseif($s->status === 'menunggu')
+                                        @elseif($s->setoran_pengepul_status === 'menunggu')
                                             <span style="background:rgba(255, 215, 0, 0.15);color:var(--color-sunburst);padding:4px 12px;border-radius:12px;font-size:12px;font-weight:700;">⏳ Menunggu</span>
                                         @else
                                             <span style="background:rgba(230, 57, 70, 0.1);color:var(--color-flame);padding:4px 12px;border-radius:12px;font-size:12px;font-weight:700;">❌ Ditolak</span>
@@ -854,12 +868,12 @@
                                 @forelse($laporanTransaksi as $index => $t)
                                 <tr>
                                     <td>{{ $index + 1 }}</td>
-                                    <td class="mono-col">{{ \Carbon\Carbon::parse($t->tanggal)->format('d/m/Y') }}</td>
+                                    <td class="mono-col">{{ \Carbon\Carbon::parse($t->transaksi_pengepul_tanggal)->format('d/m/Y') }}</td>
                                     <td><strong>{{ $t->nasabah->nasabah_nama ?? '-' }}</strong></td>
-                                    <td>{{ $t->sampah->sampah_name ?? '-' }}</td>
+                                    <td>{{ $t->sampah->sampah_nama ?? '-' }}</td>
                                     <td class="mono-col">{{ number_format($t->berat_kg, 2) }}</td>
                                     <td class="mono-col">Rp {{ number_format($t->nilai_idr, 0, ',', '.') }}</td>
-                                    <td>{{ $t->keterangan ?? '-' }}</td>
+                                    <td>{{ $t->transaksi_pengepul_keterangan ?? '-' }}</td>
                                 </tr>
                                 @empty
                                 <tr>

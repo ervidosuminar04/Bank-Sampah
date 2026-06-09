@@ -24,7 +24,7 @@ class MasterSeeder extends Seeder
 
         // 2. Seed Data Master Sampah
         Sampah::create([
-            'sampah_name'       => 'Plastik PET (Botol/Gelas)',
+            'sampah_nama'       => 'Plastik PET (Botol/Gelas)',
             'sampah_jenis'      => 'Plastik',
             'sampah_satuan'     => 'kg',
             'sampah_harga_kg'   => 3000.00,
@@ -32,7 +32,7 @@ class MasterSeeder extends Seeder
         ]);
 
         Sampah::create([
-            'sampah_name'       => 'Kertas Karton / Kardus',
+            'sampah_nama'       => 'Kertas Karton / Kardus',
             'sampah_jenis'      => 'Kertas',
             'sampah_satuan'     => 'kg',
             'sampah_harga_kg'   => 2000.00,
@@ -40,7 +40,7 @@ class MasterSeeder extends Seeder
         ]);
 
         Sampah::create([
-            'sampah_name'       => 'Besi / Logam Bekas',
+            'sampah_nama'       => 'Besi / Logam Bekas',
             'sampah_jenis'      => 'Logam',
             'sampah_satuan'     => 'kg',
             'sampah_harga_kg'   => 5000.00,
@@ -48,7 +48,7 @@ class MasterSeeder extends Seeder
         ]);
 
         Sampah::create([
-            'sampah_name'       => 'Pecahan Kaca / Botol Kaca',
+            'sampah_nama'       => 'Pecahan Kaca / Botol Kaca',
             'sampah_jenis'      => 'Kaca',
             'sampah_satuan'     => 'kg',
             'sampah_harga_kg'   => 1500.00,
@@ -58,7 +58,7 @@ class MasterSeeder extends Seeder
         // 3. Seed Data Master Geolokasi
         Geolokasi::create([
             'nama_lokasi'     => 'Pengepul Eco Jaya',
-            'alamat'          => 'Jl. Sudirman No. 23, Jakarta Pusat',
+            'geolokasi_alamat'=> 'Jl. Sudirman No. 23, Jakarta Pusat',
             'latitude'        => -6.1824,
             'longitude'       => 106.8294,
             'jam_operasional' => '08:00 - 17:00',
@@ -68,7 +68,7 @@ class MasterSeeder extends Seeder
 
         Geolokasi::create([
             'nama_lokasi'     => 'Pengepul Berkah Hijau',
-            'alamat'          => 'Jl. Thamrin No. 45, Jakarta Pusat',
+            'geolokasi_alamat'=> 'Jl. Thamrin No. 45, Jakarta Pusat',
             'latitude'        => -6.1950,
             'longitude'       => 106.8320,
             'jam_operasional' => '09:00 - 16:00',
@@ -78,7 +78,7 @@ class MasterSeeder extends Seeder
 
         Geolokasi::create([
             'nama_lokasi'     => 'Depo Bank Sampah Lestari',
-            'alamat'          => 'Jl. Gajah Mada No. 12, Jakarta Barat',
+            'geolokasi_alamat'=> 'Jl. Gajah Mada No. 12, Jakarta Barat',
             'latitude'        => -6.1685,
             'longitude'       => 106.8142,
             'jam_operasional' => '08:00 - 15:00',

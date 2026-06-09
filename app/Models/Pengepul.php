@@ -2,51 +2,45 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Pengepul extends Model
 {
-    use HasFactory;
-
-    protected $table = 'pengepul';
+    protected $table      = 'pengepul';
+    protected $primaryKey = 'id_pengepul';
+    public $timestamps    = false;
 
     protected $fillable = [
-        'nama',
-        'alamat',
-        'telepon',
-        'username',
-        'password',
-        'latitude',
-        'longitude',
-        'status_aktif',
-        'komisi_persen',
+        'pengepul_nama',
+        'pengepul_alamat',
+        'pengepul_telepon',
+        'pengepul_username',
+        'pengepul_password',
+        'pengepul_latitude',
+        'pengepul_longitude',
+        'pengepul_status_aktif',
+        'pengepul_komisi_persen',
     ];
 
-    protected $hidden = ['password'];
+    protected $hidden = ['pengepul_password'];
 
-    /**
-     * Transaksi timbangan dari nasabah.
-     */
-    public function transaksi()
+    /** Transaksi timbangan dari nasabah. */
+    public function transaksi(): HasMany
     {
-        return $this->hasMany(TransaksiPengepul::class, 'pengepul_id');
+        return $this->hasMany(TransaksiPengepul::class, 'pengepul_id', 'id_pengepul');
     }
 
-    /**
-     * Transaksi yang belum dimasukkan ke setoran.
-     */
-    public function transaksiBelumDisetor()
+    /** Transaksi yang belum dimasukkan ke setoran. */
+    public function transaksiBelumDisetor(): HasMany
     {
-        return $this->hasMany(TransaksiPengepul::class, 'pengepul_id')
+        return $this->hasMany(TransaksiPengepul::class, 'pengepul_id', 'id_pengepul')
                     ->where('sudah_disetor', false);
     }
 
-    /**
-     * Setoran pengepul ke admin.
-     */
-    public function setoran()
+    /** Setoran pengepul ke admin. */
+    public function setoran(): HasMany
     {
-        return $this->hasMany(SetoranPengepul::class, 'pengepul_id');
+        return $this->hasMany(SetoranPengepul::class, 'pengepul_id', 'id_pengepul');
     }
 }
